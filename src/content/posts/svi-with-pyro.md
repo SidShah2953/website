@@ -1,8 +1,8 @@
 ---
-title: "Geography vs National Income with SVI (Pyro)"
+title: "Stochastic Variational Inference (SVI) with Pyro"
 publishedAt: 2023-09-24
 description: ""
-slug: "geography-vs-national-income-with-svi-pyro"
+slug: "svi-with-pyro"
 isPublish: true
 ---
 
