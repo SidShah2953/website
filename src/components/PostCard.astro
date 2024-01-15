@@ -1,5 +1,5 @@
 ---
-import formatDate from "@/utils/formatDate";
+import formatShortDate from "@/utils/formatShortDate";
 
 type Props = {
   title: string;
@@ -20,7 +20,7 @@ const { title, publishedAt, description, slug } = Astro.props;
   >
     <p class="text-neutral-100">{title}</p>
     <div class="flex flex-row items-center gap-4">
-      <p>{formatDate(publishedAt)}</p>
+      <p>{formatShortDate(publishedAt)}</p>
 
       <svg
         width="18"
