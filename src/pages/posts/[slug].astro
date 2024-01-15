@@ -19,7 +19,12 @@ type Props = {
 const { post } = Astro.props;
 const { Content } = await post.render();
 ---
-
+<link
+rel="stylesheet"
+href="https://cdn.jsdelivr.net/npm/katex@0.15.2/dist/katex.min.css"
+integrity="sha384-MlJdn/WNKDGXveldHDdyRP1R4CTHr3FeuDNfhsLPYrq2t0UBkUdK2jyTnXPEK1NQ"
+crossorigin="anonymous"
+/>
 <Layout title={post.data.title} description={post.data.description}>
   <main class="post mx-auto flex w-full max-w-full flex-col gap-4">
     <header role="presentation">
