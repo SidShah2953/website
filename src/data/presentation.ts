@@ -21,6 +21,10 @@ const presentation: Presentation = {
     'Hello, I\'m a final year student, pursuing a *B.Sc. in Mathematics and Computer Science* from *Chennai Mathematical Institute (CMI)*. My interests lie in *Machine Learning*, *Data Science* and *Finance*. ',
   socials: [
     {
+      label: "Email",
+      link: "mailto:sidshah2953@gmail.com",
+    },
+    {
       label: "LinkedIn",
       link: "https://www.linkedin.com/in/siddhant-d-shah/",
     },
