@@ -4,20 +4,20 @@ import Layout from "@/layouts/Layout.astro";
 import formatDate from "@/utils/formatDate";
 
 export async function getStaticPaths() {
-  const posts = await getCollection("posts");
+  const projects = await getCollection("projects");
 
-  return posts.map((post) => ({
-    params: { slug: post.slug },
-    props: { post },
+  return projects.map((project) => ({
+    params: { slug: project.slug },
+    props: { project: project },
   }));
 }
 
 type Props = {
-  post: CollectionEntry<"posts">;
+  project: CollectionEntry<"projects">;
 };
 
-const { post } = Astro.props;
-const { Content } = await post.render();
+const { project } = Astro.props;
+const { Content } = await project.render();
 ---
 <link
 rel="stylesheet"
@@ -25,16 +25,16 @@ href="https://cdn.jsdelivr.net/npm/katex@0.15.2/dist/katex.min.css"
 integrity="sha384-MlJdn/WNKDGXveldHDdyRP1R4CTHr3FeuDNfhsLPYrq2t0UBkUdK2jyTnXPEK1NQ"
 crossorigin="anonymous"
 />
-<Layout title={post.data.title} description={post.data.description}>
-  <main class="post mx-auto flex w-full max-w-full flex-col gap-4">
+<Layout title={project.data.title} description={project.data.description}>
+  <main class="project mx-auto flex w-full max-w-full flex-col gap-4">
     <header role="presentation">
       <h1 class="text-3xl">
-        {post.data.title}
+        {project.data.title}
       </h1> <br>
       <p class="bold text-xl">
-        Published on {formatDate(post.data.publishedAt)}
+        Published on {formatDate(project.data.publishedAt)}
       </p> <br>
-      <p class="semibold">{post.data.description}</p>
+      <p class="semibold">{project.data.description}</p>
     </header>
 
     <Content />
