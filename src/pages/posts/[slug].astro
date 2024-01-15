@@ -28,10 +28,13 @@ crossorigin="anonymous"
 <Layout title={post.data.title} description={post.data.description}>
   <main class="post mx-auto flex w-full max-w-full flex-col gap-4">
     <header role="presentation">
-      <h1 class="text-md">
-        {post.data.title} - {formatDate(post.data.publishedAt)}
-      </h1>
-      <p class="italic">{post.data.description}</p>
+      <h1 class="text-3xl">
+        {post.data.title}
+      </h1> <br>
+      <p class="bold text-xl">
+        Published on {formatDate(post.data.publishedAt)}
+      </p> <br>
+      <p class="semibold">{post.data.description}</p>
     </header>
 
     <Content />

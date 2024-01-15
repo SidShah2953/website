@@ -30,6 +30,16 @@ const pathname = removeTrailingSlash(Astro.url.pathname);
             ["text-neutral-100"]: pathname === "/posts",
           }}>Posts</a
         >
+        <li>/</li>
+        <li>
+          <a
+            href="/projects"
+            class:list={{
+              ["hover:text-neutral-100"]: true,
+              ["text-neutral-100"]: pathname === "/projects",
+            }}>Projects</a
+          >
+        </li>
       </li>
     </ul>
   </nav>
