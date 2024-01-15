@@ -31,12 +31,11 @@ crossorigin="anonymous"
       <h1 class="text-3xl">
         {project.data.title}
       </h1> <br>
+      <p class="semibold">{project.data.description}</p> <br>
       <p class="bold text-xl">
         Published on {formatDate(project.data.publishedAt)}
       </p> <br>
-      <p class="semibold">{project.data.description}</p>
     </header>
-
     <Content />
   </main>
 </Layout>
