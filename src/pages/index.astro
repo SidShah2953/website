@@ -10,9 +10,11 @@ import Link from "@/components/shared/Link.astro";
 import convertAsteriskToStrongTag from "@/utils/convertAsteriskToStrongTag";
 
 import presentation from "@/data/presentation";
-import projects from "@/data/projects";
 
 const posts = (await getCollection("posts")).sort(function (first, second) {
+  return second.data.publishedAt.getTime() - first.data.publishedAt.getTime();
+});
+const projects = (await getCollection("projects")).sort(function (first, second) {
   return second.data.publishedAt.getTime() - first.data.publishedAt.getTime();
 });
 ---
@@ -73,6 +75,30 @@ const posts = (await getCollection("posts")).sort(function (first, second) {
 
     <article class="flex flex-col gap-8">
       <header class="flex w-full flex-row justify-between gap-2">
+        <h3 class="text-lg text-neutral-100">Latest Projects</h3>
+        <Link href="./projects" label="See all projects" isUnderline="false" target="_self" />
+      </header>
+      {projects.length === 0 && <p>Soon, stay connected 👀...</p>}
+      <section class="flex flex-col gap-4 md:flex-row md:flex-wrap">
+        {
+          projects.length !== 0 &&
+            projects
+              .slice(0, 2)
+              .map((project) => (
+                <ProjectCard
+                  publishedAt={project.data.publishedAt}
+                  title={project.data.title}
+                  description={project.data.description}
+                  slug={project.slug}
+                }
+                />
+              ))
+        }
+      </section>
+    </article>
+<!--     
+    <article class="flex flex-col gap-8">
+      <header class="flex w-full flex-row justify-between gap-2">
         <h3 class="text-lg text-neutral-100">
           Selected projects ({projects.length})
         </h3>
@@ -85,7 +111,7 @@ const posts = (await getCollection("posts")).sort(function (first, second) {
             projects.map((project) => <ProjectCard {...project} />)
         }
       </section>
-    </article>
+    </article> -->
 
     <article class="flex flex-col gap-8">
       <header class="flex w-full flex-row justify-between gap-2">
