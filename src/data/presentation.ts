@@ -4,6 +4,7 @@ type Social = {
 };
 
 type Presentation = {
+  name: string;
   mail: string;
   title: string;
   description: string;
@@ -12,8 +13,9 @@ type Presentation = {
 };
 
 const presentation: Presentation = {
+  name: "Siddhant Shah",
   mail: "sidshah2953@gmail.com",
-  title: "Hi, I’m Siddhant",
+  title: "Hi, I'm Siddhant",
   // profile: "/profile.webp",
   description:
     'Hello, I\'m a final year student, pursuing a *B.Sc. in Mathematics and Computer Science* from *Chennai Mathematical Institute (CMI)*. My interests lie in *Machine Learning*, *Data Science* and *Finance*. ',
