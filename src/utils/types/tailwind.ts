@@ -1,4 +1,5 @@
 export type TailwindColor =
+  | "neutral"
   | "orange"
   | "violet"
   | "red"
