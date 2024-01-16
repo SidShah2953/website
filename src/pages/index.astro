@@ -52,7 +52,7 @@ const projects = (await getCollection("projects")).sort(function (first, second)
     <article class="flex flex-col gap-8">
       <header class="flex w-full flex-row justify-between gap-2">
         <h3 class="text-lg text-neutral-100">Latest posts</h3>
-        <Link href="./posts" label="See all posts" isUnderline="false" target="_self" />
+        <Link href="./posts" label="See All Posts" isUnderline='True' />
       </header>
       {posts.length === 0 && <p>Soon, stay connected 👀...</p>}
 
@@ -76,7 +76,7 @@ const projects = (await getCollection("projects")).sort(function (first, second)
     <article class="flex flex-col gap-8">
       <header class="flex w-full flex-row justify-between gap-2">
         <h3 class="text-lg text-neutral-100">Latest Projects</h3>
-        <Link href="./projects" label="See all projects" isUnderline="false" target="_self" />
+        <Link href="./projects" label="See All Projects" isUnderline='True' />
       </header>
       {projects.length === 0 && <p>Soon, stay connected 👀...</p>}
       <section class="flex flex-col gap-4 md:flex-row md:flex-wrap">
