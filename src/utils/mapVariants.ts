@@ -1,6 +1,7 @@
 import type { TailwindColor } from "./types/tailwind";
 
 const MAP_COLOR_VARIANT_TO_BG: Record<TailwindColor, string> = {
+  neutral: "bg-neutral-950",
   orange: "bg-orange-500",
   violet: "bg-violet-500",
   red: "bg-red-500",
@@ -10,8 +11,8 @@ const MAP_COLOR_VARIANT_TO_BG: Record<TailwindColor, string> = {
   green: "bg-green-500",
   emerald: "bg-emerald-500",
   teal: "bg-violet-500",
-  cyan: "bg-cyan-500",
-  blue: "bg-blue-500",
+  cyan: "bg-cyan-800",
+  blue: "bg-blue-800",
   indigo: "bg-indigo-500",
   purple: "bg-purple-500",
   fushia: "bg-fushia-500",
@@ -20,6 +21,7 @@ const MAP_COLOR_VARIANT_TO_BG: Record<TailwindColor, string> = {
 };
 
 const MAP_COLOR_VARIANT_TO_TEXT: Record<TailwindColor, string> = {
+  neutral: "text-neutral-500",
   orange: "text-orange-500",
   violet: "text-violet-500",
   red: "text-red-500",
@@ -38,4 +40,5 @@ const MAP_COLOR_VARIANT_TO_TEXT: Record<TailwindColor, string> = {
   rose: "text-rose-500",
 };
 
-export { MAP_COLOR_VARIANT_TO_BG, MAP_COLOR_VARIANT_TO_TEXT };
+
+export { MAP_COLOR_VARIANT_TO_BG, MAP_COLOR_VARIANT_TO_TEXT};
