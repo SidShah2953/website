@@ -23,7 +23,7 @@ export default defineConfig({
     syntaxHighlight: "shiki",
     shikiConfig: {
       theme: "dracula",
-      wrap: false
+      wrap: true
     }
   }
 });

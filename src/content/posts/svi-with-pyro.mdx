@@ -320,9 +320,12 @@ gamma_outside_africa = samples["bR"]
 
 fig = plt.figure(figsize=(10, 6))
 sns.histplot(gamma_within_africa.detach().cpu().numpy(),
-             kde=True, stat="density", label="African nations")
+             kde=True, stat="density",
+             label="African nations")
 sns.histplot(gamma_outside_africa.detach().cpu().numpy(),
-             kde=True, stat="density", label="Non-African nations", color="orange")
+             kde=True, stat="density",
+             label="Non-African nations",
+             color="orange")
 fig.suptitle("Density of Slope : log(GDP) vs. Terrain Ruggedness")
 plt.xlabel("Slope of regression line")
 plt.legend()
@@ -334,7 +337,7 @@ plt.show()
 We now calculate the posterior predictive distribution for this `model`, with the guide as `auto_guide`, and pick out $800$ samples from it. Next we use this to determine the $90\%$ confidence interval for our data.
 
 ```python
-predictive = pyro.infer.Predictive(model, guide=auto_guide, num_samples=800)
+predictive = pyro.infer.Predictive(model,guide=auto_guide, num_samples=800)
 svi_samples = predictive(is_cont_africa, ruggedness, log_gdp=None)
 svi_gdp = svi_samples["obs"]
 
