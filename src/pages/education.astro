@@ -6,19 +6,54 @@ import courses from "@/content/education/courses.json"
 
 ---
 
-<Layout title="All courses">
-  <main class="flex flex-col gap-8">
-    <h1 class="text-3xl text-neutral-100">Courses & Workshops</h1>
-    <article class="flex flex-col flex-wrap gap-2 md:flex-row md:flex-wrap ">
-      {
-        courses.map((course) => (
-          <CourseCard title={course.title}
-            completedOn={formatDateFromJSON(course.completedOn)} 
-            offeredBy={course.offeredBy}
-            />
+<Layout title="Education">
+  <main class="flex flex-col gap-20">
+    <article class="flex flex-col gap-8">
+      <header>
+        <h1 class="text-3xl text-neutral-100">Education</h1>
+      </header>
+      <section class="flex flex-col flex-wrap gap-8 md:flex-row md:flex-wrap ">
+        <div
+          class="flex flex-col w-full gap-2 transition-all duration-200 hover:-translate-y-2 hover:border-neutral-200 hover:bg-slate-600 hover:bg-opacity-40 hover:text-neutral-100"
+        >
+          <div class="flex w-full items-center justify-between">
+            <h2 class="text-2xl text-neutral-100">Chennai Mathematical Institute</h2>
+            <p class="text-neutral-200">Chennai | July 2024</p>
+          </div>
+          <p class="text-lg text-neutral-200">Bachelor of Science (Hons) - Mathematics and Computer Science</p>
+          <ul class="list-disc pl-8">
+            <li>
+              Linear algebra, Exterior & Tensor algebra, Group theory & Ring theory
+            </li>
+            <li>
+              Analysis of multi-variate real-valued functions, Fourier Analysis, Probability Theory - expected values, standard deviation & variance
+            </li>
+            <li>
+              Design & Analysis of Algorithms, Theory of Computation - Finite state automata, pushdown automata and Turing machines.
+            </li>
+            <li>
+              Foundations of Machine Learning, Financial Modelling with Python, Stochastic Processes & Statistical Inference
+            </li>
+          </ol>
+        </div>
+      </section>
+    </article>
+
+    <article class="flex flex-col gap-8">
+      <header>
+        <h1 class="text-3xl text-neutral-100">Courses & Workshops</h1>
+      </header>
+      <section class="flex flex-col flex-wrap gap-2 md:flex-row md:flex-wrap ">
+        {
+          courses.map((course) => (
+            <CourseCard title={course.title}
+              completedOn={formatDateFromJSON(course.completedOn)} 
+              offeredBy={course.offeredBy}
+              />
+            )
           )
-        )
-      }
+        }
+      </section>
     </article>
   </main>
 </Layout>
