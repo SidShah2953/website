@@ -22,14 +22,4 @@ const projectsCollection = defineCollection({
   }),
 });
 
-const coursesCollection = defineCollection({
-  type: "content",
-  schema: z.object({
-    title: z.string(),
-    completedOn: z.date(),
-    offeredBy: z.string(),
-    description: z.string()
-  }),
-});
-
-export const collections = { posts: postsCollection, projects: projectsCollection, education:coursesCollection};
+export const collections = { posts: postsCollection, projects: projectsCollection };

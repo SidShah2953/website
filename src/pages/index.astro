@@ -6,8 +6,11 @@ import HomeLayout from "@/layouts/HomeLayout.astro";
 import SocialLinks from "@/components/SocialLinks.astro";
 import PostCard from "@/components/PostCard.astro";
 import ProjectCard from "@/components/ProjectCard.astro";
+import CourseCard from "@/components/CourseCard.astro";
 import Link from "@/components/shared/Link.astro";
 import convertAsteriskToStrongTag from "@/utils/convertAsteriskToStrongTag";
+import courses from "@/content/education/courses.json";
+import formatDateFromJSON from "@/utils/formatDateFromJSON";
 
 import presentation from "@/data/presentation";
 
@@ -90,8 +93,26 @@ const projects = (await getCollection("projects")).sort(function (first, second)
                   title={project.data.title}
                   description={project.data.description}
                   slug={project.slug}
-                }
                 />
+              ))
+        }
+      </section>
+    </article>
+    <article class="flex flex-col gap-8">
+      <header class="flex w-full flex-row justify-between gap-2">
+        <h3 class="text-2xl text-neutral-100">Recent Courses & Workshops</h3>
+        <Link href="./education" label="See All Courses" isUnderline='True' />
+      </header>
+      {courses.length === 0 && <p>Soon, stay connected 👀...</p>}
+      <section class="flex flex-col gap-2 md:flex-row md:flex-wrap">
+        {
+          courses.length !== 0 &&
+          courses
+              .slice(0, 2)
+              .map((course) => (
+              <CourseCard title={course.title}
+                completedOn={formatDateFromJSON(course.completedOn)} 
+                offeredBy={course.offeredBy} />
               ))
         }
       </section>
