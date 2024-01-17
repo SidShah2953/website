@@ -9,7 +9,6 @@ type Presentation = {
   title: string;
   description: string;
   socials: Social[];
-  profile?: string;
 };
 
 const presentation: Presentation = {
