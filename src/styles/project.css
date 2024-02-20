@@ -23,11 +23,11 @@
 }
 
 .project ul {
-  @apply list-disc;
+  @apply list-disc leading-6;
 }
 
-.post ol {
-  @apply list-decimal;
+.project ol {
+  @apply list-decimal leading-6;
 }
 
 .project blockquote {
