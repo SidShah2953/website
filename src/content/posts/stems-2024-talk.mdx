@@ -1,0 +1,70 @@
+---
+title: "Intro to Finance & Options (STEMS 2024)"
+publishedAt: 2024-02-22
+description: "These are my notes for an introductory, informal session on Options that I took as a part of the STEMS 2024 Camp, organised by the students of Chennai Mathematical Institute, as a part of Tessellate 2024. It provides an introduction to fundamental ideas of Financial Mathematics, proceeding to using them to explain the structure of options."
+slug: "stems-2024-talk"
+isPublish: true
+---
+
+> Link to the STEMS 2024 website: https://tessellate.cmi.ac.in/stems/  
+> Link to the Tessellate 2024 website: https://tessellate.cmi.ac.in/
+
+## Finance 101
+
+### Time Value of Money & Present Value
+
+- **Money today is worth more than the same amount of money in the future.**  
+    This is due to the potential for **earning interest** over time.
+- **Present Value (PV):**  
+    The current worth of a future sum of money, discounted back to the present using a specific **interest rate**. This helps compare future cash flows to their present value for investment decisions.
+- **Discount rate:**  
+    The interest rate used to discount future cash flows back to their present value.
+    $$
+    \text{PV} = \frac{\text{Future Value}}{(1 + \text{Discount Rate})^{\text{Time}}}
+    $$
+    
+### Cash Flows
+
+A cash flow is any movement of money into or out of an entity (e.g., individual, company). It can be:
+- **Positive:** Receiving money (income, investment returns)
+- **Negative:** Spending money (expenses, loan payments)
+
+### No-Arbitrage Principle
+
+**Arbitrage**
+- Arbitrage refers to taking advantage of price discrepancies between equivalent assets in different markets to make a *risk-free profit*. 
+
+**Necessary Conditions for Arbitrage**
+1. *Price discrepancy:*  
+    There must be a difference in the price of the same or equivalent assets in different markets. This difference cannot be justified by fundamental factors like risk or liquidity.
+2. *Risk-free:*  
+    The arbitrage opportunity must be guaranteed to make a profit without any risk of loss. This means there are no transaction costs, execution risks, or potential changes in prices before you can exploit the discrepancy.
+3. *Replicability:*  
+    The arbitrage opportunity must be replicable by other investors.This ensures that the price discrepancy will be quickly eliminated, restoring market efficiency.
+
+> __The No-Arbitrage Principle__:  
+> In efficient markets, **equivalent assets should have the same risk-adjusted return**.  
+> If an arbitrage opportunity exists, investors will take advantage of it, eliminating the price discrepancy, ensuring market efficiency and fair pricing of assets.
+
+---
+
+## Options 101
+
+### Need for Options
+
+- Options as “insurance”
+- Value proposition of options (**buying the right, not the obligation**).
+
+### Definitions
+
+- "Call" and "put" options.
+- Strike price
+- Expiration date
+- Intrinsic value.
+
+### Payoff Diagrams
+
+**Factors affecting prices:**
+    - Volatility
+    - Interest rate
+    - Time to expiration
