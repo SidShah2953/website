@@ -31,11 +31,11 @@
 }
 
 .post ul {
-  @apply list-disc leading-6 pl-6;
+  @apply list-disc pl-6;
 }
 
 .post ol {
-  @apply list-decimal leading-6 pl-6;
+  @apply list-decimal pl-6;
 }
 
 .post blockquote {
