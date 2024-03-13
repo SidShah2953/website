@@ -96,8 +96,9 @@ ax[1].set(xlabel="Terrain Ruggedness Index",
           title="African Nations");
 ```
 
-This displays a somewhat superficial claim that there is indeed a possible relationship between ruggedness and GDP, but that further analysis will be needed to confirm it.
+This displays a somewhat superficial claim that there is indeed a possible relationship between ruggedness and GDP, but that further analysis will be needed to confirm it.  
 
+<img src="../src/media/posts/svi-with-pyro/Image01-PreliminaryVisualisation.png"></img>
 ---
 
 ## Our Mathematical Model
@@ -246,6 +247,7 @@ def custom_guide(is_cont_africa, ruggedness, log_gdp=None):
     sigma = pyro.sample("sigma", dist.Normal(sigma_loc, torch.tensor(0.05)))
     return {"a": a, "b_s": b_s, "b_r": b_r, "b_sr": b_sr, "sigma": sigma}
 ```
+<img src="../src/media/posts/svi-with-pyro/Image02-CustomGuideParams.png"></img>
 
 We can achieve this result by simply using:
 
@@ -255,6 +257,7 @@ pyro.render_model(auto_guide,
                   model_args=(is_cont_africa, ruggedness, log_gdp),
                   render_params=True)
 ```
+<img src="../src/media/posts/svi-with-pyro/Image03-AutoGuideParams.png"></img>
 
 ---
 
@@ -286,6 +289,7 @@ plt.plot(losses)
 plt.xlabel("SVI step")
 plt.ylabel("ELBO loss");
 ```
+<img src="../src/media/posts/svi-with-pyro/Image04-SVIStep.png" width="80%" class='self-center'></img>
 
 At the end of this code block, we print the values of the learnable parameters which are stored in the `param_store`
 
@@ -294,7 +298,7 @@ for name, value in pyro.get_param_store().items():
     print(name, pyro.param(name).data.cpu().numpy())
 ```
 
-```
+```text
 AutoNormal.locs.a 9.176606
 AutoNormal.scales.a 0.07974657
 AutoNormal.locs.bS -1.8880633
@@ -331,6 +335,7 @@ plt.xlabel("Slope of regression line")
 plt.legend()
 plt.show()
 ```
+<img src="../src/media/posts/svi-with-pyro/Image05-DensityVsSlope.png"></img>
 
 ## Making Predictions with the Learned Model
 
@@ -369,6 +374,7 @@ ax[1].fill_between(african_nations["rugged"],
 ax[1].plot(african_nations["rugged"], african_nations["true_gdp"], "o")
 ax[1].set(xlabel="Terrain Ruggedness Index", ylabel="log GDP (2000)", title="African Nations");
 ```
+<img src="../src/media/posts/svi-with-pyro/Image06-PosteriorDistribution.png"></img>
 
 ---
 
