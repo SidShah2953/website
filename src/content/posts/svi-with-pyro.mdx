@@ -7,6 +7,8 @@ slug: "svi-with-pyro"
 isPublish: true
 ---
 
+---
+
 ## Abstract of _Ruggedness: The blessing of bad geography in Africa_
 
 We show that geography, through its impact on history, can have important effects on current economic development. The analysis focuses on the historic interaction between ruggedness and Africa's slave trades. Although rugged terrain hinders trade and most productive activities, negatively affecting income globally, within Africa rugged terrain afforded protection to those being raided during the slave trades. Since the slave trades retarded subsequent economic development, within Africa ruggedness has also had a historic indirect positive effect on income. Studying all countries worldwide, we estimate the differential effect of ruggedness on income for Africa. We show that:
@@ -429,7 +431,7 @@ def param(
 
 `pyro.param` values persist across model calls, unless the parameter store is updated by an optimization algorithm or cleared via `pyro.clear_param_store()`. Unlike `pyro.sample`, `pyro.param` can be called with the same name multiple times in a model; every call with the same name will return the same value. The global parameter store itself is accessible by calling `pyro.get_param_store()`.
 
-## The `pyro.plate` Primitive
+### The `pyro.plate` Primitive
 
 `pyro.plate` is Pyro's formal encoding of [plate notation](https://en.wikipedia.org/wiki/Plate_notation), widely used in probabilistic machine learning to simplify visualisation and analysis of models with lots of conditionally *independent and identically distributed* random variables.
 
