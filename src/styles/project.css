@@ -14,6 +14,15 @@
   @apply mt-4 text-xl text-neutral-100;
 }
 
+.project nav {
+  @apply pb-5 text-neutral-100 no-underline pl-0;
+}
+
+.project nav ol a{
+  @apply text-neutral-100 no-underline;
+}
+
+
 .project code {
   @apply rounded-sm bg-neutral-800 px-1 py-[2px] text-red-500;
 }
@@ -23,11 +32,11 @@
 }
 
 .project ul {
-  @apply list-disc leading-6;
+  @apply list-disc leading-6 pl-6;
 }
 
 .project ol {
-  @apply list-decimal leading-6;
+  @apply list-decimal leading-6 pl-6;
 }
 
 .project blockquote {
