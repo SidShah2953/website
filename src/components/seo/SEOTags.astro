@@ -13,12 +13,12 @@ const DEFAULT_DESCRIPTION_PAGE =
 const DEFAULT_URL_SITE = SITE_URL;
 
 const openGraph = {
-  title: title || og?.title || DEFAULT_TITLE_PAGE,
-  type: og?.type || "website",
-  image: og?.image || "/src/components/shared/name-by-aditi.svg",
-  alt: og?.alt || "Siddhant Shah",
+  title: DEFAULT_TITLE_PAGE,
+  type: "website",
+  image: "/src/components/shared/social-prev.png",
+  alt: "Siddhant Shah",
   url: DEFAULT_URL_SITE,
-  description: og?.description || DEFAULT_DESCRIPTION_PAGE,
+  description: DEFAULT_DESCRIPTION_PAGE,
 };
 ---
 
@@ -31,6 +31,7 @@ const openGraph = {
     openGraph={{
       basic: {
         title: openGraph.title,
+        description: openGraph.description,
         type: openGraph.type,
         image: openGraph.image,
       },
