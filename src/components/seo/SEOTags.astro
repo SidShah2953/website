@@ -9,14 +9,14 @@ const { title, description, noindex, og } = Astro.props;
 
 const DEFAULT_TITLE_PAGE = "Siddhant Shah";
 const DEFAULT_DESCRIPTION_PAGE =
-  "A minimal portfolio template built with Astro and Tailwindcss.";
+  "I'm a final year student, pursuing a B.Sc. in Math and CS from CMI";
 const DEFAULT_URL_SITE = SITE_URL;
 
 const openGraph = {
   title: title || og?.title || DEFAULT_TITLE_PAGE,
   type: og?.type || "website",
-  image: og?.image || "/opengraph-image.jpg",
-  alt: og?.alt || "astro portfolio template image",
+  image: og?.image || "/src/components/shared/name-by-aditi.svg",
+  alt: og?.alt || "Siddhant Shah",
   url: DEFAULT_URL_SITE,
   description: og?.description || DEFAULT_DESCRIPTION_PAGE,
 };
@@ -38,9 +38,6 @@ const openGraph = {
         alt: openGraph.alt,
       },
     }}
-    twitter={{
-      creator: "@itsstormzz_",
-    }}
     extend={{
       link: [
         { rel: "icon", href: "/favicon.svg" },
@@ -49,14 +46,6 @@ const openGraph = {
       meta: [
         { name: "viewport", content: "width=device-width, initial-scale=1" },
         { name: "generator", content: Astro.generator },
-        {
-          name: "twitter:image",
-          content: openGraph.image,
-        },
-        { name: "twitter:card", content: "summary_large_image" },
-        { name: "twitter:title", content: openGraph.title },
-        { name: "twitter:description", content: openGraph.description },
-        { name: "twitter:site", content: "@itsstormzz_" },
       ],
     }}
   />
