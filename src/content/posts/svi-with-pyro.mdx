@@ -6,6 +6,8 @@ The goal of this exercise is to explore the relationship between topographic het
 slug: "svi-with-pyro"
 isPublish: true
 ---
+import { Image } from '@astrojs/image/components';
+import img1 from '/src/assets/posts/svi-with-pyro/Image01-PrelimVisual.png';
 
 ---
 
@@ -100,7 +102,7 @@ ax[1].set(xlabel="Terrain Ruggedness Index",
 
 This displays a somewhat superficial claim that there is indeed a possible relationship between ruggedness and GDP, but that further analysis will be needed to confirm it.  
 
-![Preliminary Visualisation](/src/assets/posts/svi-with-pyro/Image01-PrelimVisual.png)
+<Image src={img1} alt="Preliminary Visualisation">
 ---
 
 ## Our Mathematical Model
