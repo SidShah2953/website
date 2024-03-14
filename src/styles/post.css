@@ -1,5 +1,5 @@
 .post p {
-  @apply leading-10;
+  @apply leading-8;
 }
 
 .post code {
@@ -31,11 +31,11 @@
 }
 
 .post ul {
-  @apply list-disc pl-6;
+  @apply list-disc pl-6 leading-8;
 }
 
 .post ol {
-  @apply list-decimal pl-6;
+  @apply list-decimal pl-6 leading-8;
 }
 
 .post blockquote {

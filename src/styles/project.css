@@ -32,11 +32,11 @@
 }
 
 .project ul {
-  @apply list-disc leading-6 pl-6;
+  @apply list-disc leading-8 pl-6;
 }
 
 .project ol {
-  @apply list-decimal leading-6 pl-6;
+  @apply list-decimal leading-8 pl-6;
 }
 
 .project blockquote {

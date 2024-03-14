@@ -5,6 +5,9 @@ description: "These are my notes for an introductory, informal session on Option
 slug: "stems-2024-talk"
 isPublish: true
 ---
+import { Image } from 'astro:assets';
+import img1 from '/src/assets/posts/stems-2024-talk/Image-1.png';
+
 ---
 
 > Link to the STEMS 2024 website: https://tessellate.cmi.ac.in/stems/  
@@ -14,7 +17,7 @@ isPublish: true
 
 ### **Time Value of Money & Present Value**
 
-- **Money today is worth more than the same amount of money in the future.**This is due to the potential for **earning interest** over time.
+- **Money today is worth more than the same amount of money in the future.** This is due to the potential for **earning interest** over time.
 - **Present Value (PV):** The current worth of a future sum of money, discounted back to the present using a specific **interest rate**. This helps compare future cash flows to their present value for investment decisions.
 - **Discount rate:** The interest rate used to discount future cash flows back to their present value.
     
@@ -114,7 +117,7 @@ The value of such a contract lies in the fact that you are not obligated to exer
 
 Thus, the pay-off diagrams for all the option look like
 
-<img src="../src/media/posts/stems-2024-talk/Image01 - Payoff.png"></img>
+<Image src={img1} alt="Option Strategy Pay-off Diagram"/>
 
 ## Combinations of Options
 
