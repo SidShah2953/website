@@ -7,7 +7,12 @@ slug: "svi-with-pyro"
 isPublish: true
 ---
 import { Image } from 'astro:assets';
-import img1 from '/src/assets/posts/svi-with-pyro/Image01-PrelimVisual.png';
+import img1 from '/src/assets/posts/svi-with-pyro/Image-1.png';
+import img2 from '/src/assets/posts/svi-with-pyro/Image-2.png';
+import img3 from '/src/assets/posts/svi-with-pyro/Image-3.png';
+import img4 from '/src/assets/posts/svi-with-pyro/Image-4.png';
+import img5 from '/src/assets/posts/svi-with-pyro/Image-5.png';
+import img6 from '/src/assets/posts/svi-with-pyro/Image-6.png';
 
 ---
 
@@ -251,7 +256,7 @@ def custom_guide(is_cont_africa, ruggedness, log_gdp=None):
     sigma = pyro.sample("sigma", dist.Normal(sigma_loc, torch.tensor(0.05)))
     return {"a": a, "b_s": b_s, "b_r": b_r, "b_sr": b_sr, "sigma": sigma}
 ```
-![Custom Guide Parameters](/src/assets/posts/svi-with-pyro/Image02-CustomGuideParams.png)
+<Image src={img2} alt="Custom Guide Parameter Visualisation"/>
 
 We can achieve this result by simply using:
 
@@ -261,7 +266,7 @@ pyro.render_model(auto_guide,
                   model_args=(is_cont_africa, ruggedness, log_gdp),
                   render_params=True)
 ```
-![AutoGuide Parameters](/src/assets/posts/svi-with-pyro/Image03-AutoGuideParams.png)
+<Image src={img3} alt="AutoGuide Parameter Visualisation"/>
 
 ---
 
@@ -293,9 +298,7 @@ plt.plot(losses)
 plt.xlabel("SVI step")
 plt.ylabel("ELBO loss");
 ```
-<div class="self-center">
-    ![SVI Steps](/src/assets/posts/svi-with-pyro/Image04-SVIStep.png)
-</div>
+<Image src={img4} alt="ELBO Loss vs SVI Steps"/>
 
 At the end of this code block, we print the values of the learnable parameters which are stored in the `param_store`
 
@@ -341,7 +344,7 @@ plt.xlabel("Slope of regression line")
 plt.legend()
 plt.show()
 ```
-![Density Vs Slope](/src/assets/posts/svi-with-pyro/Image05-DensityVsSlope.png)
+<Image src={img5} alt="Density vs Slope of Regression Line"/>
 
 ## Making Predictions with the Learned Model
 
@@ -380,7 +383,7 @@ ax[1].fill_between(african_nations["rugged"],
 ax[1].plot(african_nations["rugged"], african_nations["true_gdp"], "o")
 ax[1].set(xlabel="Terrain Ruggedness Index", ylabel="log GDP (2000)", title="African Nations");
 ```
-![Posterior Distribution](/src/assets/posts/svi-with-pyro/Image06-PosteriorDistribution.png)
+<Image src={img6} alt="Posterior Distribution"/>
 
 ---
 
