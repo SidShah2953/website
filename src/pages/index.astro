@@ -50,7 +50,7 @@ import courses from "@/content/education/courses.json";
         {
           posts.length !== 0 &&
             posts
-              .slice(0, 2)
+              .slice(0, 4)
               .map((post) => (
                 <PostCard
                   publishedAt={post.data.publishedAt}
@@ -73,7 +73,7 @@ import courses from "@/content/education/courses.json";
         {
           projects.length !== 0 &&
             projects
-              .slice(0, 2)
+              .slice(0, 4)
               .map((project) => (
                 <ProjectCard
                   publishedAt={project.data.publishedAt}
@@ -95,7 +95,7 @@ import courses from "@/content/education/courses.json";
         {
           courses.length !== 0 &&
           courses
-              .slice(0, 2)
+              .slice(0, 4)
               .map((course) => (
               <CourseCard title={course.title}
                 completedOn={formatDateFromJSON(course.completedOn)} 
