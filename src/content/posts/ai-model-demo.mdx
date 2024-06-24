@@ -6,6 +6,8 @@ slug: "ai-model-demo"
 isPublish: true
 ---
 
+import CallOutForMDX from './CallOutForMDX.astro';
+
 ---
 
 > The example used here analyses Customer Churn Data using a Random Forrest Classifier. This is used for demonstrative purposes only and the steps, libraries and data used by you may vary.
@@ -17,23 +19,25 @@ isPublish: true
 - Start by collecting data from some verified data source.
 - ⁠⁠Separate data into training and testing sets. Testing sets will only be used after the model has been selected. Data leakage is unacceptable.
 
-<div class="group flex w-full cursor-pointer flex-col gap-2 rounded-xl border border-neutral-500 p-4 transition-all duration-200 hover:-translate-y-2 hover:border-neutral-200 hover:bg-slate-600 hover:bg-opacity-40 hover:text-neutral-100">
+<CallOutForMDX>
+### Example Code
 
-Example Code:  
+```python
+import pandas as pd
 
-    ```python
-    import pandas as pd
+data = pd.read_csv('Data/Customer Churn.csv')
 
-    data = pd.read_csv('Data/Customer Churn.csv')
+data['Gender'] = oe.fit_transform(data[['Gender']])
+data['EmailOptIn'] = oe.fit_transform(data[['EmailOptIn']])
+data['PromotionResponse'] = oe.fit_transform(data[['PromotionResponse']])
 
-    data['Gender'] = oe.fit_transform(data[['Gender']])
-    data['EmailOptIn'] = oe.fit_transform(data[['EmailOptIn']])
-    data['PromotionResponse'] = oe.fit_transform(data[['PromotionResponse']])
-
-    X = data.iloc[:,:-1]
-    y = data.iloc[:,-1]
-    ```
-</div>
+X = data.iloc[:,:-1]
+y = data.iloc[:,-1]
+```
+- Here, we first read the data that is stored in a CSV (Comma-separated Values) file. 
+- The data is then pre-processed into a format that can be understood and used by the model. The processing may vary depending on the model you use.
+- Finally, we separate the data into the measured values and the goal variable.
+</CallOutForMDX>
 
 ```python
 from sklearn.model_selection import train_test_split
