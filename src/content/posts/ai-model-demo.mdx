@@ -17,12 +17,14 @@ import CallOutForMDX from "@/components/CallOutForMDX.astro";
 ### Data Collection & Processing
 
 - Start by collecting data from some verified data source.
-- ⁠⁠Separate data into training and testing sets. Testing sets will only be used after the model has been selected. Data leakage is unacceptable.
+- Then pre-process the entire dataset (if needed) to ensure uniformity.
 
 <CallOutForMDX 
     title="Example Code">
     ```python
     import pandas as pd
+    from sklearn.preprocessing import OrdinalEncoder 
+    oe = OrdinalEncoder()
 
     data = pd.read_csv('Data/Customer Churn.csv')
 
@@ -38,57 +40,23 @@ import CallOutForMDX from "@/components/CallOutForMDX.astro";
     - Finally, we separate the data into the measured values and the goal variable.
 </CallOutForMDX>
 
-```python
-from sklearn.model_selection import train_test_split
-from sklearn.model_selection import GridSearchCV
-from sklearn.model_selection import RepeatedStratifiedKFold
-from sklearn.preprocessing import OrdinalEncoder 
-oe = OrdinalEncoder()
-from sklearn.metrics import accuracy_score, recall_score, precision_score, f1_score
+- ⁠⁠Separate data into training and testing sets. Testing sets will only be used after the model has been selected. Data leakage is unacceptable.
 
-import torch
-from torch.nn.functional import mse_loss
-```
+<CallOutForMDX 
+    title="Example Code">
+    ```python
+    from sklearn.model_selection import train_test_split
 
-```python
+    X_train, X_test, y_train, y_test = train_test_split(
+                                            X,
+                                            y,
+                                            test_size=0.2,
+                                            stratify=X['Gender'],
+                                            random_state=1
+                                            )
+    ```
+</CallOutForMDX>
 
-X_train, X_test, y_train, y_test = train_test_split(
-                                        X,
-                                        y,
-                                        test_size=0.2,
-                                        stratify=X['Gender'],
-                                        random_state=1
-                                        )
-```
-
-```python
-from sklearn.ensemble import RandomForestClassifier
-model = RandomForestClassifier()
-
-grid = { 
-    'n_estimators': [25 * i for i in range(1, 10 + 1)], 
-    'max_features': ['sqrt', 'log2'], 
-    'max_depth': [3 * i for i in range(1, 5 + 1)], 
-    'max_leaf_nodes': [2, 5, 10, 20, 50], 
-}
-
-cv = RepeatedStratifiedKFold(
-    n_splits=10,
-    n_repeats=3,
-    random_state=1
-    )
-grid_search = GridSearchCV(
-    estimator=model,
-    param_grid=grid,
-    n_jobs=-1,
-    cv=cv,
-    scoring='accuracy'
-    )
-
-grid_result = grid_search.fit(X_train, y_train)
-print(f"Highest Accuracy: {grid_result.best_score_:.4f}")
-print(f"Hyper Parameter Values: {grid_result.best_params_}")
-```
 
 ### ⁠Implement Models and Compare Performance
 
@@ -99,6 +67,43 @@ print(f"Hyper Parameter Values: {grid_result.best_params_}")
     - Use these predictions and compare them with the actual values from the data.
     - Based on the predictions and the actual values, compute values of different metrics such as accuracy, recall, mean-squared error, or others depending on the use case.
     - Based on these metrics, choose the ideal model configuration.
+<CallOutForMDX 
+    title="Example Code">
+    ```python
+    from sklearn.model_selection import GridSearchCV
+    from sklearn.model_selection import RepeatedStratifiedKFold
+    from sklearn.metrics import accuracy_score, recall_score, precision_score, f1_score
+
+    import torch
+    from torch.nn.functional import mse_loss
+    from sklearn.ensemble import RandomForestClassifier
+    model = RandomForestClassifier()
+
+    grid = { 
+        'n_estimators': [25 * i for i in range(1, 10 + 1)], 
+        'max_features': ['sqrt', 'log2'], 
+        'max_depth': [3 * i for i in range(1, 5 + 1)], 
+        'max_leaf_nodes': [2, 5, 10, 20, 50], 
+    }
+
+    cv = RepeatedStratifiedKFold(
+        n_splits=10,
+        n_repeats=3,
+        random_state=1
+        )
+    grid_search = GridSearchCV(
+        estimator=model,
+        param_grid=grid,
+        n_jobs=-1,
+        cv=cv,
+        scoring='accuracy'
+        )
+
+    grid_result = grid_search.fit(X_train, y_train)
+    print(f"Highest Accuracy: {grid_result.best_score_:.4f}")
+    print(f"Hyper Parameter Values: {grid_result.best_params_}")
+    ```
+</CallOutForMDX>
 
 ### Insights & Analysis
 
