@@ -6,7 +6,7 @@ slug: "ai-model-demo"
 isPublish: true
 ---
 
-import CallOutForMDX from './CallOutForMDX.astro';
+import CallOutForMDX from "@/components/CallOutForMDX.astro";
 
 ---
 
@@ -19,24 +19,23 @@ import CallOutForMDX from './CallOutForMDX.astro';
 - Start by collecting data from some verified data source.
 - ⁠⁠Separate data into training and testing sets. Testing sets will only be used after the model has been selected. Data leakage is unacceptable.
 
-<CallOutForMDX>
-### Example Code
+<CallOutForMDX 
+    title="Example Code">
+    ```python
+    import pandas as pd
 
-```python
-import pandas as pd
+    data = pd.read_csv('Data/Customer Churn.csv')
 
-data = pd.read_csv('Data/Customer Churn.csv')
+    data['Gender'] = oe.fit_transform(data[['Gender']])
+    data['EmailOptIn'] = oe.fit_transform(data[['EmailOptIn']])
+    data['PromotionResponse'] = oe.fit_transform(data[['PromotionResponse']])
 
-data['Gender'] = oe.fit_transform(data[['Gender']])
-data['EmailOptIn'] = oe.fit_transform(data[['EmailOptIn']])
-data['PromotionResponse'] = oe.fit_transform(data[['PromotionResponse']])
-
-X = data.iloc[:,:-1]
-y = data.iloc[:,-1]
-```
-- Here, we first read the data that is stored in a CSV (Comma-separated Values) file. 
-- The data is then pre-processed into a format that can be understood and used by the model. The processing may vary depending on the model you use.
-- Finally, we separate the data into the measured values and the goal variable.
+    X = data.iloc[:,:-1]
+    y = data.iloc[:,-1]
+    ```
+    - Here, we first read the data that is stored in a CSV (Comma-separated Values) file. 
+    - The data is then pre-processed into a format that can be understood and used by the model. The processing may vary depending on the model you use.
+    - Finally, we separate the data into the measured values and the goal variable.
 </CallOutForMDX>
 
 ```python

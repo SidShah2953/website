@@ -1,5 +1,17 @@
+---
+type Props = {
+  title: string;
+};
+
+
+const { title } = Astro.props;
+---
 <div 
     class="group flex w-full cursor-pointer flex-col gap-2 rounded-md border border-neutral-500 bg-white opacity-60"
 >
+    <div
+    class=" flex w-full flex-col justify-between gap-2 md:flex-row md:items-center">
+        <p class="text-neutral-100 text-lg">{title}</p>
+    </div>
     <slot />
 </div>
