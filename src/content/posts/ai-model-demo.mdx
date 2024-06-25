@@ -55,28 +55,18 @@ import CallOutForMDX from "@/components/CallOutForMDX.astro";
                                             random_state=1
                                             )
     ```
+    - `test_size=0.2` denotes that we are using $20\%$ of the data for the testing set.
 </CallOutForMDX>
-
 
 ### ⁠Implement Models and Compare Performance
 
 - ⁠Choose some Machine Learning Models. These will be implemented in Python using the Scikit-learn library, resources for which can be found at the end.
 - ⁠Implement your selected models with various hyper-parameter values for each model.
-- ⁠Train each such configuration on the training data set and evaluate it on the testing data set. Evaluation will consist of the following steps
-    - After training, use the data from the testing set to make predictions.
-    - Use these predictions and compare them with the actual values from the data.
-    - Based on the predictions and the actual values, compute values of different metrics such as accuracy, recall, mean-squared error, or others depending on the use case.
-    - Based on these metrics, choose the ideal model configuration.
 
 <CallOutForMDX 
     title="Example Code">
+    - Here we choose to implement a *Random Forrest Classifier*.
     ```python
-    from sklearn.model_selection import GridSearchCV
-    from sklearn.model_selection import RepeatedStratifiedKFold
-    from sklearn.metrics import accuracy_score, recall_score, precision_score, f1_score
-
-    import torch
-    from torch.nn.functional import mse_loss
     from sklearn.ensemble import RandomForestClassifier
     model = RandomForestClassifier()
 
@@ -86,6 +76,20 @@ import CallOutForMDX from "@/components/CallOutForMDX.astro";
         'max_depth': [3 * i for i in range(1, 5 + 1)], 
         'max_leaf_nodes': [2, 5, 10, 20, 50], 
     }
+    ```
+    - The dictionary `grid` contains the names of the hyper-parameters that can be tuned for this particular model.
+</CallOutForMDX>
+
+- ⁠Train each such configuration on the training data set and evaluate it. Evaluation will consist of the following steps
+    - After training, use the data from a sub-dataset to make predictions.
+    - Use these predictions and compare them with the actual values from the data. (This process is called validation.)
+    - Based on the predictions and the actual values, compute values of different metrics such as accuracy, recall, mean-squared error, or others depending on the use case.
+
+<CallOutForMDX 
+    title="Example Code">
+    ```python
+    from sklearn.model_selection import GridSearchCV
+    from sklearn.model_selection import RepeatedStratifiedKFold
 
     cv = RepeatedStratifiedKFold(
         n_splits=10,
@@ -104,12 +108,30 @@ import CallOutForMDX from "@/components/CallOutForMDX.astro";
     print(f"Highest Accuracy: {grid_result.best_score_:.4f}")
     print(f"Hyper Parameter Values: {grid_result.best_params_}")
     ```
+    - Here we use functions called `RepeatedStratifiedKFold` and `GridSearchCV` as `RepeatedStratifiedKFold` creates a validation set from the training data on its own, without any data leakage and `GridSearchCV` automatically varies across all the hyper-parameter values, trains the given model and evaluates the given score over the validation dataset.
+    - At the end, we use the last two `print` statements to get the highest accuracy achieved across all the hyper-parameter values and to get the respective values as well.
 </CallOutForMDX>
 
 ### Insights & Analysis
+- Based on the previous metric, choose the ideal model configuration.
 
+<CallOutForMDX 
+    title="Example Code">
+    ```python
+    rf = RandomForestClassifier(
+        n_estimators=200,
+        max_features='log2',
+        max_leaf_nodes=2,
+        max_depth=12,
+        random_state=1
+        )
+
+    rf_model = rf.fit(X_train, y_train)
+    ```
+</CallOutForMDX>
 - ⁠For the selected model, explain what the values of the metrics means and what the corresponding values imply. Explain why the particular metrics were chosen.
-- ⁠Based on the model, give possible explanations and insights about the relation between the various values measured and the goal variable
+    - Results can shown in terms of Confusion Matrices, variations in metrics with change in values, etc.
+    - Possible insights can include improved performance in a specific use-case, a hypothesis regarding the structure of the data based on the model, etc.
 
 
 ## Possible topics
