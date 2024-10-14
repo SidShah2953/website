@@ -17,7 +17,7 @@ const presentation: Presentation = {
   title: "Hi, I'm Siddhant",
   // profile: "/profile.webp",
   description:
-    'I\'m a final year student, pursuing a *B.Sc. in Mathematics and Computer Science* from *Chennai Mathematical Institute (CMI)*. My interests lie in *Machine Learning*, *Data Science* and *Finance*. ',
+    'I\'m a graduate student, pursuing an *MS in Applied Data Analytics* from *Boston University*. My interests lie in *Machine Learning*, *Data Science* and *Finance*.',
   socials: [
     {
       label: "Email",
