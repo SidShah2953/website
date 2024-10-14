@@ -33,7 +33,7 @@ const presentation: Presentation = {
     },
     {
       label: "Resume",
-      link: "public/Resume.pdf",
+      link: "./public/Resume.pdf",
     },
   ],
 };
