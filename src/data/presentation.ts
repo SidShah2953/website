@@ -31,6 +31,10 @@ const presentation: Presentation = {
       label: "Github",
       link: "https://github.com/SidShah2953",
     },
+    {
+      label: "Resume",
+      link: "public/Resume.pdf",
+    },
   ],
 };
 
