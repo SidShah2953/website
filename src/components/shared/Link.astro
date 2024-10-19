@@ -3,16 +3,17 @@ import type { HTMLAttributes } from "astro/types";
 
 type Props = HTMLAttributes<"a"> & {
   label: string;
+  isUnderline: string
 };
 
-const { label, href } = Astro.props;
+const { label, href, isUnderline } = Astro.props;
 ---
 
 <a
   href={href}
   class:list={{
     ["hover:text-neutral-100 cursor-pointer"]: true,
-    ["underline"]: false,
+    ["underline"]: (isUnderline == 'True'),
   }}
 >
   {label}
