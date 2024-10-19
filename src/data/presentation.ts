@@ -25,7 +25,7 @@ const presentation: Presentation = {
     },
     {
       label: "LinkedIn",
-      link: "https://www.linkedin.com/in/siddhant-d-shah/",
+      link: "https://www.linkedin.com/in/shah-siddhant/",
     },
     {
       label: "Github",
