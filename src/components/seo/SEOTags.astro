@@ -2,18 +2,18 @@
 import { SEO } from "astro-seo";
 import { SITE_URL } from "@/data/config";
 import type { HeadTags } from "@/utils/types/HeadTags";
+import presentation from "@/data/presentation";
 
 type Props = HeadTags;
 
 const { title, description, noindex, og } = Astro.props;
 
 const DEFAULT_TITLE_PAGE = "Siddhant Shah";
-const DEFAULT_DESCRIPTION_PAGE =
-  "I'm a final year student, pursuing a B.Sc. in Math and Computer Science.";
+const DEFAULT_DESCRIPTION_PAGE = presentation.description;
 const DEFAULT_URL_SITE = SITE_URL;
 
 const openGraph = {
-  title: "Hello! I'm Siddhant Shah from CMI",
+  title: "Hello! I'm Siddhant.",
   type: "website",
   image: "/social-prev.png",
   alt: "Siddhant Shah",
