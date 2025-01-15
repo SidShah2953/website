@@ -12,11 +12,11 @@
 
 body {
   display: flex;
-  align-items: flex-end;
   justify-content: center;
+  align-items: flex-end;
   min-height: 100vh;
   background-color: var(--dark-color);
-  overflow: hidden;
+  // overflow: hidden;
   perspective: 1000px;
   padding: 50px 0px;
 }
@@ -38,7 +38,7 @@ body {
 
 .flower {
   position: absolute;
-  bottom: 10vmin;
+  bottom: 5vmin;
   transform-origin: bottom center;
   z-index: 10;
 
@@ -1361,20 +1361,37 @@ body {
   animation-play-state: paused !important;
 }
 
-h1 {
+.text{
   color: #a7ffee;
-  text-align: right;
-  font-family: fantasy;
-  opacity: 0; /* Initially hidden */
-  animation: fadeIn 3s forwards; /* Trigger the fade-in animation */
-  animation-delay: 3s;
-}
-  
-@keyframes fadeIn {
-  0% {
-    opacity: 0; /* Start fully hidden */
+  text-align: center;
+  h1 {
+    font-family: fantasy;
+    opacity: 0; /* Initially hidden */
+    animation: fadeIn 3s forwards; /* Trigger the fade-in animation */
+    animation-delay: 5s;
   }
-  100% {
-    opacity: 1; /* Fully visible */
+    
+  @keyframes fadeIn {
+    0% {
+      opacity: 0; /* Start fully hidden */
+    }
+    100% {
+      opacity: 1; /* Fully visible */
+    }
+  }
+
+  p {
+    opacity: 0; /* Initially hidden */
+    animation: fadeIn 3s forwards; /* Trigger the fade-in animation */
+    animation-delay: 7s;
+  }
+    
+  @keyframes fadeIn {
+    0% {
+      opacity: 0; /* Start fully hidden */
+    }
+    100% {
+      opacity: 1; /* Fully visible */
+    }
   }
 }
