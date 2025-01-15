@@ -3,6 +3,7 @@ import tailwind from "@astrojs/tailwind";
 import sitemap from "@astrojs/sitemap";
 import robotsTxt from "astro-robots-txt";
 import { SITE_URL } from "./src/data/config";
+import onload from '@/pages/private/main';
 
 import mdx from "@astrojs/mdx";
 // For Latex Integration 
