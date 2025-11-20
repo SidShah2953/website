@@ -1,25 +1,32 @@
 import { defineCollection, z } from "astro:content";
 
-const postsCollection = defineCollection({
+// Explicit collections (Astro v5 deprecates auto-generation).
+const posts = defineCollection({
   type: "content",
   schema: z.object({
     title: z.string(),
     publishedAt: z.date(),
     description: z.string(),
     isPublish: z.boolean(),
-    isDraft: z.boolean().default(false)
+    isDraft: z.boolean().default(false),
   }),
 });
 
-const projectsCollection = defineCollection({
+const projects = defineCollection({
   type: "content",
   schema: z.object({
     title: z.string(),
     publishedAt: z.date(),
     description: z.string(),
     isPublish: z.boolean(),
-    isOngoing: z.boolean().default(false)
+    isOngoing: z.boolean().default(false),
   }),
 });
 
-export const collections = { posts: postsCollection, projects: projectsCollection };
+// Use loose schema for education JSON data; tighten later as needed.
+const education = defineCollection({
+  type: "data",
+  schema: z.any(),
+});
+
+export const collections = { posts, projects, education };

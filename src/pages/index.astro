@@ -91,18 +91,17 @@ import courses from "@/content/education/courses.json";
         <Link href="./education" label="See All Courses" isUnderline='True' />
       </header>
       {courses.length === 0 && <p>Soon, stay connected 👀...</p>}
-      <section class="flex flex-col gap-2 md:flex-row md:flex-wrap">
-        {
-          courses.length !== 0 &&
-          courses
-              .slice(0, 4)
-              .map((course) => (
-              <CourseCard title={course.title}
-                completedOn={formatDateFromJSON(course.completedOn)} 
-                offeredBy={course.offeredBy} />
-              ))
-        }
-      </section>
+      {courses.length !== 0 && (
+        <section class="flex flex-col gap-2 md:flex-row md:flex-wrap">
+          {courses.slice(0, 4).map((course) => (
+            <CourseCard
+              title={course.title}
+              completedOn={formatDateFromJSON(course.completedOn)}
+              offeredBy={course.offeredBy}
+            />
+          ))}
+        </section>
+      )}
     </article>
   </main>
-</Layout>
+</HomeLayout>
