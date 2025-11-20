@@ -1,4 +1,6 @@
 #!/bin/bash
+echo "Activating conda environment 'website'..."
+conda activate website
 
 echo "Updating node to the latest version..."
 nvm install node --latest-npm
