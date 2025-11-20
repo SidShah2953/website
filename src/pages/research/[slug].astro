@@ -1,0 +1,92 @@
+---
+import { getCollection, type CollectionEntry } from "astro:content";
+import Layout from "@/layouts/Layout.astro";
+
+export async function getStaticPaths() {
+  const research = await getCollection("research");
+  return research
+    .filter(r => r.data.isPublished)
+    .map(r => ({ params: { slug: r.slug }, props: { entry: r } }));
+}
+
+type Props = {
+  entry: CollectionEntry<"research">;
+};
+
+const { entry } = Astro.props;
+const { Content } = await entry.render();
+---
+
+<Layout
+  title={`${entry.data.title} | Research`}
+  description={entry.data.description}
+>
+  <main class="flex flex-col gap-16">
+    <article class="glass-card p-8 md:p-12 relative overflow-hidden">
+      <!-- Decorative gradient -->
+      <div class="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-finance-green/10 to-finance-cyan/10 blur-3xl rounded-full"></div>
+      
+      <header class="flex w-full flex-col gap-6 relative z-10">
+        <div class="flex flex-col gap-4">
+          <h1 class="text-4xl md:text-5xl font-bold gradient-text leading-tight">{entry.data.title}</h1>
+          
+          <div class="flex flex-wrap gap-4 text-sm items-center">
+            <div class="flex items-center gap-2 text-neutral-400">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
+              <time datetime={entry.data.publishedAt.toISOString()}>{entry.data.publishedAt.toDateString()}</time>
+            </div>
+          </div>
+          
+          <div class="flex flex-col gap-2">
+            <p class="text-neutral-400">
+              <span class="text-neutral-500 font-semibold">Authors:</span> {entry.data.authors.join(", ")}
+            </p>
+            {entry.data.publication && (
+              <p class="text-finance-cyan font-medium">{entry.data.publication}</p>
+            )}
+          </div>
+          
+          <div class="flex flex-wrap gap-3 pt-2">
+            {entry.data.tags.map(tag => (
+              <span class="px-3 py-1 rounded-lg bg-finance-green/10 text-finance-green border border-finance-green/30 text-sm font-medium">
+                {tag}
+              </span>
+            ))}
+          </div>
+          
+          {(entry.data.doi || entry.data.arxiv || entry.data.pdfUrl) && (
+            <div class="flex flex-wrap gap-3 pt-4 border-t border-glass-border">
+              {entry.data.pdfUrl && (
+                <a href={entry.data.pdfUrl} target="_blank" rel="noopener noreferrer" 
+                   class="glass-btn text-finance-cyan hover:text-finance-blue inline-flex items-center gap-2">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                  Download PDF
+                </a>
+              )}
+              {entry.data.doi && (
+                <a href={`https://doi.org/${entry.data.doi}`} target="_blank" rel="noopener noreferrer"
+                   class="glass-btn text-neutral-300 hover:text-white">
+                  DOI: {entry.data.doi}
+                </a>
+              )}
+              {entry.data.arxiv && (
+                <a href={`https://arxiv.org/abs/${entry.data.arxiv}`} target="_blank" rel="noopener noreferrer"
+                   class="glass-btn text-neutral-300 hover:text-white">
+                  arXiv: {entry.data.arxiv}
+                </a>
+              )}
+            </div>
+          )}
+        </div>
+      </header>
+      
+      <div class="relative z-10 mt-8 prose prose-invert max-w-none">
+        <Content />
+      </div>
+    </article>
+  </main>
+</Layout>

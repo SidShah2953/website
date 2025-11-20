@@ -34,4 +34,21 @@ const blog = defineCollection({
   }),
 });
 
-export const collections = { projects, education, blog };
+// Research papers collection
+const research = defineCollection({
+  type: "content",
+  schema: z.object({
+    title: z.string(),
+    publishedAt: z.date(),
+    description: z.string(),
+    authors: z.array(z.string()),
+    publication: z.string().optional(),
+    doi: z.string().optional(),
+    arxiv: z.string().optional(),
+    pdfUrl: z.string().url().optional(),
+    tags: z.array(z.string()).default([]),
+    isPublished: z.boolean().default(true),
+  }),
+});
+
+export const collections = { projects, education, blog, research };

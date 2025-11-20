@@ -1,0 +1,76 @@
+---
+title: "Estimating the Accuracy of a Bagged Ensemble"
+publishedAt: 2025-01-15T00:00:00Z
+description: "Probabilistic framework to reduce computational overhead in model fine-tuning, using various distributions to estimate Random Forest performance with less than 3% relative error."
+authors:
+  - "Siddhant Shah"
+  - "Eugene Pinsky"
+publication: "Machine Learning and Applications: An International Journal (MLAIJ)"
+doi: "10.5121/mlaij.2025.12106"
+tags:
+  - "Machine Learning"
+  - "Random Forests"
+  - "Ensemble Methods"
+  - "Probabilistic Modeling"
+  - "Computational Efficiency"
+isPublished: true
+---
+
+## Abstract
+
+This paper presents a novel probabilistic framework for estimating the accuracy of bagged ensemble models, specifically Random Forests, without exhaustive computational evaluation. Our approach uses various probability distributions to model ensemble performance, achieving less than 3% relative error across varying configurations while significantly reducing computational overhead.
+
+## Introduction
+
+Model fine-tuning and hyperparameter optimization for ensemble methods typically require extensive computational resources. This research addresses the challenge of efficiently estimating ensemble performance without complete evaluation.
+
+## Methodology
+
+### Probabilistic Framework
+
+We developed a mathematical framework that models Random Forest accuracy using probability distributions. The key components include:
+
+1. **Distribution Selection**: Testing various probability distributions to model accuracy
+2. **Parameter Estimation**: Efficient methods for distribution parameter fitting
+3. **Validation**: Cross-validation across different Random Forest configurations
+
+### Experimental Setup
+
+- **Datasets**: Multiple benchmark datasets with varying characteristics
+- **Forest Configurations**: Different numbers of trees, max depth, and other hyperparameters
+- **Evaluation Metrics**: Relative error, computational time savings
+
+## Key Results
+
+- **Accuracy**: Less than 3% relative error in accuracy estimation
+- **Efficiency**: Significant reduction in computational overhead
+- **Robustness**: Consistent performance across different configurations
+- **Generalization**: Framework applicable to various bagging-based ensembles
+
+## Theoretical Contributions
+
+The research provides:
+- Mathematical formulation of ensemble accuracy estimation
+- Proof of error bounds
+- Computational complexity analysis
+
+## Practical Applications
+
+This framework enables:
+- Faster hyperparameter tuning
+- Efficient AutoML pipelines
+- Resource-constrained model development
+
+## Implementation
+
+The methodology was implemented in Python using scikit-learn for Random Forest models and statistical libraries for distribution fitting.
+
+## Conclusion
+
+Our probabilistic approach to estimating bagged ensemble accuracy offers a practical solution for reducing computational costs in model development while maintaining high accuracy in performance prediction.
+
+## Publication Details
+
+**Published in**: Machine Learning and Applications: An International Journal (MLAIJ)  
+**DOI**: 10.5121/mlaij.2025.12106  
+**Authors**: Shah, S., & Pinsky, E.

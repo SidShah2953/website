@@ -12,9 +12,12 @@ const { label, href, isUnderline } = Astro.props;
 <a
   href={href}
   class:list={{
-    ["hover:text-neutral-100 cursor-pointer"]: true,
-    ["underline"]: (isUnderline == 'True'),
+    ["text-finance-cyan hover:text-finance-blue transition-colors cursor-pointer inline-flex items-center gap-2 group"]: true,
+    ["underline underline-offset-2 decoration-finance-cyan/30 hover:decoration-finance-blue/60"]: (isUnderline == 'True'),
   }}
 >
   {label}
+  <svg class="w-4 h-4 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+  </svg>
 </a>

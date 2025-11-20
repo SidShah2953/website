@@ -4,154 +4,168 @@ import Layout from "@/layouts/Layout.astro";
 ---
 
 <Layout title="Education">
-  <main class="flex flex-col gap-20">
-    <article class="flex flex-col gap-8">
+  <main class="flex flex-col gap-16">
+    <article class="flex flex-col gap-10">
       <header>
-        <h1 class="text-3xl text-neutral-100">Experience</h1>
+        <h1 class="text-4xl md:text-5xl font-bold gradient-text">Experience</h1>
       </header>
 
-      <section class="flex flex-col flex-wrap gap-8 md:flex-row md:flex-wrap ">
+      <section class="flex flex-col flex-wrap gap-8 md:flex-row md:flex-wrap">
         
-        <div
-          class="flex flex-col w-full gap-2"
-        >
-          <div class="flex w-full items-center justify-between">
-            <h2 class="text-xl text-neutral-100">
-              <a href="https://www.mathscircle.org">
-                Maths Circle | Raising A Mathematician (RAM) Foundation
-              </a>
-            </h2>
-            <p class="text-neutral-200">
-              July 2024 - August 2024
-            </p>
+        <!-- Research Assistant at Boston University -->
+        <div class="glass-card p-6 md:p-8 flex flex-col w-full gap-4 relative overflow-hidden">
+          <div class="absolute top-0 right-0 w-32 h-32 bg-finance-cyan/10 rounded-full blur-2xl"></div>
+          
+          <div class="relative z-10">
+            <div class="flex w-full items-start justify-between flex-wrap gap-3">
+              <h2 class="text-xl md:text-2xl font-bold gradient-text">
+                <a href="https://www.bu.edu" class="hover:opacity-80 transition-opacity">
+                  Boston University, Department of Computer Science
+                </a>
+              </h2>
+              <p class="text-neutral-300 text-sm font-medium">
+                Oct 2024 - Present
+              </p>
+            </div>
+            <div class="flex w-full items-center justify-between flex-wrap gap-2 mt-2">
+              <h3 class="text-lg text-white font-semibold">
+                Research Assistant
+              </h3>
+              <p class="text-neutral-400 text-sm">
+                Boston, MA
+              </p>
+            </div>
+            <ul class="list-disc pl-6 mt-4 space-y-2 text-neutral-300 leading-relaxed">
+              <li>
+                Developed and back-tested proprietary trading strategies comparing Mean Absolute Deviation (MAD) vs. Markowitz mean-variance optimization across 9 sector ETFs, implementing risk-constrained portfolio construction and rebalancing algorithms with associated performance analytics including Sharpe ratios, MDD, and transaction cost analysis for alpha generation.
+              </li>
+              <li>
+                Conducted research on momentum-based trading strategies in crude oil ETFs and futures, developing long-short models yielding up to 19.9% annualized returns over an 18-year testing period. Published in Stocks & Commodities Magazine (September 2025).
+              </li>
+              <li>
+                Developed a strategy leveraging overnight silver returns to predict Bitcoin price movements, exhibiting lower drawdowns in a 10-year backtest. Published in Stocks & Commodities Magazine (June 2025).
+              </li>
+              <li>
+                Developed probabilistic framework to reduce computational overhead in model fine-tuning, using various distributions to estimate Random Forest performance, achieving less than 3% relative error size across varying configurations. Published as 'Estimating the Accuracy of a Bagged Ensemble' (DOI:10.5121/mlaij.2025.12106).
+              </li>
+            </ul>
+            <div class="mt-4 pt-4 border-t border-glass-border">
+              <p class="text-sm text-neutral-400">
+                <span class="text-finance-cyan font-semibold">Skills:</span> Python, scikit-learn, Pandas, NumPy, PyTorch, TensorFlow, R, SQL, Git, Back-testing, Research
+              </p>
+            </div>
           </div>
-          <div class="flex w-full items-center justify-between">
-            <h3 class="text-lg text-neutral-100">
-              Program Operations Intern
-            </h3>
-            <p class="text-neutral-200">
-              Mumbai, MH, India 
-            </p>
-          </div>
-          <ul class="list-disc pl-8">
-            <li>
-              Analyzed application data of over 6000 registrants to identify most viable locations for initial chapters.
-            </li>
-            <li>
-              Spearheaded the establishment and start of the Maths Circle Initiative in Chennai; received 300 applicants from the greater Chennai area, accepting 35 students.
-            </li>
-            <li>
-              Lead a team of problem setters, created question papers for various RAM Examinations.
-            </li>
-          </ul>
-          <p class="text-neutral-200">
-            <b>Skills Used: </b> Data Analysis, Python, Microsoft Excel, Confluence, Jira
-          </p>
         </div>
 
-        <div
-          class="flex flex-col w-full gap-2"
-        >
-          <div class="flex w-full items-center justify-between">
-            <h2 class="text-xl text-neutral-100">
-              <a href="https://www.mathscircle.org">
-                Science Enrichment Program | Mumbai Science Teachers Association
-              </a>
-            </h2>
-            <p class="text-neutral-200">
-              July 2021 - August 2024
-            </p>
+        <!-- Program Operations Intern at RAM Foundation -->
+        <div class="glass-card p-6 md:p-8 flex flex-col w-full gap-4 relative overflow-hidden">
+          <div class="absolute top-0 right-0 w-32 h-32 bg-finance-blue/10 rounded-full blur-2xl"></div>
+          
+          <div class="relative z-10">
+            <div class="flex w-full items-start justify-between flex-wrap gap-3">
+              <h2 class="text-xl md:text-2xl font-bold gradient-text">
+                <a href="https://www.mathscircle.org" class="hover:opacity-80 transition-opacity">
+                  Raising A Mathematician Foundation
+                </a>
+              </h2>
+              <p class="text-neutral-300 text-sm font-medium">
+                Jul 2024 - Aug 2024
+              </p>
+            </div>
+            <div class="flex w-full items-center justify-between flex-wrap gap-2 mt-2">
+              <h3 class="text-lg text-white font-semibold">
+                Program Operations Intern
+              </h3>
+              <p class="text-neutral-400 text-sm">
+                Mumbai, India
+              </p>
+            </div>
+            <ul class="list-disc pl-6 mt-4 space-y-2 text-neutral-300 leading-relaxed">
+              <li>
+                Spearheaded the Maths Circle Initiative by RAM Foundation in India, leading a team of five overlooking data-driven business expansion and leveraging analysis of applicant data to identify high-potential markets for educational programs.
+              </li>
+              <li>
+                Implemented project management infrastructure using Jira, Confluence, and Slack to streamline task tracking, documentation, and communication between cross-functional teams.
+              </li>
+            </ul>
+            <div class="mt-4 pt-4 border-t border-glass-border">
+              <p class="text-sm text-neutral-400">
+                <span class="text-finance-cyan font-semibold">Skills:</span> Python, Microsoft Office (Excel, Word, PowerPoint), Jira, Confluence, Leadership
+              </p>
+            </div>
           </div>
-          <div class="flex w-full items-center justify-between">
-            <h3 class="text-lg text-neutral-100">
-              Mathematics & Physics Teacher
-            </h3>
-            <p class="text-neutral-200">
-              Mumbai, MH, India 
-            </p>
-          </div>
-          <ul class="list-disc pl-8">
-            <li>
-              Helped students prepare for the various stages leading up to the International Junior Science Olympiad, one of whom won a gold medal for Team India at the International Biology Olympiad in 2024.
-            </li>
-            <li>
-              Prepared and implemented lesson plans covering required course topics.
-            </li>
-          </ul>
-          <p class="text-neutral-200">
-            <b>Skills Used: </b> Teaching, LaTeX, Communication
-          </p>
         </div>
 
-        <div
-          class="flex flex-col w-full gap-2"
-        >
-          <div class="flex w-full items-center justify-between">
-            <h2 class="text-xl text-neutral-100">
-              <a href="https://www.mathscircle.org">
-                Fino Payments Bank
-              </a>
-            </h2>
-            <p class="text-neutral-200">
-              May 2023 - July 2023
-            </p>
+        <!-- Data Science Intern at Fino Payments Bank -->
+        <div class="glass-card p-6 md:p-8 flex flex-col w-full gap-4 relative overflow-hidden">
+          <div class="absolute top-0 right-0 w-32 h-32 bg-finance-purple/10 rounded-full blur-2xl"></div>
+          
+          <div class="relative z-10">
+            <div class="flex w-full items-start justify-between flex-wrap gap-3">
+              <h2 class="text-xl md:text-2xl font-bold gradient-text">
+                <a href="https://www.finobank.com" class="hover:opacity-80 transition-opacity">
+                  Fino Payments Bank
+                </a>
+              </h2>
+              <p class="text-neutral-300 text-sm font-medium">
+                May 2023 - Jul 2023
+              </p>
+            </div>
+            <div class="flex w-full items-center justify-between flex-wrap gap-2 mt-2">
+              <h3 class="text-lg text-white font-semibold">
+                Data Science Intern
+              </h3>
+              <p class="text-neutral-400 text-sm">
+                Mumbai, India
+              </p>
+            </div>
+            <ul class="list-disc pl-6 mt-4 space-y-2 text-neutral-300 leading-relaxed">
+              <li>
+                Built a database of 6,000+ government-sponsored financial schemes, leveraging PySpark and pattern recognition on customer-level transaction data, to generate analytical insights and presented a revenue growth strategy that could 2x revenue.
+              </li>
+            </ul>
+            <div class="mt-4 pt-4 border-t border-glass-border">
+              <p class="text-sm text-neutral-400">
+                <span class="text-finance-cyan font-semibold">Skills:</span> Python (PySpark), R, SQL, Microsoft Office (Advanced Excel & VBA, Word, PowerPoint), Stakeholder Communication
+              </p>
+            </div>
           </div>
-          <div class="flex w-full items-center justify-between">
-            <h3 class="text-lg text-neutral-100">
-              Data Analytics Intern
-            </h3>
-            <p class="text-neutral-200">
-              Navi Mumbai, MH, India
-            </p>
-          </div>
-          <ul class="list-disc pl-8">
-            <li>
-              Created a database of over 6000 active government-sponsored schemes, distributing over INR 20.000,000,000.
-            </li>
-            <li>
-              Worked in PySpark, to identify potential revenue streams that could double revenue in the upcoming years.
-            </li>
-            <li>
-              Performed a cost-to-benefit analysis, drafted a proposal for a nation-wide marketing plan to promote government-sponsored-scheme-related services offered by the bank.
-            </li>
-          </ul>
-          <p class="text-neutral-200">
-            <b>Skills Used: </b> Data Analysis, NumPy, Pandas, PySpark
-          </p>
         </div>
 
-        <div
-          class="flex flex-col w-full gap-2"
-        >
-          <div class="flex w-full items-center justify-between">
-            <h2 class="text-xl text-neutral-100">
-              <a href="https://www.mathscircle.org">
-                Chennai Mathematical Institute
-              </a>
-            </h2>
-            <p class="text-neutral-200">
-              August 2023 - January 2024
-            </p>
+        <!-- Mathematics & Physics Teacher at GMSTA -->
+        <div class="glass-card p-6 md:p-8 flex flex-col w-full gap-4 relative overflow-hidden">
+          <div class="absolute top-0 right-0 w-32 h-32 bg-finance-blue/10 rounded-full blur-2xl"></div>
+          
+          <div class="relative z-10">
+            <div class="flex w-full items-start justify-between flex-wrap gap-3">
+              <h2 class="text-xl md:text-2xl font-bold gradient-text">
+                <a href="https://www.mathscircle.org" class="hover:opacity-80 transition-opacity">
+                  Greater Mumbai Science Teachers' Association
+                </a>
+              </h2>
+              <p class="text-neutral-300 text-sm font-medium">
+                May 2023 - Jul 2023
+              </p>
+            </div>
+            <div class="flex w-full items-center justify-between flex-wrap gap-2 mt-2">
+              <h3 class="text-lg text-white font-semibold">
+                Mathematics & Physics Teacher
+              </h3>
+              <p class="text-neutral-400 text-sm">
+                Mumbai, India
+              </p>
+            </div>
+            <ul class="list-disc pl-6 mt-4 space-y-2 text-neutral-300 leading-relaxed">
+              <li>
+                Helped students prepare for the various stages leading up to the International Junior Science Olympiad.
+              </li>
+            </ul>
+            <div class="mt-4 pt-4 border-t border-glass-border">
+              <p class="text-sm text-neutral-400">
+                <span class="text-finance-cyan font-semibold">Skills:</span> Quantitative Reasoning, Data Interpretation, Scientific Communication, Leadership and Mentorship
+              </p>
+            </div>
           </div>
-          <div class="flex w-full items-center justify-between">
-            <h3 class="text-lg text-neutral-100">
-              Teaching Assistant
-            </h3>
-            <p class="text-neutral-200">
-              Chennai, TN, India 
-            </p>
-          </div>
-          <ul class="list-disc pl-8">
-            <li>
-              Acted as a Teaching Assistant for 3 courses - Classical Mechanics 1, Design and Analysis of Algorithms for Data Science (ADT) (for Masters' students), Design and Analysis of Algorithms (ALGO).
-            </li>
-            <li>
-              Also acted as a Teaching Assistant for the Design and Analysis of Algorithms (DAA) Course conducted via NPTEL from May 2023 till July 2023, and January 2024 till March 2024.
-            </li>
-          </ul>
-          <p class="text-neutral-200">
-            <b>Skills Used: </b> Teaching, LaTeX, Communication
-          </p>
         </div>
         
       </section>

@@ -5,10 +5,8 @@ import HomeLayout from "@/layouts/HomeLayout.astro";
 import SocialLinks from "@/components/SocialLinks.astro";
 import PostCard from "@/components/PostCard.astro";
 import ProjectCard from "@/components/ProjectCard.astro";
-import CourseCard from "@/components/CourseCard.astro";
 import Link from "@/components/shared/Link.astro";
 import convertAsteriskToStrongTag from "@/utils/convertAsteriskToStrongTag";
-import formatDateFromJSON from "@/utils/formatDateFromJSON";
 
 import presentation from "@/data/presentation";
 
@@ -18,62 +16,105 @@ const posts = (await getCollection("blog")).filter(p => !p.data.isDraft).sort(fu
 const projects = (await getCollection("projects")).sort(function (first, second) {
   return second.data.publishedAt.getTime() - first.data.publishedAt.getTime();
 });
-import courses from "@/content/education/courses.json";
+const research = (await getCollection("research")).filter(r => r.data.isPublished).sort(function (first, second) {
+  return second.data.publishedAt.getTime() - first.data.publishedAt.getTime();
+});
 ---
 
 <HomeLayout title="About | Siddhant Shah">
-  <main class="flex flex-col gap-20">
-    <article
-      class="flex flex-col gap-8 md:flex-row-reverse md:justify-end md:gap-12"
-    >
+  <main class="flex flex-col gap-16">
+    <!-- Hero Section -->
+    <article class="glass-card p-8 md:p-12 relative overflow-hidden">
       <div class="flex flex-col gap-8">
-        <div
-          class="flex w-full flex-col gap-2 md:flex-row md:items-center"
-          >
-          <h1 class="text-3xl  text-neutral-100"> Hi, I'm Siddhant</h1>
+        <div class="flex w-full flex-col gap-4">
+          <h1 class="text-5xl md:text-6xl font-bold text-white">Siddhant Shah</h1>
+          <div class="h-px w-24 bg-gradient-to-r from-finance-cyan/60 to-transparent"></div>
         </div>
         <h2
-          class="w-auto max-w-[60ch] text-lg leading-6"
+          class="w-auto max-w-[70ch] text-xl md:text-2xl leading-relaxed text-neutral-300"
           set:html={convertAsteriskToStrongTag(presentation.description)}
         />
+        <div class="flex flex-wrap gap-3 mt-2 text-sm text-neutral-400">
+          <span>Research</span>
+          <span>•</span>
+          <span>Machine Learning</span>
+          <span>•</span>
+          <span>Data Analytics</span>
+          <span>•</span>
+          <span>Python, R, SQL</span>
+        </div>
         <SocialLinks />
       </div>
     </article>
 
-    <article class="flex flex-col gap-8">
-      <header class="flex w-full flex-row justify-between gap-2">
-        <h3 class="text-2xl text-neutral-100">Latest posts</h3>
-        <Link href="./blog" label="See All Posts" isUnderline='True' />
+    <!-- Current Work - Research Assistant -->
+    <article class="flex flex-col gap-6">
+      <header>
+        <h3 class="text-3xl font-bold text-white">Current Role</h3>
       </header>
-      {posts.length === 0 && <p>Soon, stay connected 👀...</p>}
-      <section class="flex flex-col gap-2 md:flex-row md:flex-wrap">
-        {
-          posts.length !== 0 &&
-            posts
-              .slice(0, 4)
-              .map((post) => (
-                <PostCard
-                  publishedAt={post.data.publishedAt}
-                  title={post.data.title}
-                  description={post.data.description}
-                  slug={post.slug}
-                />
-              ))
-        }
-      </section>
+      <div class="glass-card p-6 md:p-8 flex flex-col gap-4">
+        <div>
+          <div class="flex w-full items-start justify-between flex-wrap gap-3">
+            <h4 class="text-xl md:text-2xl font-bold text-white">
+              <a href="https://www.bu.edu" class="hover:text-finance-cyan transition-colors">
+                Boston University, Department of Computer Science
+              </a>
+            </h4>
+            <p class="text-neutral-500 text-sm">Oct 2024 - Present</p>
+          </div>
+          <h5 class="text-lg text-neutral-300 font-medium mt-2">Research Assistant</h5>
+          <ul class="list-disc pl-6 mt-4 space-y-2 text-neutral-300 leading-relaxed">
+            <li>Developed proprietary trading strategies with mean-variance optimization across 9 sector ETFs, implementing risk-constrained portfolio construction and performance analytics (Sharpe ratios, drawdowns, transaction costs)</li>
+            <li>Published 3 research papers on trading strategies in leading journals (Stocks & Commodities Magazine, MLAIJ)</li>
+            <li>Achieved 19.9% annualized returns on crude oil momentum strategies and 68.65% returns on cross-asset Bitcoin trading over multi-year backtests</li>
+          </ul>
+          <div class="mt-4 pt-4 border-t border-glass-border">
+            <p class="text-sm text-neutral-400">
+              <span class="text-finance-cyan font-semibold">Skills:</span> Python, R, SQL, Pandas, NumPy, scikit-learn, PyTorch, Backtesting, Portfolio Optimization
+            </p>
+          </div>
+        </div>
+      </div>
     </article>
 
+    <!-- Research Publications -->
     <article class="flex flex-col gap-8">
-      <header class="flex w-full flex-row justify-between gap-2">
-        <h3 class="text-2xl text-neutral-100">Latest Projects</h3>
+      <header class="flex w-full flex-row justify-between items-center gap-2">
+        <h3 class="text-3xl font-bold text-white">Published Research</h3>
+        <Link href="./research" label="See All Publications" isUnderline='True' />
+      </header>
+      {research.length !== 0 && (
+        <section class="flex flex-col gap-4">
+          {research.slice(0, 3).map((paper) => (
+            <a href={`/research/${paper.slug}`} class="group glass-card-hover p-6 flex flex-col gap-3">
+              <div>
+                <h4 class="text-xl font-semibold text-white group-hover:text-finance-cyan transition-colors leading-tight">{paper.data.title}</h4>
+                <p class="text-sm text-neutral-500 mt-2">{paper.data.authors.join(", ")}</p>
+                {paper.data.publication && <p class="text-sm text-neutral-400 mt-1">{paper.data.publication}</p>}
+                <p class="text-neutral-400 mt-3 line-clamp-2">{paper.data.description}</p>
+                <div class="flex gap-2 mt-3 flex-wrap">
+                  {paper.data.tags.slice(0, 3).map(tag => (
+                    <span class="text-xs text-neutral-500">{tag}</span>
+                  ))}
+                </div>
+              </div>
+            </a>
+          ))}
+        </section>
+      )}
+    </article>
+
+    <!-- Key Projects -->
+    <article class="flex flex-col gap-8">
+      <header class="flex w-full flex-row justify-between items-center gap-2">
+        <h3 class="text-3xl font-bold text-white">Featured Projects</h3>
         <Link href="./projects" label="See All Projects" isUnderline='True' />
       </header>
-      {projects.length === 0 && <p>Soon, stay connected 👀...</p>}
       <section class="flex flex-col gap-4 md:flex-row md:flex-wrap">
         {
           projects.length !== 0 &&
             projects
-              .slice(0, 4)
+              .slice(0, 3)
               .map((project) => (
                 <ProjectCard
                   publishedAt={project.data.publishedAt}
@@ -85,23 +126,74 @@ import courses from "@/content/education/courses.json";
         }
       </section>
     </article>
-    <article class="flex flex-col gap-8">
-      <header class="flex w-full flex-row justify-between gap-2">
-        <h3 class="text-2xl text-neutral-100">Recent Courses & Workshops</h3>
-        <Link href="./education" label="See All Courses" isUnderline='True' />
+
+    <!-- Technical Skills -->
+    <article class="flex flex-col gap-6">
+      <header>
+        <h3 class="text-3xl font-bold text-white">Technical Expertise</h3>
       </header>
-      {courses.length === 0 && <p>Soon, stay connected 👀...</p>}
-      {courses.length !== 0 && (
-        <section class="flex flex-col gap-2 md:flex-row md:flex-wrap">
-          {courses.slice(0, 4).map((course) => (
-            <CourseCard
-              title={course.title}
-              completedOn={formatDateFromJSON(course.completedOn)}
-              offeredBy={course.offeredBy}
-            />
-          ))}
-        </section>
-      )}
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="glass-card p-6">
+          <h4 class="text-lg font-semibold text-white mb-3">Quantitative Finance</h4>
+          <ul class="space-y-2 text-neutral-400 text-sm">
+            <li>Portfolio Optimization & Risk Management</li>
+            <li>Algorithmic Trading Strategy Development</li>
+            <li>Statistical Arbitrage & Alpha Generation</li>
+            <li>Backtesting & Performance Attribution</li>
+          </ul>
+        </div>
+        <div class="glass-card p-6">
+          <h4 class="text-lg font-semibold text-white mb-3">Machine Learning & Data Science</h4>
+          <ul class="space-y-2 text-neutral-400 text-sm">
+            <li>Ensemble Methods & Random Forests</li>
+            <li>Time-Series Analysis & Forecasting</li>
+            <li>Feature Engineering & Model Optimization</li>
+            <li>Statistical Modeling & Hypothesis Testing</li>
+          </ul>
+        </div>
+        <div class="glass-card p-6">
+          <h4 class="text-lg font-semibold text-white mb-3">Programming & Tools</h4>
+          <ul class="space-y-2 text-neutral-400 text-sm">
+            <li>Python (Pandas, NumPy, scikit-learn, PyTorch)</li>
+            <li>R (Statistical Analysis & Visualization)</li>
+            <li>SQL, PySpark, KDB+/q</li>
+            <li>Git, LaTeX, Advanced Excel/VBA</li>
+          </ul>
+        </div>
+        <div class="glass-card p-6">
+          <h4 class="text-lg font-semibold text-white mb-3">Certifications & Education</h4>
+          <ul class="space-y-2 text-neutral-400 text-sm">
+            <li>MS in Applied Data Analytics (Boston University)</li>
+            <li>BS in Mathematics & CS (Chennai Mathematical Institute)</li>
+            <li>CFA Level 1 Candidate (CFA Scholarship Recipient)</li>
+            <li>Bloomberg Market Concepts Certified</li>
+          </ul>
+        </div>
+      </div>
+    </article>
+
+    <!-- Blog Posts -->
+    <article class="flex flex-col gap-8">
+      <header class="flex w-full flex-row justify-between items-center gap-2">
+        <h3 class="text-3xl font-bold text-white">Latest Insights</h3>
+        <Link href="./blog" label="See All Posts" isUnderline='True' />
+      </header>
+      {posts.length === 0 && <p>Soon, stay connected 👀...</p>}
+      <section class="flex flex-col gap-2 md:flex-row md:flex-wrap">
+        {
+          posts.length !== 0 &&
+            posts
+              .slice(0, 2)
+              .map((post) => (
+                <PostCard
+                  publishedAt={post.data.publishedAt}
+                  title={post.data.title}
+                  description={post.data.description}
+                  slug={post.slug}
+                />
+              ))
+        }
+      </section>
     </article>
   </main>
 </HomeLayout>

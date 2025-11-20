@@ -6,71 +6,104 @@ import stylisedName from "@/components/shared/name-by-aditi.svg"
 const pathname = removeTrailingSlash(Astro.url.pathname);
 ---
 
-<header class="z-40 flex w-full flex-col gap-8 md:flex-row md:justify-between">
-  <a href={`/`} class="hover:text-neutral-100"
-    >
-    <Image
-      src={stylisedName}
-      class="left-0 inline-block align-bottom"
-      alt="Siddhant Shah"
-      width="143"
-      height="50"
-      loading="eager"
-      fetchpriority="high"
-    />
-  </a>
+<header id="header" class="sticky top-0 z-50 mb-8 px-6 py-4 transition-all duration-300">
+  <div class="flex w-full flex-col gap-6 md:flex-row md:justify-between md:items-center">
+    <a href={`/`} class="hover:opacity-80 transition-opacity group"
+      >
+      <Image
+        src={stylisedName}
+        class="left-0 inline-block align-bottom group-hover:drop-shadow-[0_0_10px_rgba(6,182,212,0.5)] transition-all"
+        alt="Siddhant Shah"
+        width="143"
+        height="50"
+        loading="eager"
+        fetchpriority="high"
+      />
+    </a>
 
-  <nav role="navigation">
-    <ul role="list" class="flex flex-row gap-2">
-      <li>
-        <a
-          href="/"
-          class:list={{
-            ["hover:text-neutral-100"]: true,
-            ["text-neutral-100"]: pathname === "/",
-          }}>Home</a
-        >
-      </li>
-      <li>/</li>
-      <li>
-        <a
-          href="/education"
-          class:list={{
-            ["hover:text-neutral-100"]: true,
-            ["text-neutral-100"]: pathname === "/education",
-          }}>Education</a
-        >
-      </li>
-      <li>/</li>
-      <li>
-        <a
-          href="/experience"
-          class:list={{
-            ["hover:text-neutral-100"]: true,
-            ["text-neutral-100"]: pathname === "/experience",
-          }}>Experience</a
-        >
-      </li>
-      <li>/</li>
-      <li>
-        <a
-          href="/projects"
-          class:list={{
-            ["hover:text-neutral-100"]: true,
-            ["text-neutral-100"]: pathname === "/projects",
-          }}>Projects</a
-        >
-      </li>
-      <li>/</li>
-      <li>
-        <a
-          href="/blog"
-          class:list={{
-            ["hover:text-neutral-100"]: true,
-            ["text-neutral-100"]: pathname === "/blog" || pathname.startsWith("/blog/"),
-          }}>Blog</a
-        >
-      </li>
-    </ul>
-  </nav>
+    <nav role="navigation">
+      <ul role="list" class="flex flex-row gap-1 items-center text-base">
+        <li>
+          <a
+            href="/"
+            class:list={{
+              ["px-4 py-2 rounded-lg transition-all duration-200"]: true,
+              ["bg-finance-cyan/10 text-finance-cyan border border-finance-cyan/30"]: pathname === "/",
+              ["hover:bg-glass text-neutral-300 hover:text-neutral-100"]: pathname !== "/",
+            }}>Home</a
+          >
+        </li>
+        <li>
+          <a
+            href="/education"
+            class:list={{
+              ["px-4 py-2 rounded-lg transition-all duration-200"]: true,
+              ["bg-finance-cyan/10 text-finance-cyan border border-finance-cyan/30"]: pathname === "/education",
+              ["hover:bg-glass text-neutral-300 hover:text-neutral-100"]: pathname !== "/education",
+            }}>Education</a
+          >
+        </li>
+        <li>
+          <a
+            href="/experience"
+            class:list={{
+              ["px-4 py-2 rounded-lg transition-all duration-200"]: true,
+              ["bg-finance-cyan/10 text-finance-cyan border border-finance-cyan/30"]: pathname === "/experience",
+              ["hover:bg-glass text-neutral-300 hover:text-neutral-100"]: pathname !== "/experience",
+            }}>Experience</a
+          >
+        </li>
+        <li>
+          <a
+            href="/projects"
+            class:list={{
+              ["px-4 py-2 rounded-lg transition-all duration-200"]: true,
+              ["bg-finance-cyan/10 text-finance-cyan border border-finance-cyan/30"]: pathname === "/projects",
+              ["hover:bg-glass text-neutral-300 hover:text-neutral-100"]: pathname !== "/projects",
+            }}>Projects</a
+          >
+        </li>
+        <li>
+          <a
+            href="/research"
+            class:list={{
+              ["px-4 py-2 rounded-lg transition-all duration-200"]: true,
+              ["bg-finance-cyan/10 text-finance-cyan border border-finance-cyan/30"]: pathname === "/research" || pathname.startsWith("/research/"),
+              ["hover:bg-glass text-neutral-300 hover:text-neutral-100"]: pathname !== "/research" && !pathname.startsWith("/research/"),
+            }}>Research</a
+          >
+        </li>
+        <li>
+          <a
+            href="/blog"
+            class:list={{
+              ["px-4 py-2 rounded-lg transition-all duration-200"]: true,
+              ["bg-finance-cyan/10 text-finance-cyan border border-finance-cyan/30"]: pathname === "/blog" || pathname.startsWith("/blog/"),
+              ["hover:bg-glass text-neutral-300 hover:text-neutral-100"]: pathname !== "/blog" && !pathname.startsWith("/blog/"),
+            }}>Blog</a
+          >
+        </li>
+      </ul>
+    </nav>
+  </div>
 </header>
+
+<script>
+  const header = document.getElementById('header');
+  let lastScroll = 0;
+
+  function updateHeader() {
+    const currentScroll = window.scrollY;
+    
+    if (currentScroll > 50) {
+      header?.classList.add('bg-dark-card/60', 'backdrop-blur-xl', 'border-b', 'border-glass-border/20', 'shadow-glass');
+    } else {
+      header?.classList.remove('bg-dark-card/60', 'backdrop-blur-xl', 'border-b', 'border-glass-border/20', 'shadow-glass');
+    }
+    
+    lastScroll = currentScroll;
+  }
+
+  window.addEventListener('scroll', updateHeader, { passive: true });
+  updateHeader(); // Check initial state
+</script>

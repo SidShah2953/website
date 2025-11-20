@@ -30,23 +30,23 @@ const postsData = enriched.map(p => ({
 }));
 ---
 <Layout title="Blog | Siddhant Shah" description="Articles, write-ups & thoughts">
-  <main class="flex flex-col gap-20">
+  <main class="flex flex-col gap-16">
     <section class="flex flex-col gap-8">
-      <header class="flex w-full flex-row justify-between gap-2">
-        <h3 class="text-2xl text-neutral-100">Blog</h3>
+      <header class="flex w-full flex-col gap-3">
+        <h1 class="text-4xl md:text-5xl font-bold gradient-text">Blog</h1>
+        <p class="text-lg text-neutral-300 leading-relaxed">Long-form posts, experiments & deeper dives into finance, tech, and quantitative analysis.</p>
       </header>
-      <p class="text-lg leading-6">Long-form posts, experiments & deeper dives.</p>
     
       {allTags.length > 0 && (
         <div class="flex flex-wrap gap-2" id="tag-filters">
-          <button data-tag="" class="tag-filter px-3 py-1 rounded-full text-sm bg-neutral-700 text-neutral-100">All</button>
+          <button data-tag="" class="tag-filter glass-btn bg-finance-cyan/10 text-finance-cyan border-finance-cyan/30">All</button>
           {allTags.map(tag => (
-            <button data-tag={tag} class="tag-filter px-3 py-1 rounded-full text-sm bg-neutral-800 text-neutral-400 hover:bg-neutral-700">{toTitleCase(tag)}</button>
+            <button data-tag={tag} class="tag-filter glass-btn text-neutral-300 hover:text-white hover:border-finance-cyan/30">{toTitleCase(tag)}</button>
           ))}
         </div>
       )}
 
-      <p id="tag-message" class="text-sm text-neutral-400 hidden"></p>
+      <p id="tag-message" class="text-sm text-finance-cyan hidden"></p>
 
       <section id="posts-container" class="flex flex-col gap-2 md:flex-row md:flex-wrap">
         {enriched.map(post => (
