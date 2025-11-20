@@ -18,5 +18,8 @@ export default defineConfig({
   markdown: {
     syntaxHighlight: 'shiki',
     shikiConfig: { theme: 'dracula', wrap: true }
+  },
+  redirects: {
+    '/': '/blog'
   }
 });
