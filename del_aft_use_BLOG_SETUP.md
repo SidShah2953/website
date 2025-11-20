@@ -19,6 +19,8 @@ Complete guide for deploying the blog to `blog.siddhants.com` with Cloudflare Pa
 
 After deployment, note your Pages URL: `siddhants-blog.pages.dev`
 
+> **Note**: The `astro.blog.config.mjs` includes a redirect from `/` to `/blog`, so visiting `blog.siddhants.com` will automatically redirect to `blog.siddhants.com/blog`.
+
 ---
 
 ## Step 2: DNS Configuration
