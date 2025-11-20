@@ -4,6 +4,8 @@ import Layout from '@/layouts/Layout.astro';
 import PostCard from '@/components/PostCard.astro';
 import { estimateReadingTime } from '@/utils/estimateReadingTime';
 
+const toTitleCase = (str: string) => str.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ');
+
 const blogPosts = (await getCollection('blog')).filter(p => !p.data.isDraft).sort((a,b)=> b.data.publishedAt.getTime() - a.data.publishedAt.getTime());
 
 // Inject reading time (if not stored yet)
@@ -39,7 +41,7 @@ const postsData = enriched.map(p => ({
         <div class="flex flex-wrap gap-2" id="tag-filters">
           <button data-tag="" class="tag-filter px-3 py-1 rounded-full text-sm bg-neutral-700 text-neutral-100">All</button>
           {allTags.map(tag => (
-            <button data-tag={tag} class="tag-filter px-3 py-1 rounded-full text-sm bg-neutral-800 text-neutral-400 hover:bg-neutral-700">{tag}</button>
+            <button data-tag={tag} class="tag-filter px-3 py-1 rounded-full text-sm bg-neutral-800 text-neutral-400 hover:bg-neutral-700">{toTitleCase(tag)}</button>
           ))}
         </div>
       )}
@@ -62,6 +64,10 @@ const postsData = enriched.map(p => ({
   </main>
 
   <script define:vars={{ postsData }}>
+    function toTitleCase(str) {
+      return str.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ');
+    }
+
     const posts = postsData;
     const container = document.getElementById('posts-container');
     const tagMessage = document.getElementById('tag-message');
@@ -98,7 +104,7 @@ const postsData = enriched.map(p => ({
       }).join('');
 
       if (selectedTag) {
-        tagMessage.innerHTML = `Showing posts tagged with <strong class="text-neutral-200">${selectedTag}</strong>`;
+        tagMessage.innerHTML = `Showing posts tagged with <strong class="text-neutral-200">${toTitleCase(selectedTag)}</strong>`;
         tagMessage.classList.remove('hidden');
       } else {
         tagMessage.classList.add('hidden');
