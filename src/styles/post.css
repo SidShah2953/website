@@ -1,51 +1,65 @@
 .post p {
-  @apply leading-8;
+  @apply leading-8 text-neutral-300;
 }
 
 .post code {
-  @apply rounded-sm bg-neutral-800 px-1 py-[2px] text-orange-500;
+  @apply rounded-lg bg-dark-elevated/60 backdrop-blur-sm px-2 py-1 text-finance-cyan border border-glass-border font-mono text-sm;
 }
 
 .post h2 {
-  @apply mt-6 text-2xl text-neutral-100;
+  @apply mt-8 text-3xl font-semibold bg-gradient-to-r from-white to-neutral-300 bg-clip-text text-transparent;
 }
 
 .post h3 {
-  @apply mt-4 text-xl text-neutral-100;
+  @apply mt-6 text-xl font-medium text-neutral-100;
 }
 
 .post nav {
-  @apply pb-5 text-neutral-100 no-underline pl-0;
+  @apply pb-6 text-neutral-100 no-underline pl-0;
 }
 
 .post nav ol a{
-  @apply text-neutral-100 no-underline;
-}
-
-.post code {
-  @apply rounded-sm bg-neutral-800 px-1 py-[2px] text-red-500;
+  @apply text-finance-cyan no-underline hover:text-finance-blue transition-colors;
 }
 
 .post a {
-  @apply text-neutral-100 underline;
+  @apply text-finance-cyan hover:text-finance-blue underline decoration-finance-cyan/30 hover:decoration-finance-blue/60 transition-all underline-offset-2;
 }
 
 .post ul {
-  @apply list-disc pl-6 leading-8;
+  @apply list-disc pl-6 leading-8 text-neutral-300;
 }
 
 .post ol {
-  @apply list-decimal pl-6 leading-8;
+  @apply list-decimal pl-6 leading-8 text-neutral-300;
 }
 
 .post blockquote {
-  @apply flex flex-row gap-2 before:block before:h-auto before:w-1 before:max-w-[1px] before:bg-red-400 before:content-[''];
+  @apply flex flex-row gap-3 p-4 rounded-lg bg-dark-elevated/40 backdrop-blur-sm border-l-4 border-finance-cyan/50 my-4;
+  @apply before:content-[''] before:hidden;
 }
 
 .post pre {
-  @apply p-4;
+  @apply p-6 rounded-xl bg-dark-elevated/80 backdrop-blur-sm border border-glass-border shadow-glass my-6 overflow-x-auto;
 }
 
 .post pre > code {
-  @apply bg-transparent;
+  @apply bg-transparent border-0 p-0 text-neutral-300;
+}
+
+/* Tables */
+.post table {
+  @apply w-full my-6 border-collapse;
+}
+
+.post th {
+  @apply bg-dark-elevated/60 backdrop-blur-sm text-left p-3 text-neutral-100 font-semibold border-b-2 border-finance-cyan/30;
+}
+
+.post td {
+  @apply p-3 border-b border-glass-border text-neutral-300;
+}
+
+.post tr:hover {
+  @apply bg-glass/50;
 }

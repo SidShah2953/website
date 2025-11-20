@@ -7,69 +7,57 @@ import courses from "@/content/education/courses.json"
 ---
 
 <Layout title="Education">
-  <main class="flex flex-col gap-20">
-    <article class="flex flex-col gap-8">
+  <main class="flex flex-col gap-16">
+    <article class="flex flex-col gap-10">
       <header>
-        <h1 class="text-3xl text-neutral-100">Education</h1>
+        <h1 class="text-4xl md:text-5xl font-bold gradient-text">Education</h1>
       </header>
-      <section class="flex flex-col flex-wrap gap-8 md:flex-row md:flex-wrap ">
-        <div
-          class="flex flex-col w-full gap-2"
-        >
-          <div class="flex w-full items-center justify-between">
-            <h2 class="text-2xl text-neutral-100">
-              <a href="https://www.bu.edu">
+      <section class="flex flex-col flex-wrap gap-8 md:flex-row md:flex-wrap">
+        <div class="glass-card p-6 md:p-8 flex flex-col w-full gap-4">
+          <div class="flex w-full items-center justify-between flex-wrap gap-2">
+            <h2 class="text-2xl md:text-3xl font-bold gradient-text">
+              <a href="https://www.bu.edu" class="hover:opacity-80 transition-opacity">
                 Boston University
               </a>
             </h2>
-            <p class="text-neutral-200">Boston | Present</p>
+            <p class="text-neutral-300 text-sm">Boston | Present</p>
           </div>
-          <p class="text-lg text-neutral-200">Master of Science - Applied Data Analytics</p>
-          <ul class="list-disc pl-8">
-            <li>
-              Analysis of Algorithms (CS 566); Data Science with Python (CS 677)
-            </li>
-            <li>
-              Foundations of Analytics and Data Visualisation (CS 544); Foundations of Machine Learning (CS 555)
-            </li>
+          <p class="text-lg text-white font-medium">Master of Science - Applied Data Analytics</p>
+          <ul class="list-disc pl-6 mt-4 space-y-2 text-neutral-300 leading-relaxed">
+            <li>Analytics and Data Visualization in R</li>
+            <li>Advanced Machine Learning</li>
+            <li>Big Data Analytics</li>
+            <li>Web Mining & Graph Analytics</li>
           </ul>
         </div>
         
-        <div
-          class="flex flex-col w-full gap-2"
-        >
-          <div class="flex w-full items-center justify-between">
-            <h2 class="text-2xl text-neutral-100">
-              <a href="https://www.cmi.ac.in">
+        <div class="glass-card p-6 md:p-8 flex flex-col w-full gap-4">
+          <div class="flex w-full items-center justify-between flex-wrap gap-2">
+            <h2 class="text-2xl md:text-3xl font-bold gradient-text">
+              <a href="https://www.cmi.ac.in" class="hover:opacity-80 transition-opacity">
                 Chennai Mathematical Institute
               </a>
             </h2>
-            <p class="text-neutral-200">Chennai | July 2024</p>
+            <p class="text-neutral-300 text-sm">Chennai | July 2024</p>
           </div>
-          <p class="text-lg text-neutral-200">Bachelor of Science (Hons) - Mathematics and Computer Science</p>
-          <ul class="list-disc pl-8">
-            <li>
-              Linear algebra, Exterior & Tensor algebra, Group theory & Ring theory; Analysis of multi-variate real-valued functions, Fourier Analysis; Differential Equations; Topology
-            </li>
-            <li>
-              Design & Analysis of Algorithms, Theory of Computation - Finite state automata, pushdown automata and Turing machines.
-            </li>
-            <li>
-              Probability Theory - expected values, standard deviation & variance; Stochastic Processes; Statistical Inference
-            </li>
-            <li>
-              Linear Programming; Theoretical Foundations of Machine Learning; Data Mining & Machine Learning; Applied Machine Learning (MLOps); Financial Modelling with Python; Economics
-            </li>
+          <p class="text-lg text-white font-medium">Bachelor of Science (Honors) - Mathematics and Computer Science</p>
+          <ul class="list-disc pl-6 mt-4 space-y-2 text-neutral-300 leading-relaxed">
+            <li>Linear Algebra</li>
+            <li>Fourier Analysis</li>
+            <li>Data Structures and Algorithms</li>
+            <li>Probability Theory & Statistics</li>
+            <li>Stochastic Processes</li>
+            <li>Statistical Inference</li>
+            <li>Financial Modelling</li>
+            <li>Economics</li>
           </ul>
         </div>
 
-        <div
-        class="flex flex-col w-full gap-2"
-      >
-        <div class="flex w-full items-center justify-between">
-          <h2 class="text-2xl text-neutral-100">
-              PACE Junior Science College
-          </h2>
+        <div class="glass-card p-6 md:p-8 flex flex-col w-full gap-4">
+          <div class="flex w-full items-center justify-between flex-wrap gap-2">
+            <h2 class="text-2xl md:text-3xl font-bold gradient-text">
+                PACE Junior Science College
+            </h2>
           <p class="text-neutral-200">Mumbai | September 2021</p>
         </div>
         <p class="text-lg text-neutral-200">Grade 12 (Maharashtra HSC) - Science</p>

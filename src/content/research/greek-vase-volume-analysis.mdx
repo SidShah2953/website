@@ -1,0 +1,164 @@
+---
+title: "Greek Vase Volume Analysis Using Mathematical Modeling"
+publishedAt: 2025-11-01T00:00:00Z
+description: "Advanced interdisciplinary research combining mathematical modeling, statistical analysis, and Python programming to compute volumes of ancient Greek vases using geometric principles and modern computational methods. Achieved 4.91% mean relative error."
+authors:
+  - "Siddhant Shah"
+  - "Minfei Liang"
+  - "Eugene Pinsky"
+publication: "MDPI Journal (Metrology)"
+tags:
+  - "Mathematical Modeling"
+  - "Statistical Analysis"
+  - "Python"
+  - "Data Analytics"
+  - "Archaeological Research"
+  - "Computational Methods"
+isPublished: false
+---
+
+## Overview
+
+This advanced interdisciplinary research project combines mathematical modeling, statistical analysis, Python programming, and data analytics to solve a centuries-old archaeological problem: accurately computing volumes of ancient Greek vases using geometric principles and modern computational methods.
+
+**Publication**: MDPI Journal (Metrology) - November 2025  
+**Team**: Siddhant Shah, Minfei Liang, Eugene Pinsky  
+**Affiliation**: Boston University, Department of Computer Science
+
+## Objective
+
+Develop an accurate, practical method for computing volumes of ancient Greek amphorae using mathematical modeling and computational methods. Enable large-scale analysis of 130,000+ vases in the Beazley Archive database to support archaeological research on ancient trade and economic activity.
+
+## Problem Context
+
+### Historical Significance
+Ancient Greek amphorae were critical for trade and commerce, used for storing and transporting wine, olive oil, and grain. Accurate volume measurement is essential for understanding economic activity, trade patterns, and consumption estimates in antiquity.
+
+### Technical Challenges
+- Direct volume measurement is infeasible due to age and fragility of artifacts
+- Many specimens are incomplete (fragments only)
+- Museum preservation restrictions limit physical manipulation
+- Over 130,000 vases cataloged in Beazley Archive require systematic analysis
+
+## Methodology
+
+### Data Collection
+- **Dataset**: 25+ ancient Greek amphorae from Boston Museum of Fine Arts
+- **Source**: Lacey Caskey's measurements from "A Geometry of Greek Vases" (1920s)
+- **Metrics**: Height, width, diameter measurements, geometric ratios (Golden Ratio φ, √2, √3, √5), cross-sectional profiles
+
+### Mathematical Modeling
+
+**Hypothesis**: Greek vase contours follow logarithmic spiral equations based on "dynamic symmetry" principles.
+
+**Model Components**:
+- Derived closed-form mathematical formulas for volume calculation
+- Developed parametric equations with parameters: α (growth rate), β (rotation), c (scaling factor), θ (angular coordinates)
+- Created exact analytical solution using integral calculus for volumes of revolution
+
+**Key Parameters**:
+- α (growth rate): Range -0.13 to 0.07
+- β (rotation): Range -0.06 to 0.05
+- c (scaling factor): Range 0.15 to 0.24
+
+### Statistical Analysis
+
+Performed t-Test analysis to validate approximation methods:
+- **Sample Size**: 25
+- **t-statistic**: 0.66
+- **p-value**: 0.52
+- **Significance Level**: 95%
+- **Conclusion**: Failed to reject null hypothesis, validating approximation simplifications
+
+### Computational Implementation
+
+**Technologies**:
+- **Python** with NumPy (numerical computing) and SciPy (optimization algorithms)
+- Numerical optimization and parameter estimation
+- Least-squares fitting and gradient descent
+- Coordinate transformation and normalization
+
+### Approximation Methods
+
+| Method | Mean Relative Error | Complexity | Use Case |
+|--------|---------------------|------------|----------|
+| Single Frustum | 15-20% | Low | Quick estimates |
+| Two Frustums | 8-12% | Medium | Better accuracy |
+| Semi-Ellipsoid (Optimal) | **4.91%** | Medium | Recommended for practical applications |
+
+## Key Formula
+
+Simplified volume formula for practical application:
+
+**Body Volume**: V ≈ (2π/3) × (widest radius)² × (body height)  
+**Neck Volume**: V_neck ≈ (3π/4) × (neck diameter)² × (neck height)  
+**Total Volume**: V_total = V_body + V_neck
+
+This formula requires only 3 basic measurements and achieves 4.91% mean relative error.
+
+## Results
+
+### Validation Metrics
+- **Sample Size**: 25 vases
+- **Accuracy Confidence**: 95%
+- **Best Model Performance**: 4.91% mean relative error (semi-ellipsoid method)
+- **Validation Baselines**: Compared against web-based tools (Université Libre de Bruxelles) and Getty Museum reported volumes
+
+### Project Impact
+
+**Academic Contribution**:
+- First mathematical framework for universal Greek vase volume calculation
+- Validated hypothesis connecting dynamic symmetry to logarithmic spirals
+- Provided simple, historically accurate volume estimation method
+
+**Practical Impact**:
+- Enables large-scale analysis of 130,000+ vases in Beazley Archive database
+- Supports archaeological research on ancient trade and economic activity
+- Creates standardized methodology for museum cataloging
+
+## Technical Skills Demonstrated
+
+### Quantitative & Analytical
+- Advanced Mathematics (Calculus, differential equations, analytical geometry)
+- Statistical Analysis (Hypothesis testing, t-tests, error analysis)
+- Optimization Theory (Constrained optimization, parameter estimation)
+- Data Modeling (Parametric modeling, regression analysis, model validation)
+
+### Technical & Programming
+- Python Proficiency (NumPy, SciPy, optimization algorithms)
+- Data Processing (normalization, coordinate systems, transformations)
+- Algorithm Development (numerical integration, convergence analysis)
+- LaTeX Documentation
+
+### Research & Problem Solving
+- Problem Decomposition
+- Hypothesis Development
+- Cross-disciplinary Integration (art history, mathematics, computer science)
+- Validation & Verification with external benchmarks
+
+## Transferable Skills
+
+This project demonstrates skills directly applicable to quantitative finance and investment analysis:
+
+- **Financial Modeling**: Mathematical rigor for pricing models, risk analysis, portfolio optimization
+- **Data-Driven Decision Making**: Validated hypotheses with quantitative evidence
+- **Model Validation**: Rigorous backtesting and error analysis for trading strategies
+- **Programming for Finance**: Python skills for algorithmic trading and risk management
+- **Statistical Inference**: Hypothesis testing framework for market research and factor analysis
+- **Approximation Methods**: Balancing accuracy vs. simplicity in financial models
+- **Parameter Estimation**: Similar to estimating beta, volatility, correlation matrices
+
+## Applications
+
+Similar analytical challenges exist in:
+- Container logistics and volume estimation
+- 3D modeling applications
+- Industrial measurement systems
+- Archaeological and museum research
+
+## Publication
+
+**Published in**: MDPI Journal (Metrology)  
+**Date**: November 2025  
+**Authors**: Siddhant Shah, Minfei Liang, Eugene Pinsky  
+**Institution**: Boston University, Department of Computer Science

@@ -1,7 +1,7 @@
 ---
 import Header from "../components/Header.astro";
 import SEOTags from "@/components/seo/SEOTags.astro";
-import Background from "@/components/Background.astro";
+import LiquidBackground from "@/components/LiquidBackground.astro";
 import Footer from "@/components/Footer.astro";
 import type { HeadTags } from "@/utils/types/HeadTags";
 
@@ -19,14 +19,16 @@ const headTags = Astro.props;
   <SEOTags {...headTags} />
   <slot name="head" />
 
-  <body>
-    <Background />
-    <div class="mx-auto relative top-0 flex z-50 min-h-screen max-w-7xl flex-col gap-9 bg- px-10 py-8 text-sm text-neutral-300 md:gap-20 md:py-16">
+  <body class="antialiased">
+    <LiquidBackground />
+    <div class="mx-auto relative z-10 flex min-h-screen max-w-7xl flex-col gap-12 px-6 py-8 md:px-10 md:gap-20 md:py-16">
       <Header />
       <slot />
       <style is:global>
         html {
-          font-family: "Open Sans";
+          font-family: "Open Sans", system-ui, sans-serif;
+          -webkit-font-smoothing: antialiased;
+          -moz-osx-font-smoothing: grayscale;
         }
       </style>
       <Footer />
