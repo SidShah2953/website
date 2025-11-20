@@ -29,4 +29,20 @@ const education = defineCollection({
   schema: z.any(),
 });
 
-export const collections = { posts, projects, education };
+// Blog posts collection (dedicated blog subdomain)
+const blog = defineCollection({
+  type: "content",
+  schema: z.object({
+    title: z.string(),
+    description: z.string().max(300),
+    publishedAt: z.date(),
+    updatedAt: z.date().optional(),
+    tags: z.array(z.string()).default([]),
+    isDraft: z.boolean().default(false),
+    readingTimeMinutes: z.number().optional(), // injected at build
+    canonical: z.string().url().optional(),
+    ogImage: z.string().optional(),
+  }),
+});
+
+export const collections = { posts, projects, education, blog };
