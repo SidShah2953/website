@@ -27,7 +27,7 @@ integrity="sha384-MlJdn/WNKDGXveldHDdyRP1R4CTHr3FeuDNfhsLPYrq2t0UBkUdK2jyTnXPEK1
 crossorigin="anonymous"
 />
 <Layout title={project.data.title} description={project.data.description}>
-  <script slot="head" data-goatcounter="https://siddhants.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+  {import.meta.env.PROD && <script slot="head" data-goatcounter="https://siddhants.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>}
   <main class="project mx-auto flex w-full max-w-full flex-col gap-4">
     <header role="presentation">
       <h1 class="text-4xl">
