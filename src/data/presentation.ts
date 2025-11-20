@@ -13,7 +13,7 @@ type Presentation = {
 
 const presentation: Presentation = {
   name: "Siddhant Shah",
-  mail: "sidshah2953@gmail.com",
+  mail: "siddhant@siddhants.com",
   title: "Hi, I'm Siddhant",
   // profile: "/profile.webp",
   description:
@@ -21,7 +21,7 @@ const presentation: Presentation = {
   socials: [
     {
       label: "Email",
-      link: "mailto:sidshah2953@gmail.com",
+      link: "mailto:siddhant@siddhants.com",
     },
     {
       label: "LinkedIn",
