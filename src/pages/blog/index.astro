@@ -1,0 +1,60 @@
+---
+import { getCollection } from 'astro:content';
+import BlogLayout from '@/layouts/BlogLayout.astro';
+import PostCard from '@/components/PostCard.astro';
+import { estimateReadingTime } from '@/utils/estimateReadingTime';
+import '@/styles/tailwind.css';
+import '@/styles/post.css';
+
+const selectedTag = Astro.url.searchParams.get('tag');
+const blogPosts = (await getCollection('blog')).filter(p => !p.data.isDraft).sort((a,b)=> b.data.publishedAt.getTime() - a.data.publishedAt.getTime());
+
+// Inject reading time (if not stored yet)
+const enriched = blogPosts.map(p => {
+  if(!p.data.readingTimeMinutes){
+    const stats = estimateReadingTime(p.body);
+    return { ...p, data: { ...p.data, readingTimeMinutes: stats.minutes } };
+  }
+  return p;
+});
+
+// Filter by tag if selected
+const filtered = selectedTag ? enriched.filter(p => p.data.tags.includes(selectedTag)) : enriched;
+
+// Collect all unique tags
+const allTags = [...new Set(enriched.flatMap(p => p.data.tags))].sort();
+---
+<BlogLayout title="Blog" description="Articles, write-ups & thoughts" canonical={"https://" + (import.meta.env.PUBLIC_BLOG_HOST || 'blog.example.com') + '/'}>
+  <section class="flex flex-col gap-6">
+    <h1 class="text-4xl font-semibold">Blog</h1>
+    <p class="text-neutral-300">Long-form posts, experiments & deeper dives.</p>
+    
+    {allTags.length > 0 && (
+      <div class="flex flex-wrap gap-2">
+        <a href="/blog" class={`px-3 py-1 rounded-full text-sm ${!selectedTag ? 'bg-neutral-700 text-neutral-100' : 'bg-neutral-800 text-neutral-400 hover:bg-neutral-700'}`}>All</a>
+        {allTags.map(tag => (
+          <a href={`/blog?tag=${encodeURIComponent(tag)}`} class={`px-3 py-1 rounded-full text-sm ${selectedTag === tag ? 'bg-neutral-700 text-neutral-100' : 'bg-neutral-800 text-neutral-400 hover:bg-neutral-700'}`}>{tag}</a>
+        ))}
+      </div>
+    )}
+
+    {selectedTag && (
+      <p class="text-sm text-neutral-400">Showing posts tagged with <strong class="text-neutral-200">{selectedTag}</strong></p>
+    )}
+
+    <div class="grid gap-6 md:grid-cols-2">
+      {filtered.map(post => (
+        <PostCard
+          publishedAt={post.data.publishedAt}
+          title={post.data.title}
+          description={post.data.description}
+          slug={post.slug}
+        />
+      ))}
+    </div>
+    
+    {filtered.length === 0 && (
+      <p class="text-neutral-400">No posts found with this tag.</p>
+    )}
+  </section>
+</BlogLayout>

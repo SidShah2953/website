@@ -12,7 +12,7 @@ import formatDateFromJSON from "@/utils/formatDateFromJSON";
 
 import presentation from "@/data/presentation";
 
-const posts = (await getCollection("posts")).sort(function (first, second) {
+const posts = (await getCollection("blog")).filter(p => !p.data.isDraft).sort(function (first, second) {
   return second.data.publishedAt.getTime() - first.data.publishedAt.getTime();
 });
 const projects = (await getCollection("projects")).sort(function (first, second) {
@@ -43,7 +43,7 @@ import courses from "@/content/education/courses.json";
     <article class="flex flex-col gap-8">
       <header class="flex w-full flex-row justify-between gap-2">
         <h3 class="text-2xl text-neutral-100">Latest posts</h3>
-        <Link href="./posts" label="See All Posts" isUnderline='True' />
+        <Link href="./blog" label="See All Posts" isUnderline='True' />
       </header>
       {posts.length === 0 && <p>Soon, stay connected 👀...</p>}
       <section class="flex flex-col gap-2 md:flex-row md:flex-wrap">
