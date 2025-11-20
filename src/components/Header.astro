@@ -13,7 +13,10 @@ const pathname = removeTrailingSlash(Astro.url.pathname);
       src={stylisedName}
       class="left-0 inline-block align-bottom"
       alt="Siddhant Shah"
+      width="143"
       height="50"
+      loading="eager"
+      fetchpriority="high"
     />
   </a>
 
@@ -61,11 +64,11 @@ const pathname = removeTrailingSlash(Astro.url.pathname);
       <li>/</li>
       <li>
         <a
-          href="/posts"
+          href="/blog"
           class:list={{
             ["hover:text-neutral-100"]: true,
-            ["text-neutral-100"]: pathname === "/posts",
-          }}>Posts</a
+            ["text-neutral-100"]: pathname === "/blog" || pathname.startsWith("/blog/"),
+          }}>Blog</a
         >
       </li>
     </ul>

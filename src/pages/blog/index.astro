@@ -1,12 +1,9 @@
 ---
 import { getCollection } from 'astro:content';
-import BlogLayout from '@/layouts/BlogLayout.astro';
+import Layout from '@/layouts/Layout.astro';
 import PostCard from '@/components/PostCard.astro';
 import { estimateReadingTime } from '@/utils/estimateReadingTime';
-import '@/styles/tailwind.css';
-import '@/styles/post.css';
 
-const selectedTag = Astro.url.searchParams.get('tag');
 const blogPosts = (await getCollection('blog')).filter(p => !p.data.isDraft).sort((a,b)=> b.data.publishedAt.getTime() - a.data.publishedAt.getTime());
 
 // Inject reading time (if not stored yet)
@@ -18,43 +15,136 @@ const enriched = blogPosts.map(p => {
   return p;
 });
 
-// Filter by tag if selected
-const filtered = selectedTag ? enriched.filter(p => p.data.tags.includes(selectedTag)) : enriched;
-
 // Collect all unique tags
 const allTags = [...new Set(enriched.flatMap(p => p.data.tags))].sort();
+
+// Pass all posts to client-side for filtering
+const postsData = enriched.map(p => ({
+  slug: p.slug,
+  title: p.data.title,
+  description: p.data.description,
+  publishedAt: p.data.publishedAt.toISOString(),
+  tags: p.data.tags
+}));
 ---
-<BlogLayout title="Blog" description="Articles, write-ups & thoughts" canonical={"https://" + (import.meta.env.PUBLIC_BLOG_HOST || 'blog.example.com') + '/'}>
-  <section class="flex flex-col gap-6">
-    <h1 class="text-4xl font-semibold">Blog</h1>
-    <p class="text-neutral-300">Long-form posts, experiments & deeper dives.</p>
+<Layout title="Blog | Siddhant Shah" description="Articles, write-ups & thoughts">
+  <main class="flex flex-col gap-20">
+    <section class="flex flex-col gap-8">
+      <header class="flex w-full flex-row justify-between gap-2">
+        <h3 class="text-2xl text-neutral-100">Blog</h3>
+      </header>
+      <p class="text-lg leading-6">Long-form posts, experiments & deeper dives.</p>
     
-    {allTags.length > 0 && (
-      <div class="flex flex-wrap gap-2">
-        <a href="/blog" class={`px-3 py-1 rounded-full text-sm ${!selectedTag ? 'bg-neutral-700 text-neutral-100' : 'bg-neutral-800 text-neutral-400 hover:bg-neutral-700'}`}>All</a>
-        {allTags.map(tag => (
-          <a href={`/blog?tag=${encodeURIComponent(tag)}`} class={`px-3 py-1 rounded-full text-sm ${selectedTag === tag ? 'bg-neutral-700 text-neutral-100' : 'bg-neutral-800 text-neutral-400 hover:bg-neutral-700'}`}>{tag}</a>
+      {allTags.length > 0 && (
+        <div class="flex flex-wrap gap-2" id="tag-filters">
+          <button data-tag="" class="tag-filter px-3 py-1 rounded-full text-sm bg-neutral-700 text-neutral-100">All</button>
+          {allTags.map(tag => (
+            <button data-tag={tag} class="tag-filter px-3 py-1 rounded-full text-sm bg-neutral-800 text-neutral-400 hover:bg-neutral-700">{tag}</button>
+          ))}
+        </div>
+      )}
+
+      <p id="tag-message" class="text-sm text-neutral-400 hidden"></p>
+
+      <section id="posts-container" class="flex flex-col gap-2 md:flex-row md:flex-wrap">
+        {enriched.map(post => (
+          <PostCard
+            publishedAt={post.data.publishedAt}
+            title={post.data.title}
+            description={post.data.description}
+            slug={post.slug}
+          />
         ))}
-      </div>
-    )}
+      </section>
 
-    {selectedTag && (
-      <p class="text-sm text-neutral-400">Showing posts tagged with <strong class="text-neutral-200">{selectedTag}</strong></p>
-    )}
+      <p id="no-posts-message" class="text-neutral-400 hidden">No posts found for this tag.</p>
+    </section>
+  </main>
 
-    <div class="grid gap-6 md:grid-cols-2">
-      {filtered.map(post => (
-        <PostCard
-          publishedAt={post.data.publishedAt}
-          title={post.data.title}
-          description={post.data.description}
-          slug={post.slug}
-        />
-      ))}
-    </div>
-    
-    {filtered.length === 0 && (
-      <p class="text-neutral-400">No posts found with this tag.</p>
-    )}
-  </section>
-</BlogLayout>
+  <script define:vars={{ postsData }}>
+    const posts = postsData;
+    const container = document.getElementById('posts-container');
+    const tagMessage = document.getElementById('tag-message');
+    const noPostsMessage = document.getElementById('no-posts-message');
+    const tagFilters = document.querySelectorAll('.tag-filter');
+
+    function renderPosts(filtered, selectedTag) {
+      if (filtered.length === 0) {
+        container.classList.add('hidden');
+        noPostsMessage.classList.remove('hidden');
+        return;
+      }
+
+      container.classList.remove('hidden');
+      noPostsMessage.classList.add('hidden');
+
+      container.innerHTML = filtered.map(post => {
+        const date = new Date(post.publishedAt).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' }).replace(/\//g, '/');
+        return `
+          <a class="group flex cursor-pointer flex-col gap-2 w-full md:w-[49%] rounded-xl border border-neutral-500 p-4 transition-all duration-200 hover:-translate-y-2 hover:border-neutral-200 hover:bg-slate-600 hover:bg-opacity-40 hover:text-neutral-100" href="/blog/${post.slug}">
+            <div class="flex w-full flex-col justify-between gap-2 md:flex-row md:items-center">
+              <p class="text-neutral-100 text-lg">${post.title}</p>
+              <div class="flex flex-row items-center gap-4">
+                <p>${date}</p>
+                <svg width="18" height="18" viewBox="0 0 18 18" fill="none" class="transition-all duration-200 group-hover:translate-x-1">
+                  <path d="M5.25 12.75L12.75 5.25" stroke="#999999" stroke-linecap="round" stroke-linejoin="round"></path>
+                  <path d="M5.25 5.25H12.75V12.75" stroke="#999999" stroke-linecap="round" stroke-linejoin="round"></path>
+                </svg>
+              </div>
+            </div>
+            <p class="truncate">${post.description}</p>
+          </a>
+        `;
+      }).join('');
+
+      if (selectedTag) {
+        tagMessage.innerHTML = `Showing posts tagged with <strong class="text-neutral-200">${selectedTag}</strong>`;
+        tagMessage.classList.remove('hidden');
+      } else {
+        tagMessage.classList.add('hidden');
+      }
+    }
+
+    function filterByTag(tag) {
+      const filtered = tag ? posts.filter(p => p.tags.includes(tag)) : posts;
+      
+      // Update URL without reload
+      const url = new URL(window.location);
+      if (tag) {
+        url.searchParams.set('tag', tag);
+      } else {
+        url.searchParams.delete('tag');
+      }
+      window.history.pushState({}, '', url);
+
+      // Update button states
+      tagFilters.forEach(btn => {
+        const btnTag = btn.dataset.tag;
+        if (btnTag === tag) {
+          btn.classList.remove('bg-neutral-800', 'text-neutral-400');
+          btn.classList.add('bg-neutral-700', 'text-neutral-100');
+        } else {
+          btn.classList.remove('bg-neutral-700', 'text-neutral-100');
+          btn.classList.add('bg-neutral-800', 'text-neutral-400', 'hover:bg-neutral-700');
+        }
+      });
+
+      renderPosts(filtered, tag);
+    }
+
+    // Set up click handlers
+    tagFilters.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const tag = btn.dataset.tag;
+        filterByTag(tag);
+      });
+    });
+
+    // Check URL on load
+    const urlParams = new URLSearchParams(window.location.search);
+    const initialTag = urlParams.get('tag');
+    if (initialTag) {
+      filterByTag(initialTag);
+    }
+  </script>
+</Layout>
