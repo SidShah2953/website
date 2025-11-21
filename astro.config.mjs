@@ -9,10 +9,6 @@ import mdx from "@astrojs/mdx";
 import rehypeKatex from 'rehype-katex';
 import remarkMath from 'remark-math';
 
-// For ToC
-import remarkToc from "remark-toc";
-import rehypeToc from "rehype-toc";
-
 // https://astro.build/config
 export default defineConfig({
   integrations: [tailwind(),
@@ -24,11 +20,6 @@ export default defineConfig({
       ], // For Latex Integration
 			rehypePlugins: [
         rehypeKatex,
-        [
-          rehypeToc, {
-            headings: ["h2", "h3"],
-          },
-        ],
       ] // For Latex Integration
 		})],
   site: SITE_URL,

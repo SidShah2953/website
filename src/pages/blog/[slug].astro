@@ -26,8 +26,9 @@ const { Content } = await entry.render();
   />
   <script slot="head" defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "e709a605fa1c4a3895e2987e5a9ca9c6"}'></script>
   {import.meta.env.PROD && <script slot="head" data-goatcounter="https://siddhants.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>}
-  <main class="flex flex-col gap-16">
-    <article class="post glass-card p-8 md:p-12 relative overflow-hidden">
+  <main class="flex flex-col lg:flex-row gap-8 max-w-7xl mx-auto w-full">
+    <!-- Main Content -->
+    <article class="post glass-card p-8 md:p-12 relative overflow-hidden flex-1 min-w-0">
       <!-- Decorative gradient -->
       <div class="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-finance-cyan/10 to-finance-purple/10 blur-3xl rounded-full"></div>
       
@@ -64,5 +65,65 @@ const { Content } = await entry.render();
         <Content />
       </div>
     </article>
+
+    <!-- Table of Contents Sidebar -->
+    <aside class="lg:w-80 order-first lg:order-last">
+      <nav class="glass-card p-6 relative overflow-hidden lg:sticky lg:bottom-8 lg:max-h-[calc(100vh-4rem)] lg:overflow-y-auto">
+        <div class="absolute top-0 left-0 w-32 h-32 bg-gradient-to-br from-finance-cyan/5 to-finance-purple/5 blur-2xl rounded-full"></div>
+        <h2 class="text-xl font-semibold gradient-text mb-4 relative z-10">Table of Contents</h2>
+        <div id="toc-container" class="relative z-10"></div>
+      </nav>
+    </aside>
   </main>
+  
+  <script>
+    // Generate hierarchical TOC from headings
+    const article = document.querySelector('.post');
+    const tocContainer = document.getElementById('toc-container');
+    if (article && tocContainer) {
+      const headings = article.querySelectorAll('h2, h3');
+      if (headings.length > 0) {
+        const ol = document.createElement('ol');
+        ol.className = 'space-y-2 text-sm';
+        
+        let currentH2Li: HTMLLIElement | null = null;
+        let currentH3Ol: HTMLOListElement | null = null;
+        
+        headings.forEach((heading, index) => {
+          const id = heading.id || `heading-${index}`;
+          heading.id = id;
+          
+          if (heading.tagName === 'H2') {
+            // Create H2 list item
+            const li = document.createElement('li');
+            const a = document.createElement('a');
+            a.href = `#${id}`;
+            a.textContent = heading.textContent;
+            a.className = 'text-finance-cyan hover:text-finance-blue transition-colors font-medium block py-1';
+            li.appendChild(a);
+            ol.appendChild(li);
+            currentH2Li = li;
+            currentH3Ol = null;
+          } else if (heading.tagName === 'H3' && currentH2Li) {
+            // Create nested list for H3 if it doesn't exist
+            if (!currentH3Ol) {
+              currentH3Ol = document.createElement('ol');
+              currentH3Ol.className = 'ml-0 mt-1 space-y-1';
+              currentH2Li.appendChild(currentH3Ol);
+            }
+            // Create H3 list item
+            const li = document.createElement('li');
+            const a = document.createElement('a');
+            a.href = `#${id}`;
+            a.textContent = heading.textContent;
+            a.className = 'text-neutral-400 hover:text-neutral-300 transition-colors block py-1 pl-4';
+            li.appendChild(a);
+            currentH3Ol.appendChild(li);
+          }
+        });
+        
+        tocContainer.appendChild(ol);
+      }
+    }
+  </script>
 </Layout>
