@@ -17,13 +17,13 @@ const { title, publishedAt, description, slug } = Astro.props;
   href={`/projects/${slug}`}
 >
   <!-- Subtle gradient overlay on hover -->
-  <div class="absolute inset-0 bg-gradient-to-br from-finance-purple/0 to-finance-blue/0 group-hover:from-finance-purple/5 group-hover:to-finance-blue/5 transition-all duration-300 rounded-2xl"></div>
+  <div class="absolute inset-0 bg-gradient-to-br from-finance-blue/0 to-finance-purple/0 group-hover:from-finance-blue/5 group-hover:to-finance-purple/5 transition-all duration-300 rounded-2xl"></div>
   
   <div class="relative z-10">
     <div
       class="flex w-full flex-col justify-between gap-3 md:flex-row md:items-start"
     >
-      <h3 class="text-white text-xl font-semibold leading-tight group-hover:text-finance-purple transition-colors">{title}</h3>
+      <h3 class="text-white text-xl font-semibold leading-tight group-hover:text-finance-blue transition-colors">{title}</h3>
       <div class="flex flex-row items-center gap-3 text-sm text-neutral-400 shrink-0">
         <time datetime={publishedAt.toISOString()}>{formatDate(publishedAt)}</time>
 

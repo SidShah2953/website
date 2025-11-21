@@ -3,7 +3,7 @@
 }
 
 .post code {
-  @apply rounded-lg bg-dark-elevated/60 backdrop-blur-sm px-2 py-1 text-finance-cyan border border-glass-border font-mono text-sm;
+  @apply rounded-lg bg-dark-elevated/60 backdrop-blur-sm px-2 py-1 text-finance-blue border border-glass-border font-mono text-sm;
 }
 
 .post h2 {
@@ -14,16 +14,20 @@
   @apply mt-6 text-xl font-medium text-neutral-100;
 }
 
+.post h4 {
+  @apply mt-5 text-lg font-medium text-neutral-200;
+}
+
 .post nav {
   @apply pb-6 text-neutral-100 no-underline pl-0;
 }
 
 .post nav ol a{
-  @apply text-finance-cyan no-underline hover:text-finance-blue transition-colors;
+  @apply text-finance-blue no-underline hover:text-finance-purple transition-colors;
 }
 
 .post a {
-  @apply text-finance-cyan hover:text-finance-blue underline decoration-finance-cyan/30 hover:decoration-finance-blue/60 transition-all underline-offset-2;
+  @apply text-finance-blue hover:text-finance-purple underline decoration-finance-blue/30 hover:decoration-finance-purple/60 transition-all underline-offset-2;
 }
 
 .post ul {
@@ -35,7 +39,7 @@
 }
 
 .post blockquote {
-  @apply flex flex-row gap-3 p-4 rounded-lg bg-dark-elevated/40 backdrop-blur-sm border-l-4 border-finance-cyan/50 my-4;
+  @apply flex flex-row gap-3 p-4 rounded-lg bg-dark-elevated/40 backdrop-blur-sm border-l-4 border-finance-blue/50 my-4;
   @apply before:content-[''] before:hidden;
 }
 
@@ -53,7 +57,7 @@
 }
 
 .post th {
-  @apply bg-dark-elevated/60 backdrop-blur-sm text-left p-3 text-neutral-100 font-semibold border-b-2 border-finance-cyan/30;
+  @apply bg-dark-elevated/60 backdrop-blur-sm text-left p-3 text-neutral-100 font-semibold border-b-2 border-finance-blue/30;
 }
 
 .post td {
@@ -61,5 +65,67 @@
 }
 
 .post tr:hover {
+  @apply bg-glass/50;
+}
+
+/* Research Page Styles */
+.research p {
+  @apply leading-8 text-neutral-300;
+}
+
+.research code {
+  @apply rounded-lg bg-dark-elevated/60 backdrop-blur-sm px-2 py-1 text-finance-blue border border-glass-border font-mono text-sm;
+}
+
+.research h2 {
+  @apply mt-8 text-3xl font-semibold bg-gradient-to-r from-white to-neutral-300 bg-clip-text text-transparent;
+}
+
+.research h3 {
+  @apply mt-6 text-xl font-medium text-neutral-100;
+}
+
+.research h4 {
+  @apply mt-5 text-lg font-medium text-neutral-200;
+}
+
+.research a {
+  @apply text-finance-blue hover:text-finance-purple underline decoration-finance-blue/30 hover:decoration-finance-purple/60 transition-all underline-offset-2;
+}
+
+.research ul {
+  @apply list-disc pl-6 leading-8 text-neutral-300;
+}
+
+.research ol {
+  @apply list-decimal pl-6 leading-8 text-neutral-300;
+}
+
+.research blockquote {
+  @apply flex flex-row gap-3 p-4 rounded-lg bg-dark-elevated/40 backdrop-blur-sm border-l-4 border-finance-blue/50 my-4;
+  @apply before:content-[''] before:hidden;
+}
+
+.research pre {
+  @apply p-6 rounded-xl bg-dark-elevated/80 backdrop-blur-sm border border-glass-border shadow-glass my-6 overflow-x-auto;
+}
+
+.research pre > code {
+  @apply bg-transparent border-0 p-0 text-neutral-300;
+}
+
+.research table {
+  @apply w-full my-6 border-collapse;
+}
+
+.research th {
+  @apply bg-dark-elevated/60 backdrop-blur-sm text-left p-3 text-neutral-100 font-semibold border-b-2 border-finance-blue/30;
+}
+
+.research td {
+  @apply p-3 border-b border-glass-border text-neutral-300;
+}
+
+.research tr:hover {
   @apply bg-glass/50;
 }

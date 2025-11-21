@@ -86,7 +86,7 @@ const { Content } = await entry.render();
         </div>
       </header>
       
-      <div class="relative z-10 mt-8 prose prose-invert max-w-none">
+      <div class="research relative z-10 mt-8">
         <Content />
       </div>
     </article>
@@ -124,7 +124,7 @@ const { Content } = await entry.render();
             const a = document.createElement('a');
             a.href = `#${id}`;
             a.textContent = heading.textContent;
-            a.className = 'text-finance-green hover:text-finance-cyan transition-colors font-medium block py-1';
+            a.className = 'text-finance-green hover:text-finance-blue transition-colors font-medium block py-1';
             li.appendChild(a);
             ol.appendChild(li);
             currentH2Li = li;

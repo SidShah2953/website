@@ -31,7 +31,7 @@ crossorigin="anonymous"
   <main class="flex flex-col lg:flex-row gap-8 max-w-7xl mx-auto w-full">
     <!-- Main Content -->
     <article class="project glass-card p-8 md:p-12 relative overflow-hidden flex-1 min-w-0">
-      <div class="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-finance-purple/10 to-finance-blue/10 blur-3xl rounded-full"></div>
+      <div class="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-finance-blue/10 to-finance-purple/10 blur-3xl rounded-full"></div>
       
       <header role="presentation" class="relative z-10">
         <h1 class="text-4xl md:text-5xl font-bold gradient-text leading-tight">
@@ -54,7 +54,7 @@ crossorigin="anonymous"
     <!-- Table of Contents Sidebar -->
     <aside class="lg:w-80 order-first lg:order-last">
       <nav class="glass-card p-6 relative overflow-hidden lg:sticky lg:bottom-8 lg:max-h-[calc(100vh-4rem)] lg:overflow-y-auto">
-        <div class="absolute top-0 left-0 w-32 h-32 bg-gradient-to-br from-finance-purple/5 to-finance-blue/5 blur-2xl rounded-full"></div>
+        <div class="absolute top-0 left-0 w-32 h-32 bg-gradient-to-br from-finance-blue/5 to-finance-purple/5 blur-2xl rounded-full"></div>
         <h2 class="text-xl font-semibold gradient-text mb-4 relative z-10">Table of Contents</h2>
         <div id="toc-container" class="relative z-10"></div>
       </nav>
@@ -84,7 +84,7 @@ crossorigin="anonymous"
             const a = document.createElement('a');
             a.href = `#${id}`;
             a.textContent = heading.textContent;
-            a.className = 'text-finance-purple hover:text-finance-blue transition-colors font-medium block py-1';
+            a.className = 'text-finance-blue hover:text-finance-purple transition-colors font-medium block py-1';
             li.appendChild(a);
             ol.appendChild(li);
             currentH2Li = li;
