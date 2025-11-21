@@ -2,7 +2,7 @@
 title: "Stochastic Variational Inference (SVI) with Pyro"
 publishedAt: 2023-09-24
 description: "An in-depth explanation of the Pyro tutorial adapted from Statistical Rethinking. Explores the relationship between topographic heterogeneity and GDP per capita using Bayesian inference."
-tags: ["machine-learning", "python", "bayesian", "pyro", "tutorial"]
+tags: ["machine-learning", "python", "probability"]
 isDraft: false
 ---
 import { Image } from 'astro:assets';
@@ -133,12 +133,10 @@ In equation $(1)$, we assume that the common impact of ruggedness on income is n
 Historical studies and the empirical work of Nunn (2008) have documented that Africa's slave trades adversely affected the political and social structures of societies. We capture this effect of Africa's slave trades with the following equation
 
 $$
-\begin{equation}
-\begin{align*}
-q_i =\quad & κ_2 -\gamma  x_i +u_i \quad \text{if i is in Africa}, \\
-&u_i \quad \text{otherwise}
-\end{align*}
-\end{equation}
+q_i = \begin{cases}
+κ_2 -\gamma  x_i +u_i & \text{if i is in Africa} \\
+u_i & \text{otherwise}
+\end{cases}
 $$
 
 where $x_i$ denotes slave exports, $κ_2$ and $\gamma $ are constants $(\gamma  > 0)$, and $u_i$ is a classical error term.
@@ -230,7 +228,7 @@ $$
 
 Each of these computations (the posterior distribution, the marginal likelihood and the posterior predictive distribution) requires performing integrals that are often impossible or computationally intractable.
 
-While Pyro includes support for many different exact and approximate inference algorithms, the best-supported is variational inference, which offers a unified scheme for finding $\theta_{max}$ and computing a tractable approximation $q_\phi(\textbf{z})$ to the true, unknown posterior $p_{\theta_{max}}(\textbf z \mid \textbf x)$ by converting the intractable integrals into optimization of a functional of $p$ and $q$.
+While Pyro includes support for many different exact and approximate inference algorithms, the best-supported is variational inference, which offers a unified scheme for finding $\theta_{max}$ and computing a tractable approximation $q_\phi(\textbf{z})$ to the true, unknown posterior $p_{\theta_{max}}(\textbf{z} \mid \textbf{x})$ by converting the intractable integrals into optimization of a functional of $p$ and $q$.
 
 This distribution $q_\phi$ is called the variational distribution in much of the literature, and in the context of Pyro it's called the **_guide._**
 
