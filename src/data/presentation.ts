@@ -17,7 +17,7 @@ const presentation: Presentation = {
   title: "Hi, I'm Siddhant",
   // profile: "/profile.webp",
   description:
-    '*MS in Applied Data Analytics* student at *Boston University* with a strong foundation in mathematics and computer science. Experienced in developing *trading strategies*, data analysis, and machine learning applications. Currently pursuing the *CFA Level 1* certification and working on research in *cryptocurrency* and *blockchain technologies*.',
+    'I develop systematic approaches to investment challenges—designing momentum strategies, optimizing sector portfolios, and building institutional AI platforms that integrate research, risk, and portfolio governance in real time. My work spans quantitative research, financial modeling, emerging markets, and AI/ML in capital markets, bridging precision analytics with business insight. Skilled in *Python, SQL, Bloomberg*, and advanced portfolio modeling, I craft data-driven solutions that accelerate smarter investment decisions.',
   socials: [
     {
       label: "Email",
@@ -30,6 +30,14 @@ const presentation: Presentation = {
     {
       label: "Github",
       link: "https://github.com/SidShah2953",
+    },
+    {
+      label: "Medium",
+      link: "https://medium.com/@siddhantshah29",
+    },
+    {
+      label: "Paragraph",
+      link: "https://paragraph.com/@siddhantshah29",
     },
     {
       label: "Resume",
