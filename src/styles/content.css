@@ -1,0 +1,111 @@
+/* Unified Content Styles for Blog, Projects, and Research */
+
+/* Base paragraph styles */
+.content-article .content-body p {
+  @apply text-neutral-300 mb-4 leading-relaxed;
+}
+
+/* Blog posts have slightly different line height */
+.content-article.blog .content-body p {
+  line-height: 1.5;
+}
+
+/* Inline code */
+.content-article .content-body code {
+  @apply rounded-lg bg-dark-elevated/60 backdrop-blur-sm px-2 py-1 text-finance-blue border border-glass-border font-mono text-sm;
+}
+
+/* Headings */
+.content-article .content-body h2 {
+  @apply mt-8 mb-4 text-3xl font-bold bg-gradient-to-r from-white to-neutral-300 bg-clip-text text-transparent;
+}
+
+.content-article .content-body h3 {
+  @apply mt-6 mb-3 text-xl font-bold text-neutral-100;
+}
+
+.content-article .content-body h4 {
+  @apply mt-5 mb-2 text-lg font-semibold text-neutral-200;
+}
+
+/* Project and Research have slightly different heading weights */
+.content-article.project .content-body h2,
+.content-article.research .content-body h2 {
+  @apply font-semibold;
+}
+
+.content-article.project .content-body h3,
+.content-article.research .content-body h3 {
+  @apply font-medium;
+}
+
+.content-article.project .content-body h4,
+.content-article.research .content-body h4 {
+  @apply font-medium;
+}
+
+/* Links */
+.content-article .content-body a {
+  @apply text-finance-blue hover:text-finance-cyan underline decoration-finance-blue/30 hover:decoration-finance-cyan/60 transition-all underline-offset-2;
+}
+
+/* Lists */
+.content-article .content-body ul {
+  @apply list-disc pl-8 leading-8 text-neutral-300 mb-4;
+}
+
+.content-article .content-body ol {
+  @apply list-decimal pl-8 leading-8 text-neutral-300 mb-4;
+}
+
+/* Project lists have slightly less padding */
+.content-article.project .content-body ul,
+.content-article.project .content-body ol {
+  @apply pl-6;
+}
+
+/* Blockquotes */
+.content-article .content-body blockquote {
+  @apply flex flex-row gap-3 p-4 rounded-lg bg-dark-elevated/40 backdrop-blur-sm border-l-4 border-finance-blue/50 my-4;
+  @apply before:content-[''] before:hidden;
+}
+
+/* Code blocks */
+.content-article .content-body pre {
+  @apply p-6 rounded-xl bg-dark-elevated/80 backdrop-blur-sm border border-glass-border shadow-glass my-6 overflow-x-auto;
+}
+
+.content-article .content-body pre > code {
+  @apply bg-transparent border-0 p-0 text-neutral-300;
+}
+
+/* Tables */
+.content-article .content-body table {
+  @apply w-full my-6 border-collapse text-sm;
+}
+
+.content-article .content-body th {
+  @apply bg-dark-elevated/60 backdrop-blur-sm text-left p-2 text-neutral-100 font-semibold border-b-2 border-finance-blue/30 leading-tight;
+}
+
+.content-article .content-body td {
+  @apply p-2 border-b border-glass-border text-neutral-300 leading-tight;
+}
+
+.content-article .content-body tr:hover {
+  @apply bg-glass/50;
+}
+
+/* Navigation (TOC inside articles) */
+.content-article nav {
+  @apply pb-6 text-neutral-100 no-underline pl-0;
+}
+
+.content-article nav ol a {
+  @apply text-finance-blue no-underline hover:text-finance-cyan transition-colors;
+}
+
+/* Project nav has slightly different padding */
+.content-article.project nav {
+  @apply pb-5;
+}

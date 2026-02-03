@@ -1,0 +1,214 @@
+---
+import type { CollectionEntry } from "astro:content";
+
+export type ContentType = "blog" | "project" | "research";
+
+type BlogEntry = CollectionEntry<"blog">;
+type ProjectEntry = CollectionEntry<"projects">;
+type ResearchEntry = CollectionEntry<"research">;
+
+export interface Props {
+  type: ContentType;
+  entry: BlogEntry | ProjectEntry | ResearchEntry;
+  Content: any;
+  readingTime?: number;
+}
+
+const { type, entry, Content, readingTime } = Astro.props;
+
+const isResearch = type === "research";
+
+// Helper to format date
+const formatDate = (date: Date, style: "long" | "short" = "long") => {
+  if (style === "long") {
+    return date.toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
+  }
+  return date.toDateString();
+};
+
+// Type guards
+const isBlogEntry = (e: typeof entry): e is BlogEntry => type === "blog";
+const isResearchEntry = (e: typeof entry): e is ResearchEntry => type === "research";
+---
+
+<main class="flex flex-col lg:flex-row gap-8 w-full">
+  <!-- Table of Contents Sidebar -->
+  <aside class="lg:w-64 shrink-0 order-last lg:order-first">
+    <nav class="glass-card p-6 relative overflow-hidden lg:sticky lg:top-8 lg:max-h-[calc(100vh-4rem)] lg:overflow-y-auto">
+      {isResearch ? (
+        <div class="absolute top-0 left-0 w-32 h-32 bg-gradient-to-br from-finance-green/5 to-finance-cyan/5 blur-2xl rounded-full"></div>
+      ) : (
+        <div class="absolute top-0 left-0 w-32 h-32 bg-gradient-to-br from-finance-blue/5 to-finance-purple/5 blur-2xl rounded-full"></div>
+      )}
+      <h2 class="text-xl font-semibold gradient-text mb-4 relative z-10">Table of Contents</h2>
+      <div id="toc-container" class="relative z-10"></div>
+    </nav>
+  </aside>
+
+  <!-- Main Content -->
+  <article class={`content-article ${type} glass-card p-8 md:p-12 relative overflow-hidden flex-1 min-w-0`}>
+    <!-- Decorative gradient -->
+    {isResearch ? (
+      <div class="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-finance-green/10 to-finance-cyan/10 blur-3xl rounded-full"></div>
+    ) : (
+      <div class="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-finance-blue/10 to-finance-purple/10 blur-3xl rounded-full"></div>
+    )}
+
+    <header class="flex w-full flex-col gap-4 relative z-10">
+      <h1 class="text-4xl md:text-5xl font-bold gradient-text leading-tight">{entry.data.title}</h1>
+
+      {entry.data.description && (
+        <p class="text-lg text-neutral-300 leading-relaxed">{entry.data.description}</p>
+      )}
+
+      <!-- Blog-specific: "Written by" line -->
+      {isBlogEntry(entry) && (
+        <p class="text-sm text-neutral-400">
+          Written by Siddhant Shah on <time datetime={entry.data.publishedAt.toISOString()}>{formatDate(entry.data.publishedAt)}</time>
+        </p>
+      )}
+
+      <!-- Project/Research: Date only -->
+      {!isBlogEntry(entry) && (
+        <div class="flex items-center gap-2 text-sm text-neutral-400">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+          </svg>
+          <time datetime={entry.data.publishedAt.toISOString()}>
+            {formatDate(entry.data.publishedAt, type === "research" ? "short" : "long")}
+          </time>
+        </div>
+      )}
+
+      <!-- Research-specific: Authors and Publication -->
+      {isResearchEntry(entry) && (
+        <div class="flex flex-col gap-2">
+          <p class="text-neutral-400">
+            <span class="text-neutral-500 font-semibold">Authors:</span> {entry.data.authors.join(", ")}
+          </p>
+          {entry.data.publication && (
+            <p class="text-finance-cyan font-medium">{entry.data.publication}</p>
+          )}
+        </div>
+      )}
+
+      <!-- Blog: Reading time and clickable tags -->
+      {isBlogEntry(entry) && (
+        <div class="flex flex-wrap gap-4 text-sm text-neutral-400 items-center">
+          {readingTime && (
+            <span class="flex items-center gap-2">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              {readingTime} min read
+            </span>
+          )}
+          {entry.data.tags && entry.data.tags.length > 0 && (
+            <span class="flex gap-2 flex-wrap">
+              {entry.data.tags.map((tag: string) => (
+                <a href={`/blog?tag=${encodeURIComponent(tag)}`}
+                   class="px-3 py-1 rounded-lg bg-finance-blue/10 text-finance-blue border border-finance-blue/30 hover:bg-finance-purple/20 hover:border-finance-purple/50 transition-all text-xs font-medium">
+                  {tag}
+                </a>
+              ))}
+            </span>
+          )}
+        </div>
+      )}
+
+      <!-- Research: Non-clickable tags -->
+      {isResearchEntry(entry) && entry.data.tags && entry.data.tags.length > 0 && (
+        <div class="flex flex-wrap gap-3 pt-2">
+          {entry.data.tags.map((tag: string) => (
+            <span class="px-3 py-1 rounded-lg bg-finance-cyan/10 text-finance-cyan border border-finance-cyan/30 text-sm font-medium">
+              {tag}
+            </span>
+          ))}
+        </div>
+      )}
+
+      <!-- Research: External links (DOI, arXiv, PDF) -->
+      {isResearchEntry(entry) && (entry.data.doi || entry.data.arxiv || entry.data.pdfUrl) && (
+        <div class="flex flex-wrap gap-3 pt-4 border-t border-glass-border">
+          {entry.data.pdfUrl && (
+            <a href={entry.data.pdfUrl} target="_blank" rel="noopener noreferrer"
+               class="glass-btn text-finance-cyan hover:text-white inline-flex items-center gap-2">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+              Download PDF
+            </a>
+          )}
+          {entry.data.doi && (
+            <a href={`https://doi.org/${entry.data.doi}`} target="_blank" rel="noopener noreferrer"
+               class="glass-btn text-neutral-300 hover:text-white">
+              DOI: {entry.data.doi}
+            </a>
+          )}
+          {entry.data.arxiv && (
+            <a href={`https://arxiv.org/abs/${entry.data.arxiv}`} target="_blank" rel="noopener noreferrer"
+               class="glass-btn text-neutral-300 hover:text-white">
+              arXiv: {entry.data.arxiv}
+            </a>
+          )}
+        </div>
+      )}
+    </header>
+
+    <div class="content-body relative z-10 mt-8">
+      <Content />
+    </div>
+  </article>
+</main>
+
+<script>
+  // Generate hierarchical TOC from headings
+  const article = document.querySelector('.content-article');
+  const tocContainer = document.getElementById('toc-container');
+  if (article && tocContainer) {
+    const headings = article.querySelectorAll('h2, h3');
+    if (headings.length > 0) {
+      const ol = document.createElement('ol');
+      ol.className = 'space-y-2 text-sm';
+
+      let currentH2Li = null;
+      let currentH3Ol = null;
+
+      headings.forEach((heading, index) => {
+        const id = heading.id || `heading-${index}`;
+        heading.id = id;
+
+        if (heading.tagName === 'H2') {
+          const li = document.createElement('li');
+          const a = document.createElement('a');
+          a.href = `#${id}`;
+          a.textContent = heading.textContent;
+          a.className = 'text-finance-cyan hover:text-white transition-colors font-medium block py-1';
+          li.appendChild(a);
+          ol.appendChild(li);
+          currentH2Li = li;
+          currentH3Ol = null;
+        } else if (heading.tagName === 'H3' && currentH2Li) {
+          if (!currentH3Ol) {
+            currentH3Ol = document.createElement('ol');
+            currentH3Ol.className = 'ml-0 mt-1 space-y-1';
+            currentH2Li.appendChild(currentH3Ol);
+          }
+          const li = document.createElement('li');
+          const a = document.createElement('a');
+          a.href = `#${id}`;
+          a.textContent = heading.textContent;
+          a.className = 'text-neutral-400 hover:text-neutral-300 transition-colors block py-1 pl-4';
+          li.appendChild(a);
+          currentH3Ol.appendChild(li);
+        }
+      });
+
+      tocContainer.appendChild(ol);
+    }
+  }
+</script>
