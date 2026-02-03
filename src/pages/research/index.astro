@@ -1,68 +1,32 @@
 ---
 import { getCollection } from "astro:content";
-import Layout from "@/layouts/Layout.astro";
-import formatDate from "@/utils/formatDate";
+import ContentListLayout from "@/layouts/ContentListLayout.astro";
+import ContentCard from "@/components/ContentCard.astro";
 
-const research = (await getCollection("research")).filter(r => r.data.isPublished).sort(function (first, second) {
-  return second.data.publishedAt.getTime() - first.data.publishedAt.getTime();
-});
+const research = (await getCollection("research"))
+  .filter(r => r.data.isPublished)
+  .sort((a, b) => b.data.publishedAt.getTime() - a.data.publishedAt.getTime());
 ---
 
-<Layout title="Research | Siddhant Shah" description="Published research papers and academic work">
-  <main class="flex flex-col gap-12">
-    <header>
-      <h1 class="text-4xl md:text-5xl font-bold gradient-text">Research</h1>
-      <p class="text-lg text-neutral-300 leading-relaxed mt-4">Published papers, preprints, and academic contributions.</p>
-    </header>
-    
-    <article class="flex flex-col gap-4">
-      {research.length === 0 && <p class="text-neutral-400">No publications yet. Stay tuned!</p>}
-      {
-        research.map((paper) => (
-          <a
-            href={`/research/${paper.slug}`}
-            class="group glass-card-hover p-6 md:p-8 flex flex-col gap-4 relative overflow-hidden"
-          >
-            <div class="absolute inset-0 bg-gradient-to-br from-finance-cyan/0 to-finance-blue/0 group-hover:from-finance-cyan/5 group-hover:to-finance-blue/5 transition-all duration-300 rounded-2xl"></div>
-
-            <div class="relative z-10">
-              <div class="flex justify-between items-start gap-4 flex-wrap">
-                <h2 class="text-2xl font-bold text-white group-hover:text-finance-cyan transition-colors leading-tight flex-1">{paper.data.title}</h2>
-                <time datetime={paper.data.publishedAt.toISOString()} class="text-sm text-neutral-400 shrink-0">{formatDate(paper.data.publishedAt)}</time>
-              </div>
-              
-              <p class="text-neutral-400 mt-2">{paper.data.authors.join(", ")}</p>
-              
-              {paper.data.publication && (
-                <p class="text-finance-cyan font-medium mt-2">{paper.data.publication}</p>
-              )}
-              
-              <p class="text-neutral-300 mt-4 leading-relaxed">{paper.data.description}</p>
-              
-              <div class="flex gap-3 mt-4 flex-wrap items-center">
-                {paper.data.tags.map(tag => (
-                  <span class="text-xs px-3 py-1 rounded-lg bg-finance-cyan/10 text-finance-cyan border border-finance-cyan/30">
-                    {tag}
-                  </span>
-                ))}
-                
-                <div class="flex gap-2 ml-auto">
-                  {paper.data.doi && (
-                    <span class="text-xs px-3 py-1 rounded-lg bg-glass border border-glass-border text-neutral-300">
-                      DOI: {paper.data.doi}
-                    </span>
-                  )}
-                  {paper.data.arxiv && (
-                    <span class="text-xs px-3 py-1 rounded-lg bg-glass border border-glass-border text-neutral-300">
-                      arXiv: {paper.data.arxiv}
-                    </span>
-                  )}
-                </div>
-              </div>
-            </div>
-          </a>
-        ))
-      }
-    </article>
-  </main>
-</Layout>
+<ContentListLayout
+  title="Research"
+  pageTitle="Research | Siddhant Shah"
+  description="Published papers, preprints, and academic contributions."
+  contentType="research"
+>
+  {research.length === 0 && <p class="text-neutral-400">No publications yet. Stay tuned!</p>}
+  {research.map(paper => (
+    <ContentCard
+      type="research"
+      slug={paper.slug}
+      title={paper.data.title}
+      description={paper.data.description}
+      publishedAt={paper.data.publishedAt}
+      authors={paper.data.authors}
+      publication={paper.data.publication}
+      doi={paper.data.doi}
+      arxiv={paper.data.arxiv}
+      tags={paper.data.tags}
+    />
+  ))}
+</ContentListLayout>

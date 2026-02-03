@@ -1,0 +1,118 @@
+---
+export type TimelineType = 'education' | 'experience' | 'course';
+
+export interface Props {
+  type: TimelineType;
+  title: string;
+  organization?: string;
+  organizationUrl?: string;
+  dateRange?: string;
+  subtitle?: string;
+  location?: string;
+  items?: string[];
+  skills?: string;
+  // Course-specific
+  completedOn?: Date;
+  offeredBy?: string;
+}
+
+import formatDate from "@/utils/formatDate";
+
+const {
+  type,
+  title,
+  organization,
+  organizationUrl,
+  dateRange,
+  subtitle,
+  location,
+  items = [],
+  skills,
+  completedOn,
+  offeredBy
+} = Astro.props;
+
+const isCourse = type === 'course';
+---
+
+<div class={`timeline-card timeline-card--${type} ${isCourse ? 'group glass-card-hover' : 'glass-card'} p-6 ${!isCourse ? 'md:p-8' : ''} flex flex-col w-full gap-4 relative overflow-hidden`}>
+  {type === 'experience' && (
+    <div class="absolute top-0 right-0 w-32 h-32 bg-finance-blue/10 rounded-full blur-2xl"></div>
+  )}
+
+  {isCourse && (
+    <div class="absolute inset-0 bg-gradient-to-br from-finance-cyan/0 to-finance-blue/0 group-hover:from-finance-cyan/5 group-hover:to-finance-blue/5 transition-all duration-300 rounded-2xl"></div>
+  )}
+
+  <div class="relative z-10">
+    {isCourse ? (
+      <!-- Course card layout -->
+      <Fragment>
+        <h3 class="text-white text-lg font-semibold leading-tight group-hover:text-finance-cyan transition-colors">{title}</h3>
+        <div class="mt-3 flex flex-col gap-1 text-sm text-neutral-400">
+          {completedOn && (
+            <p>
+              <span class="text-neutral-500 font-medium">Completed:</span>{" "}
+              <time datetime={completedOn.toISOString()}>{formatDate(completedOn)}</time>
+            </p>
+          )}
+          {offeredBy && (
+            <p><span class="text-neutral-500 font-medium">Provider:</span> {offeredBy}</p>
+          )}
+        </div>
+      </Fragment>
+    ) : (
+      <!-- Education/Experience card layout -->
+      <Fragment>
+        <!-- Header: Organization + Date -->
+        <div class="flex w-full items-start justify-between flex-wrap gap-3">
+          <h2 class={`font-bold ${type === 'education' ? 'text-2xl md:text-3xl' : 'text-xl md:text-2xl gradient-text'}`}>
+            {organizationUrl ? (
+              <a href={organizationUrl} class="text-white hover:text-finance-cyan transition-colors">
+                {organization || title}
+              </a>
+            ) : (
+              <span class="text-white">{organization || title}</span>
+            )}
+          </h2>
+          {dateRange && (
+            <p class="text-neutral-300 text-sm font-medium">{dateRange}</p>
+          )}
+        </div>
+
+        <!-- Subtitle: Role/Degree + Location -->
+        {(subtitle || location) && (
+          <div class="flex w-full items-center justify-between flex-wrap gap-2 mt-2">
+            {subtitle && (
+              <h3 class="text-lg text-white font-semibold">{subtitle}</h3>
+            )}
+            {location && (
+              <p class="text-neutral-400 text-sm">{location}</p>
+            )}
+          </div>
+        )}
+
+        <!-- For education without explicit subtitle, show title as degree -->
+        {type === 'education' && !subtitle && title && organization && (
+          <p class="text-lg text-white font-medium">{title}</p>
+        )}
+
+        <!-- Bullet points -->
+        {items.length > 0 && (
+          <ul class="list-disc pl-6 mt-4 space-y-2 text-neutral-300 leading-relaxed">
+            {items.map(item => <li set:html={item} />)}
+          </ul>
+        )}
+
+        <!-- Skills footer -->
+        {skills && (
+          <div class="mt-4 pt-4 border-t border-glass-border">
+            <p class="text-sm text-neutral-400">
+              <span class="text-finance-cyan font-semibold">Skills:</span> {skills}
+            </p>
+          </div>
+        )}
+      </Fragment>
+    )}
+  </div>
+</div>

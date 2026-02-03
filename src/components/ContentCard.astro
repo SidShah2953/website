@@ -1,0 +1,119 @@
+---
+import formatDate from "@/utils/formatDate";
+
+export type ContentType = 'blog' | 'research' | 'projects';
+
+export interface Props {
+  type: ContentType;
+  slug: string;
+  title: string;
+  description: string;
+  publishedAt: Date;
+  // Research-specific
+  authors?: string[];
+  publication?: string;
+  doi?: string;
+  arxiv?: string;
+  // Common optional
+  tags?: string[];
+}
+
+const {
+  type,
+  slug,
+  title,
+  description,
+  publishedAt,
+  authors,
+  publication,
+  doi,
+  arxiv,
+  tags = []
+} = Astro.props;
+
+const basePath = `/${type === 'blog' ? 'blog' : type}`;
+const href = `${basePath}/${slug}`;
+---
+
+<a
+  class={`content-card content-card--${type} group glass-card-hover p-6 flex flex-col gap-3 relative overflow-hidden`}
+  href={href}
+  data-tags={tags.join(',')}
+>
+  <!-- Hover gradient overlay -->
+  <div class="absolute inset-0 bg-gradient-to-br from-finance-cyan/0 to-finance-blue/0 group-hover:from-finance-cyan/5 group-hover:to-finance-blue/5 transition-all duration-300 rounded-2xl"></div>
+
+  <div class="relative z-10">
+    <!-- Header row: title + date/arrow -->
+    <div class="flex w-full items-start justify-between gap-4 flex-wrap">
+      <h2 class={`font-semibold text-white group-hover:text-finance-cyan transition-colors leading-tight flex-1 ${type === 'research' ? 'text-2xl font-bold' : type === 'blog' ? 'text-xl' : 'text-2xl'}`}>
+        {title}
+      </h2>
+
+      <div class="flex flex-row items-center gap-3 text-sm text-neutral-400 shrink-0">
+        <time datetime={publishedAt.toISOString()}>{formatDate(publishedAt)}</time>
+        <svg
+          width="20"
+          height="20"
+          viewBox="0 0 18 18"
+          fill="none"
+          class="transition-all duration-300 group-hover:translate-x-1 group-hover:translate-y-[-2px] opacity-60 group-hover:opacity-100"
+        >
+          <path
+            d="M5.25 12.75L12.75 5.25"
+            stroke="currentColor"
+            stroke-width="1.5"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+          <path
+            d="M5.25 5.25H12.75V12.75"
+            stroke="currentColor"
+            stroke-width="1.5"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+        </svg>
+      </div>
+    </div>
+
+    <!-- Research-specific: authors -->
+    {type === 'research' && authors && authors.length > 0 && (
+      <p class="text-neutral-400 mt-2">{authors.join(", ")}</p>
+    )}
+
+    <!-- Research-specific: publication -->
+    {type === 'research' && publication && (
+      <p class="text-finance-cyan font-medium mt-2">{publication}</p>
+    )}
+
+    <!-- Description -->
+    <p class={`text-neutral-300 leading-relaxed ${type === 'blog' ? 'line-clamp-2 mt-2' : 'mt-4'}`}>
+      {description}
+    </p>
+
+    <!-- Tags and metadata row (research) -->
+    {type === 'research' && (tags.length > 0 || doi || arxiv) && (
+      <div class="flex gap-3 mt-4 flex-wrap items-center">
+        {tags.map(tag => (
+          <span class="text-xs px-3 py-1 rounded-lg bg-finance-cyan/10 text-finance-cyan border border-finance-cyan/30">
+            {tag}
+          </span>
+        ))}
+
+        <div class="flex gap-2 ml-auto">
+          {doi && (
+            <span class="text-xs px-3 py-1 rounded-lg bg-glass border border-glass-border text-neutral-300">
+              DOI: {doi}
+            </span>
+          )}
+          {arxiv && (
+            <span class="text-xs px-3 py-1 rounded-lg bg-glass border border-glass-border text-neutral-300">
+              arXiv: {arxiv}
+            </span>
+          )}
+        </div>
+      </div>
+    )}
+  </div>
+</a>

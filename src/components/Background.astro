@@ -1,9 +1,0 @@
----
-import BlurCircle from "./BGCircle.astro";
-import { MAP_COLOR_VARIANT_TO_BG } from "@/utils/mapVariants";
-import theme from "@/data/theme";
----
-<div class=`mx-auto fixed z-0 top-0 left-0 flex h-screen w-full flex-col ${MAP_COLOR_VARIANT_TO_BG[theme.colors.background]}`>
-    <BlurCircle position="top" color={theme.colors.blur.top} />
-    <BlurCircle position="bottom" color={theme.colors.blur.bottom} />
-</div>
