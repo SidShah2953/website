@@ -3,8 +3,6 @@ import { getCollection } from 'astro:content';
 import Layout from '@/layouts/Layout.astro';
 import { estimateReadingTime } from '@/utils/estimateReadingTime';
 
-const toTitleCase = (str: string) => str.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ');
-
 export async function getStaticPaths() {
   const posts = await getCollection('blog');
   return posts
@@ -50,7 +48,7 @@ const { Content } = await entry.render();
               {entry.data.tags.map(tag => (
                 <a href={`/blog?tag=${encodeURIComponent(tag)}`}
                    class="px-3 py-1 rounded-lg bg-finance-blue/10 text-finance-blue border border-finance-blue/30 hover:bg-finance-purple/20 hover:border-finance-purple/50 transition-all text-xs font-medium">
-                  {toTitleCase(tag)}
+                  {tag}
                 </a>
               ))}
             </span>
