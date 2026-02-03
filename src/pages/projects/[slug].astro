@@ -28,11 +28,20 @@ crossorigin="anonymous"
 />
 <Layout title={project.data.title} description={project.data.description}>
   {import.meta.env.PROD && <script slot="head" data-goatcounter="https://siddhants.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>}
-  <main class="flex flex-col lg:flex-row gap-8 max-w-7xl mx-auto w-full">
+  <main class="flex flex-col lg:flex-row gap-8 w-full">
+    <!-- Table of Contents Sidebar -->
+    <aside class="lg:w-64 shrink-0 order-last lg:order-first">
+      <nav class="glass-card p-6 relative overflow-hidden lg:sticky lg:top-8 lg:max-h-[calc(100vh-4rem)] lg:overflow-y-auto">
+        <div class="absolute top-0 left-0 w-32 h-32 bg-gradient-to-br from-finance-blue/5 to-finance-purple/5 blur-2xl rounded-full"></div>
+        <h2 class="text-xl font-semibold gradient-text mb-4 relative z-10">Table of Contents</h2>
+        <div id="toc-container" class="relative z-10"></div>
+      </nav>
+    </aside>
+
     <!-- Main Content -->
     <article class="project glass-card p-8 md:p-12 relative overflow-hidden flex-1 min-w-0">
       <div class="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-finance-blue/10 to-finance-purple/10 blur-3xl rounded-full"></div>
-      
+
       <header role="presentation" class="relative z-10">
         <h1 class="text-4xl md:text-5xl font-bold gradient-text leading-tight">
           {project.data.title}
@@ -45,20 +54,11 @@ crossorigin="anonymous"
           <time datetime={project.data.publishedAt.toISOString()}>{formatDate(project.data.publishedAt)}</time>
         </div>
       </header>
-      
+
       <div class="relative z-10 mt-8">
         <Content />
       </div>
     </article>
-
-    <!-- Table of Contents Sidebar -->
-    <aside class="lg:w-80 order-first lg:order-last">
-      <nav class="glass-card p-6 relative overflow-hidden lg:sticky lg:bottom-8 lg:max-h-[calc(100vh-4rem)] lg:overflow-y-auto">
-        <div class="absolute top-0 left-0 w-32 h-32 bg-gradient-to-br from-finance-blue/5 to-finance-purple/5 blur-2xl rounded-full"></div>
-        <h2 class="text-xl font-semibold gradient-text mb-4 relative z-10">Table of Contents</h2>
-        <div id="toc-container" class="relative z-10"></div>
-      </nav>
-    </aside>
   </main>
   
   <script>
