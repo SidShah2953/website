@@ -23,12 +23,12 @@ const pathname = removeTrailingSlash(Astro.url.pathname);
     </a>
 
     <nav role="navigation">
-      <ul role="list" class="flex flex-row gap-1 items-center text-base">
+      <ul role="list" class="flex flex-row flex-wrap gap-2 items-center text-sm md:text-base">
         <li>
           <a
             href="/"
             class:list={{
-              ["px-4 py-2 rounded-lg transition-all duration-200"]: true,
+              ["px-3 py-1.5 md:px-4 md:py-2 rounded-lg transition-all duration-200"]: true,
               ["bg-finance-cyan/10 text-finance-cyan border border-finance-cyan/30"]: pathname === "/",
               ["hover:bg-glass text-neutral-300 hover:text-neutral-100"]: pathname !== "/",
             }}>Home</a
@@ -38,7 +38,7 @@ const pathname = removeTrailingSlash(Astro.url.pathname);
           <a
             href="/education"
             class:list={{
-              ["px-4 py-2 rounded-lg transition-all duration-200"]: true,
+              ["px-3 py-1.5 md:px-4 md:py-2 rounded-lg transition-all duration-200"]: true,
               ["bg-finance-cyan/10 text-finance-cyan border border-finance-cyan/30"]: pathname === "/education",
               ["hover:bg-glass text-neutral-300 hover:text-neutral-100"]: pathname !== "/education",
             }}>Education</a
@@ -48,7 +48,7 @@ const pathname = removeTrailingSlash(Astro.url.pathname);
           <a
             href="/experience"
             class:list={{
-              ["px-4 py-2 rounded-lg transition-all duration-200"]: true,
+              ["px-3 py-1.5 md:px-4 md:py-2 rounded-lg transition-all duration-200"]: true,
               ["bg-finance-cyan/10 text-finance-cyan border border-finance-cyan/30"]: pathname === "/experience",
               ["hover:bg-glass text-neutral-300 hover:text-neutral-100"]: pathname !== "/experience",
             }}>Experience</a
@@ -58,7 +58,7 @@ const pathname = removeTrailingSlash(Astro.url.pathname);
           <a
             href="/projects"
             class:list={{
-              ["px-4 py-2 rounded-lg transition-all duration-200"]: true,
+              ["px-3 py-1.5 md:px-4 md:py-2 rounded-lg transition-all duration-200"]: true,
               ["bg-finance-cyan/10 text-finance-cyan border border-finance-cyan/30"]: pathname === "/projects",
               ["hover:bg-glass text-neutral-300 hover:text-neutral-100"]: pathname !== "/projects",
             }}>Projects</a
@@ -68,7 +68,7 @@ const pathname = removeTrailingSlash(Astro.url.pathname);
           <a
             href="/research"
             class:list={{
-              ["px-4 py-2 rounded-lg transition-all duration-200"]: true,
+              ["px-3 py-1.5 md:px-4 md:py-2 rounded-lg transition-all duration-200"]: true,
               ["bg-finance-cyan/10 text-finance-cyan border border-finance-cyan/30"]: pathname === "/research" || pathname.startsWith("/research/"),
               ["hover:bg-glass text-neutral-300 hover:text-neutral-100"]: pathname !== "/research" && !pathname.startsWith("/research/"),
             }}>Research</a
@@ -78,7 +78,7 @@ const pathname = removeTrailingSlash(Astro.url.pathname);
           <a
             href="/blog"
             class:list={{
-              ["px-4 py-2 rounded-lg transition-all duration-200"]: true,
+              ["px-3 py-1.5 md:px-4 md:py-2 rounded-lg transition-all duration-200"]: true,
               ["bg-finance-cyan/10 text-finance-cyan border border-finance-cyan/30"]: pathname === "/blog" || pathname.startsWith("/blog/"),
               ["hover:bg-glass text-neutral-300 hover:text-neutral-100"]: pathname !== "/blog" && !pathname.startsWith("/blog/"),
             }}>Blog</a
