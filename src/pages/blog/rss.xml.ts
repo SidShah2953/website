@@ -1,7 +1,7 @@
 import { getCollection } from 'astro:content';
 import rss from '@astrojs/rss';
 
-export async function GET(context) {
+export async function GET() {
   const site = `https://${import.meta.env.PUBLIC_BLOG_HOST || 'blog.example.com'}`;
   const posts = (await getCollection('blog')).filter(p => !p.data.isDraft).sort((a,b)=> b.data.publishedAt.getTime()-a.data.publishedAt.getTime());
   return rss({
