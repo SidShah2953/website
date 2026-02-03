@@ -8,15 +8,15 @@
 }
 
 .post h2 {
-  @apply mt-8 mb-4 text-3xl font-semibold bg-gradient-to-r from-white to-neutral-300 bg-clip-text text-transparent;
+  @apply mt-8 mb-4 text-3xl font-bold bg-gradient-to-r from-white to-neutral-300 bg-clip-text text-transparent;
 }
 
 .post h3 {
-  @apply mt-6 mb-3 text-xl font-medium text-neutral-100;
+  @apply mt-6 mb-3 text-xl font-bold text-neutral-100;
 }
 
 .post h4 {
-  @apply mt-5 mb-2 text-lg font-medium text-neutral-200;
+  @apply mt-5 mb-2 text-lg font-semibold text-neutral-200;
 }
 
 .post nav {
@@ -32,11 +32,11 @@
 }
 
 .post ul {
-  @apply list-disc pl-6 leading-8 text-neutral-300;
+  @apply list-disc pl-8 leading-8 text-neutral-300 mb-4;
 }
 
 .post ol {
-  @apply list-decimal pl-6 leading-8 text-neutral-300;
+  @apply list-decimal pl-8 leading-8 text-neutral-300 mb-4;
 }
 
 .post blockquote {
@@ -95,11 +95,11 @@
 }
 
 .research ul {
-  @apply list-disc pl-6 leading-8 text-neutral-300;
+  @apply list-disc pl-8 leading-8 text-neutral-300 mb-4;
 }
 
 .research ol {
-  @apply list-decimal pl-6 leading-8 text-neutral-300;
+  @apply list-decimal pl-8 leading-8 text-neutral-300 mb-4;
 }
 
 .research blockquote {
