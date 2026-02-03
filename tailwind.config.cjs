@@ -13,7 +13,7 @@ module.exports = {
         glass: {
           DEFAULT: 'rgba(255, 255, 255, 0.05)',
           light: 'rgba(255, 255, 255, 0.08)',
-          border: 'rgba(255, 255, 255, 0.12)',
+          border: 'rgba(255, 255, 255, 0.06)',
         },
         finance: {
           green: '#00d084',

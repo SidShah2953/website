@@ -36,14 +36,6 @@ const isCourse = type === 'course';
 ---
 
 <div class={`timeline-card timeline-card--${type} ${isCourse ? 'group glass-card-hover' : 'glass-card'} p-6 ${!isCourse ? 'md:p-8' : ''} flex flex-col w-full gap-4 relative overflow-hidden`}>
-  {type === 'experience' && (
-    <div class="absolute top-0 right-0 w-32 h-32 bg-finance-blue/10 rounded-full blur-2xl"></div>
-  )}
-
-  {isCourse && (
-    <div class="absolute inset-0 bg-gradient-to-br from-finance-cyan/0 to-finance-blue/0 group-hover:from-finance-cyan/5 group-hover:to-finance-blue/5 transition-all duration-300 rounded-2xl"></div>
-  )}
-
   <div class="relative z-10">
     {isCourse ? (
       <!-- Course card layout -->

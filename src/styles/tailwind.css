@@ -3,10 +3,6 @@
 @tailwind utilities;
 
 @layer base {
-  * {
-    @apply border-glass-border;
-  }
-  
   body {
     @apply bg-dark-bg text-neutral-200;
   }
