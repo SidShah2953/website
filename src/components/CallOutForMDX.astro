@@ -3,15 +3,16 @@ type Props = {
   title: string;
 };
 
-
 const { title } = Astro.props;
 ---
-<div 
-    class="group flex w-full cursor-pointer flex-col gap-2 rounded-md border border-neutral-500 bg-gray-600 bg-opacity-30 p-4"
->
-    <div
-    class=" flex w-full flex-col justify-between gap-2 md:flex-row md:items-center">
-        <p class="text-neutral-100 text-lg"><b>{title}</b></p>
+<div class="glass-card p-6 flex flex-col gap-3 relative overflow-hidden my-6">
+  <!-- Subtle accent glow -->
+  <div class="absolute top-0 left-0 w-24 h-24 bg-finance-cyan/10 rounded-full blur-2xl"></div>
+
+  <div class="relative z-10">
+    <h4 class="text-white font-semibold text-lg m-0 leading-tight mb-2">{title}</h4>
+    <div class="text-neutral-300 leading-relaxed">
+      <slot />
     </div>
-    <slot />
+  </div>
 </div>
