@@ -3,8 +3,7 @@ import { getCollection } from "astro:content";
 
 import HomeLayout from "@/layouts/HomeLayout.astro";
 import SocialLinks from "@/components/SocialLinks.astro";
-import PostCard from "@/components/PostCard.astro";
-import ProjectCard from "@/components/ProjectCard.astro";
+import ContentCard from "@/components/ContentCard.astro";
 import Link from "@/components/shared/Link.astro";
 import convertAsteriskToStrongTag from "@/utils/convertAsteriskToStrongTag";
 
@@ -135,11 +134,12 @@ const research = (await getCollection("research")).filter(r => r.data.isPublishe
             posts
               .slice(0, 2)
               .map((post) => (
-                <PostCard
-                  publishedAt={post.data.publishedAt}
+                <ContentCard
+                  type="blog"
+                  slug={post.slug}
                   title={post.data.title}
                   description={post.data.description}
-                  slug={post.slug}
+                  publishedAt={post.data.publishedAt}
                 />
               ))
         }
@@ -158,11 +158,12 @@ const research = (await getCollection("research")).filter(r => r.data.isPublishe
             projects
               .slice(0, 3)
               .map((project) => (
-                <ProjectCard
-                  publishedAt={project.data.publishedAt}
+                <ContentCard
+                  type="projects"
+                  slug={project.slug}
                   title={project.data.title}
                   description={project.data.description}
-                  slug={project.slug}
+                  publishedAt={project.data.publishedAt}
                 />
               ))
         }
@@ -178,19 +179,16 @@ const research = (await getCollection("research")).filter(r => r.data.isPublishe
       {research.length !== 0 && (
         <section class="flex flex-col gap-4">
           {research.slice(0, 3).map((paper) => (
-            <a href={`/research/${paper.slug}`} class="group glass-card-hover p-6 flex flex-col gap-3">
-              <div>
-                <h4 class="text-xl font-semibold text-white group-hover:text-finance-cyan transition-colors leading-tight">{paper.data.title}</h4>
-                <p class="text-sm text-neutral-500 mt-2">{paper.data.authors.join(", ")}</p>
-                {paper.data.publication && <p class="text-sm text-neutral-400 mt-1">{paper.data.publication}</p>}
-                <p class="text-neutral-400 mt-3 line-clamp-2">{paper.data.description}</p>
-                <div class="flex gap-2 mt-3 flex-wrap">
-                  {paper.data.tags.slice(0, 3).map(tag => (
-                    <span class="text-xs text-neutral-500">{tag}</span>
-                  ))}
-                </div>
-              </div>
-            </a>
+            <ContentCard
+              type="research"
+              slug={paper.slug}
+              title={paper.data.title}
+              description={paper.data.description}
+              publishedAt={paper.data.publishedAt}
+              authors={paper.data.authors}
+              publication={paper.data.publication}
+              tags={paper.data.tags}
+            />
           ))}
         </section>
       )}

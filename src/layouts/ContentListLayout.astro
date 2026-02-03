@@ -1,0 +1,60 @@
+---
+import Layout from '@/layouts/Layout.astro';
+
+export type ContentListType = 'blog' | 'research' | 'projects' | 'education' | 'experience';
+
+export interface Props {
+  title: string;
+  pageTitle: string;
+  description?: string;
+  allTags?: string[];
+  enableTagFilter?: boolean;
+  contentType: ContentListType;
+}
+
+const {
+  title,
+  pageTitle,
+  description,
+  allTags = [],
+  enableTagFilter = false,
+  contentType
+} = Astro.props;
+---
+
+<Layout title={pageTitle} description={description}>
+  <main class="flex flex-col gap-16">
+    <article class="flex flex-col gap-10">
+      <header class="flex w-full flex-col gap-3">
+        <h1 class="text-4xl md:text-5xl font-bold gradient-text">{title}</h1>
+        {description && (
+          <p class="text-lg text-neutral-300 leading-relaxed">{description}</p>
+        )}
+      </header>
+
+      {enableTagFilter && allTags.length > 0 && (
+        <div class="flex flex-wrap gap-2" id="tag-filters">
+          <button data-tag="" class="tag-filter glass-btn bg-finance-cyan/10 text-finance-cyan border-finance-cyan/30">All</button>
+          {allTags.map(tag => (
+            <button data-tag={tag} class="tag-filter glass-btn text-neutral-300 hover:text-white hover:border-finance-cyan/30">{tag}</button>
+          ))}
+        </div>
+      )}
+
+      {enableTagFilter && (
+        <p id="tag-message" class="text-sm text-finance-cyan hidden"></p>
+      )}
+
+      <section id="content-container" class={`content-list content-list--${contentType} flex flex-col gap-4 ${contentType === 'education' || contentType === 'experience' ? 'gap-8' : ''}`}>
+        <slot />
+      </section>
+
+      {enableTagFilter && (
+        <p id="no-posts-message" class="text-neutral-400 hidden">No posts found for this tag.</p>
+      )}
+    </article>
+
+    <!-- Additional sections slot (for pages like education with courses) -->
+    <slot name="additional" />
+  </main>
+</Layout>

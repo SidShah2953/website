@@ -109,3 +109,59 @@
 .content-article.project nav {
   @apply pb-5;
 }
+
+/* ========================================
+   Content List Page Styles
+   ======================================== */
+
+/* Base content list container */
+.content-list {
+  @apply flex flex-col gap-4;
+}
+
+/* Blog list has tighter gaps on mobile */
+.content-list--blog {
+  @apply gap-2 md:gap-4;
+}
+
+/* Content card base styles */
+.content-card {
+  @apply w-full;
+}
+
+/* Research cards have slightly more padding */
+.content-card--research {
+  @apply md:p-8;
+}
+
+/* Blog cards on desktop can flow in rows */
+@media (min-width: 768px) {
+  .content-list--blog {
+    @apply flex-row flex-wrap;
+  }
+}
+
+/* ========================================
+   Timeline Card Styles (Education/Experience)
+   ======================================== */
+
+/* Base timeline card */
+.timeline-card {
+  @apply w-full;
+}
+
+/* Education/experience lists have larger gaps */
+.content-list--education,
+.content-list--experience {
+  @apply gap-8;
+}
+
+/* Course cards are half-width on desktop */
+.timeline-card--course {
+  @apply md:w-[49%];
+}
+
+/* Course list wraps on desktop */
+.content-list--course {
+  @apply md:flex-row md:flex-wrap;
+}

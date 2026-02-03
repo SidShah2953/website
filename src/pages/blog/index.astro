@@ -1,14 +1,16 @@
 ---
 import { getCollection } from 'astro:content';
-import Layout from '@/layouts/Layout.astro';
-import PostCard from '@/components/PostCard.astro';
+import ContentListLayout from '@/layouts/ContentListLayout.astro';
+import ContentCard from '@/components/ContentCard.astro';
 import { estimateReadingTime } from '@/utils/estimateReadingTime';
 
-const blogPosts = (await getCollection('blog')).filter(p => !p.data.isDraft).sort((a,b)=> b.data.publishedAt.getTime() - a.data.publishedAt.getTime());
+const blogPosts = (await getCollection('blog'))
+  .filter(p => !p.data.isDraft)
+  .sort((a, b) => b.data.publishedAt.getTime() - a.data.publishedAt.getTime());
 
 // Inject reading time (if not stored yet)
 const enriched = blogPosts.map(p => {
-  if(!p.data.readingTimeMinutes){
+  if (!p.data.readingTimeMinutes) {
     const stats = estimateReadingTime(p.body);
     return { ...p, data: { ...p.data, readingTimeMinutes: stats.minutes } };
   }
@@ -27,129 +29,113 @@ const postsData = enriched.map(p => ({
   tags: p.data.tags
 }));
 ---
-<Layout title="Blog | Siddhant Shah" description="Articles, write-ups & thoughts">
-  <main class="flex flex-col gap-16">
-    <section class="flex flex-col gap-8">
-      <header class="flex w-full flex-col gap-3">
-        <h1 class="text-4xl md:text-5xl font-bold gradient-text">Blog</h1>
-        <p class="text-lg text-neutral-300 leading-relaxed">Long-form posts, experiments & deeper dives into finance, tech, and quantitative analysis.</p>
-      </header>
-    
-      {allTags.length > 0 && (
-        <div class="flex flex-wrap gap-2" id="tag-filters">
-          <button data-tag="" class="tag-filter glass-btn bg-finance-cyan/10 text-finance-cyan border-finance-cyan/30">All</button>
-          {allTags.map(tag => (
-            <button data-tag={tag} class="tag-filter glass-btn text-neutral-300 hover:text-white hover:border-finance-cyan/30">{tag}</button>
-          ))}
-        </div>
-      )}
 
-      <p id="tag-message" class="text-sm text-finance-cyan hidden"></p>
+<ContentListLayout
+  title="Blog"
+  pageTitle="Blog | Siddhant Shah"
+  description="Long-form posts, experiments & deeper dives into finance, tech, and quantitative analysis."
+  allTags={allTags}
+  enableTagFilter={true}
+  contentType="blog"
+>
+  {enriched.map(post => (
+    <ContentCard
+      type="blog"
+      slug={post.slug}
+      title={post.data.title}
+      description={post.data.description}
+      publishedAt={post.data.publishedAt}
+      tags={post.data.tags}
+    />
+  ))}
+</ContentListLayout>
 
-      <section id="posts-container" class="flex flex-col gap-2 md:flex-row md:flex-wrap">
-        {enriched.map(post => (
-          <PostCard
-            publishedAt={post.data.publishedAt}
-            title={post.data.title}
-            description={post.data.description}
-            slug={post.slug}
-          />
-        ))}
-      </section>
+<script is:inline define:vars={{ postsData }}>
+  const posts = postsData;
+  const container = document.getElementById('content-container');
+  const tagMessage = document.getElementById('tag-message');
+  const noPostsMessage = document.getElementById('no-posts-message');
+  const tagFilters = document.querySelectorAll('.tag-filter');
 
-      <p id="no-posts-message" class="text-neutral-400 hidden">No posts found for this tag.</p>
-    </section>
-  </main>
+  function renderPosts(filtered, selectedTag) {
+    if (filtered.length === 0) {
+      container.classList.add('hidden');
+      noPostsMessage.classList.remove('hidden');
+      return;
+    }
 
-  <script define:vars={{ postsData }}>
-    const posts = postsData;
-    const container = document.getElementById('posts-container');
-    const tagMessage = document.getElementById('tag-message');
-    const noPostsMessage = document.getElementById('no-posts-message');
-    const tagFilters = document.querySelectorAll('.tag-filter');
+    container.classList.remove('hidden');
+    noPostsMessage.classList.add('hidden');
 
-    function renderPosts(filtered, selectedTag) {
-      if (filtered.length === 0) {
-        container.classList.add('hidden');
-        noPostsMessage.classList.remove('hidden');
-        return;
-      }
-
-      container.classList.remove('hidden');
-      noPostsMessage.classList.add('hidden');
-
-      container.innerHTML = filtered.map(post => {
-        const date = new Date(post.publishedAt).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' }).replace(/\//g, '/');
-        return `
-          <a class="group flex cursor-pointer flex-col gap-3 w-full glass-card-hover p-6 relative overflow-hidden" href="/blog/${post.slug}">
-            <!-- Subtle gradient overlay on hover -->
-            <div class="absolute inset-0 bg-gradient-to-br from-finance-cyan/0 to-finance-blue/0 group-hover:from-finance-cyan/5 group-hover:to-finance-blue/5 transition-all duration-300 rounded-2xl"></div>
-            
-            <div class="relative z-10">
-              <div class="flex w-full flex-col justify-between gap-3 md:flex-row md:items-start">
-                <h3 class="text-white text-xl font-semibold leading-tight group-hover:text-finance-cyan transition-colors">${post.title}</h3>
-                <div class="flex flex-row items-center gap-3 text-sm text-neutral-400 shrink-0">
-                  <time datetime="${post.publishedAt}">${date}</time>
-                  <svg width="20" height="20" viewBox="0 0 18 18" fill="none" class="transition-all duration-300 group-hover:translate-x-1 group-hover:translate-y-[-2px] opacity-60 group-hover:opacity-100">
-                    <path d="M5.25 12.75L12.75 5.25" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
-                    <path d="M5.25 5.25H12.75V12.75" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
-                  </svg>
-                </div>
+    container.innerHTML = filtered.map(post => {
+      const date = new Date(post.publishedAt).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' }).replace(/\//g, '/');
+      return `
+        <a class="content-card content-card--blog group glass-card-hover p-6 flex flex-col gap-3 relative overflow-hidden" href="/blog/${post.slug}" data-tags="${post.tags.join(',')}">
+          <div class="absolute inset-0 bg-gradient-to-br from-finance-cyan/0 to-finance-blue/0 group-hover:from-finance-cyan/5 group-hover:to-finance-blue/5 transition-all duration-300 rounded-2xl"></div>
+          <div class="relative z-10">
+            <div class="flex w-full items-start justify-between gap-4 flex-wrap">
+              <h2 class="font-semibold text-white group-hover:text-finance-cyan transition-colors leading-tight flex-1 text-xl">${post.title}</h2>
+              <div class="flex flex-row items-center gap-3 text-sm text-neutral-400 shrink-0">
+                <time datetime="${post.publishedAt}">${date}</time>
+                <svg width="20" height="20" viewBox="0 0 18 18" fill="none" class="transition-all duration-300 group-hover:translate-x-1 group-hover:translate-y-[-2px] opacity-60 group-hover:opacity-100">
+                  <path d="M5.25 12.75L12.75 5.25" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+                  <path d="M5.25 5.25H12.75V12.75" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+                </svg>
               </div>
-              <p class="text-neutral-300 line-clamp-2 leading-relaxed mt-2">${post.description}</p>
             </div>
-          </a>
-        `;
-      }).join('');
+            <p class="text-neutral-300 leading-relaxed line-clamp-2 mt-2">${post.description}</p>
+          </div>
+        </a>
+      `;
+    }).join('');
 
-      if (selectedTag) {
-        tagMessage.innerHTML = `Showing posts tagged with <strong class="text-neutral-200">${selectedTag}</strong>`;
-        tagMessage.classList.remove('hidden');
-      } else {
-        tagMessage.classList.add('hidden');
-      }
+    if (selectedTag) {
+      tagMessage.innerHTML = `Showing posts tagged with <strong class="text-neutral-200">${selectedTag}</strong>`;
+      tagMessage.classList.remove('hidden');
+    } else {
+      tagMessage.classList.add('hidden');
     }
+  }
 
-    function filterByTag(tag) {
-      const filtered = tag ? posts.filter(p => p.tags.includes(tag)) : posts;
-      
-      // Update URL without reload
-      const url = new URL(window.location);
-      if (tag) {
-        url.searchParams.set('tag', tag);
-      } else {
-        url.searchParams.delete('tag');
-      }
-      window.history.pushState({}, '', url);
+  function filterByTag(tag) {
+    const filtered = tag ? posts.filter(p => p.tags.includes(tag)) : posts;
 
-      // Update button states
-      tagFilters.forEach(btn => {
-        const btnTag = btn.dataset.tag;
-        if (btnTag === tag) {
-          btn.classList.remove('bg-neutral-800', 'text-neutral-400');
-          btn.classList.add('bg-neutral-700', 'text-neutral-100');
-        } else {
-          btn.classList.remove('bg-neutral-700', 'text-neutral-100');
-          btn.classList.add('bg-neutral-800', 'text-neutral-400', 'hover:bg-neutral-700');
-        }
-      });
-
-      renderPosts(filtered, tag);
+    // Update URL without reload
+    const url = new URL(window.location);
+    if (tag) {
+      url.searchParams.set('tag', tag);
+    } else {
+      url.searchParams.delete('tag');
     }
+    window.history.pushState({}, '', url);
 
-    // Set up click handlers
+    // Update button states
     tagFilters.forEach(btn => {
-      btn.addEventListener('click', () => {
-        const tag = btn.dataset.tag;
-        filterByTag(tag);
-      });
+      const btnTag = btn.dataset.tag;
+      if (btnTag === tag) {
+        btn.classList.remove('bg-neutral-800', 'text-neutral-400');
+        btn.classList.add('bg-neutral-700', 'text-neutral-100');
+      } else {
+        btn.classList.remove('bg-neutral-700', 'text-neutral-100');
+        btn.classList.add('bg-neutral-800', 'text-neutral-400', 'hover:bg-neutral-700');
+      }
     });
 
-    // Check URL on load
-    const urlParams = new URLSearchParams(window.location.search);
-    const initialTag = urlParams.get('tag');
-    if (initialTag) {
-      filterByTag(initialTag);
-    }
-  </script>
-</Layout>
+    renderPosts(filtered, tag);
+  }
+
+  // Set up click handlers
+  tagFilters.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const tag = btn.dataset.tag;
+      filterByTag(tag);
+    });
+  });
+
+  // Check URL on load
+  const urlParams = new URLSearchParams(window.location.search);
+  const initialTag = urlParams.get('tag');
+  if (initialTag) {
+    filterByTag(initialTag);
+  }
+</script>

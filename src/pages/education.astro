@@ -1,93 +1,73 @@
 ---
-import Layout from "@/layouts/Layout.astro";
+import ContentListLayout from "@/layouts/ContentListLayout.astro";
+import TimelineCard from "@/components/TimelineCard.astro";
 import formatDateFromJSON from "@/utils/formatDateFromJSON";
-import CourseCard from "@/components/CourseCard.astro";
-import courses from "@/content/education/courses.json"
-
+import courses from "@/content/education/courses.json";
 ---
 
-<Layout title="Education">
-  <main class="flex flex-col gap-16">
-    <article class="flex flex-col gap-10">
-      <header>
-        <h1 class="text-4xl md:text-5xl font-bold gradient-text">Education</h1>
-      </header>
-      <section class="flex flex-col flex-wrap gap-8 md:flex-row md:flex-wrap">
-        <div class="glass-card p-6 md:p-8 flex flex-col w-full gap-4">
-          <div class="flex w-full items-center justify-between flex-wrap gap-2">
-            <h2 class="text-2xl md:text-3xl font-bold">
-              <a href="https://www.bu.edu" class="text-white hover:text-finance-cyan transition-colors">
-                Boston University
-              </a>
-            </h2>
-            <p class="text-neutral-300 text-sm">Boston | Present</p>
-          </div>
-          <p class="text-lg text-white font-medium">Master of Science - Applied Data Analytics</p>
-          <ul class="list-disc pl-6 mt-4 space-y-2 text-neutral-300 leading-relaxed">
-            <li>Analytics and Data Visualization in R</li>
-            <li>Advanced Machine Learning</li>
-            <li>Big Data Analytics</li>
-            <li>Web Mining & Graph Analytics</li>
-          </ul>
-        </div>
-        
-        <div class="glass-card p-6 md:p-8 flex flex-col w-full gap-4">
-          <div class="flex w-full items-center justify-between flex-wrap gap-2">
-            <h2 class="text-2xl md:text-3xl font-bold">
-              <a href="https://www.cmi.ac.in" class="text-white hover:text-finance-cyan transition-colors">
-                Chennai Mathematical Institute
-              </a>
-            </h2>
-            <p class="text-neutral-300 text-sm">Chennai | July 2024</p>
-          </div>
-          <p class="text-lg text-white font-medium">Bachelor of Science (Honors) - Mathematics and Computer Science</p>
-          <ul class="list-disc pl-6 mt-4 space-y-2 text-neutral-300 leading-relaxed">
-            <li>Linear Algebra</li>
-            <li>Fourier Analysis</li>
-            <li>Data Structures and Algorithms</li>
-            <li>Probability Theory & Statistics</li>
-            <li>Stochastic Processes</li>
-            <li>Statistical Inference</li>
-            <li>Financial Modelling</li>
-            <li>Economics</li>
-          </ul>
-        </div>
+<ContentListLayout
+  title="Education"
+  pageTitle="Education"
+  contentType="education"
+>
+  <TimelineCard
+    type="education"
+    title="Master of Science - Applied Data Analytics"
+    organization="Boston University"
+    organizationUrl="https://www.bu.edu"
+    dateRange="Boston | Present"
+    items={[
+      "Analytics and Data Visualization in R",
+      "Advanced Machine Learning",
+      "Big Data Analytics",
+      "Web Mining & Graph Analytics"
+    ]}
+  />
 
-        <div class="glass-card p-6 md:p-8 flex flex-col w-full gap-4">
-          <div class="flex w-full items-center justify-between flex-wrap gap-2">
-            <h2 class="text-2xl md:text-3xl font-bold text-white">
-              PACE Junior Science College
-            </h2>
-            <p class="text-neutral-300 text-sm">Mumbai | September 2021</p>
-          </div>
-          <p class="text-lg text-white font-medium">Grade 12 (Maharashtra HSC) - Science</p>
-          <ul class="list-disc pl-6 mt-4 space-y-2 text-neutral-300 leading-relaxed">
-            <li>
-              Percentage: 94.5% (12th Grade, HSC Maharashtra Board)
-            </li>
-            <li>
-              JEE Mains (All India Rank 5274) & Advanced (All India Rank 4690)
-            </li>
-          </ul>
-        </div>
-      </section>
-    </article>
+  <TimelineCard
+    type="education"
+    title="Bachelor of Science (Honors) - Mathematics and Computer Science"
+    organization="Chennai Mathematical Institute"
+    organizationUrl="https://www.cmi.ac.in"
+    dateRange="Chennai | July 2024"
+    items={[
+      "Linear Algebra",
+      "Fourier Analysis",
+      "Data Structures and Algorithms",
+      "Probability Theory & Statistics",
+      "Stochastic Processes",
+      "Statistical Inference",
+      "Financial Modelling",
+      "Economics"
+    ]}
+  />
 
+  <TimelineCard
+    type="education"
+    title="Grade 12 (Maharashtra HSC) - Science"
+    organization="PACE Junior Science College"
+    dateRange="Mumbai | September 2021"
+    items={[
+      "Percentage: 94.5% (12th Grade, HSC Maharashtra Board)",
+      "JEE Mains (All India Rank 5274) & Advanced (All India Rank 4690)"
+    ]}
+  />
+
+  <Fragment slot="additional">
     <article class="flex flex-col gap-8">
       <header>
-        <h1 class="text-3xl md:text-4xl font-bold gradient-text">Courses & Workshops</h1>
+        <h2 class="text-3xl md:text-4xl font-bold gradient-text">Courses & Workshops</h2>
       </header>
-      <section class="flex flex-col flex-wrap gap-2 md:flex-row md:flex-wrap ">
-        {
-          courses.map((course) => (
-            <CourseCard title={course.title}
-              completedOn={formatDateFromJSON(course.completedOn)} 
-              offeredBy={course.offeredBy}
-              />
-            )
-          )
-        }
+      <section class="content-list content-list--course flex flex-col flex-wrap gap-2 md:flex-row md:flex-wrap">
+        {courses.map((course) => (
+          <TimelineCard
+            type="course"
+            title={course.title}
+            completedOn={formatDateFromJSON(course.completedOn)}
+            offeredBy={course.offeredBy}
+          />
+        ))}
       </section>
     </article>
-  </main>
-</Layout>
+  </Fragment>
+</ContentListLayout>
