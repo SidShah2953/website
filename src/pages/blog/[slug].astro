@@ -32,33 +32,29 @@ const { Content } = await entry.render();
       <!-- Decorative gradient -->
       <div class="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-finance-blue/10 to-finance-purple/10 blur-3xl rounded-full"></div>
       
-      <header class="flex w-full flex-col gap-6 relative z-10">
-        <div class="flex flex-col gap-4">
-          <h1 class="text-4xl md:text-5xl font-bold gradient-text leading-tight">{entry.data.title}</h1>
-          <div class="flex flex-wrap gap-4 text-sm text-neutral-400 items-center">
-            <time datetime={entry.data.publishedAt.toISOString()} class="flex items-center gap-2">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-              </svg>
-              {entry.data.publishedAt.toDateString()}
-            </time>
-            <span class="flex items-center gap-2">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              {stats.minutes} min read
+      <header class="flex w-full flex-col gap-4 relative z-10">
+        <h1 class="text-4xl md:text-5xl font-bold gradient-text leading-tight">{entry.data.title}</h1>
+        <p class="text-lg text-neutral-300">{entry.data.description}</p>
+        <p class="text-sm text-neutral-400">
+          Written by Siddhant Shah on <time datetime={entry.data.publishedAt.toISOString()}>{entry.data.publishedAt.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</time>
+        </p>
+        <div class="flex flex-wrap gap-4 text-sm text-neutral-400 items-center">
+          <span class="flex items-center gap-2">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            {stats.minutes} min read
+          </span>
+          {entry.data.tags.length > 0 && (
+            <span class="flex gap-2 flex-wrap">
+              {entry.data.tags.map(tag => (
+                <a href={`/blog?tag=${encodeURIComponent(tag)}`}
+                   class="px-3 py-1 rounded-lg bg-finance-blue/10 text-finance-blue border border-finance-blue/30 hover:bg-finance-purple/20 hover:border-finance-purple/50 transition-all text-xs font-medium">
+                  {toTitleCase(tag)}
+                </a>
+              ))}
             </span>
-            {entry.data.tags.length > 0 && (
-              <span class="flex gap-2 flex-wrap">
-                {entry.data.tags.map(tag => (
-                  <a href={`/blog?tag=${encodeURIComponent(tag)}`} 
-                     class="px-3 py-1 rounded-lg bg-finance-blue/10 text-finance-blue border border-finance-blue/30 hover:bg-finance-purple/20 hover:border-finance-purple/50 transition-all text-xs font-medium">
-                    {toTitleCase(tag)}
-                  </a>
-                ))}
-              </span>
-            )}
-          </div>
+          )}
         </div>
       </header>
       <div class="relative z-10 mt-8">

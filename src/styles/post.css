@@ -1,5 +1,6 @@
 .post p {
-  @apply leading-8 text-neutral-300;
+  @apply text-neutral-300 mb-4;
+  line-height: 1.5;
 }
 
 .post code {
@@ -7,15 +8,15 @@
 }
 
 .post h2 {
-  @apply mt-8 text-3xl font-semibold bg-gradient-to-r from-white to-neutral-300 bg-clip-text text-transparent;
+  @apply mt-8 mb-4 text-3xl font-semibold bg-gradient-to-r from-white to-neutral-300 bg-clip-text text-transparent;
 }
 
 .post h3 {
-  @apply mt-6 text-xl font-medium text-neutral-100;
+  @apply mt-6 mb-3 text-xl font-medium text-neutral-100;
 }
 
 .post h4 {
-  @apply mt-5 text-lg font-medium text-neutral-200;
+  @apply mt-5 mb-2 text-lg font-medium text-neutral-200;
 }
 
 .post nav {
