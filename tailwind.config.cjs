@@ -25,9 +25,9 @@ module.exports = {
           gold: '#fbbf24',
         },
         dark: {
-          bg: '#0a0a0f',
-          card: '#12121a',
-          elevated: '#1a1a24',
+          bg: '#000000',
+          card: '#0a0a0a',
+          elevated: '#111111',
         }
       },
       backgroundImage: {
