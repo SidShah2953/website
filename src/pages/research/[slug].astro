@@ -2,6 +2,8 @@
 import { getCollection, type CollectionEntry } from "astro:content";
 import Layout from "@/layouts/Layout.astro";
 import ContentPage from "@/components/ContentPage.astro";
+import ScholarlyArticleSchema from "@/components/seo/ScholarlyArticleSchema.astro";
+import BreadcrumbSchema from "@/components/seo/BreadcrumbSchema.astro";
 
 export async function getStaticPaths() {
   const research = await getCollection("research");
@@ -21,8 +23,36 @@ const { Content } = await entry.render();
 <Layout
   title={`${entry.data.title} | Research`}
   description={entry.data.description}
+  canonical={`/research/${entry.slug}/`}
+  og={{
+    title: entry.data.title,
+    type: "article",
+    description: entry.data.description,
+    alt: entry.data.title
+  }}
 >
   {import.meta.env.PROD && <script slot="head" data-goatcounter="https://siddhants.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>}
+
+  <ScholarlyArticleSchema
+    slot="head"
+    title={entry.data.title}
+    description={entry.data.description}
+    publishedAt={entry.data.publishedAt}
+    slug={entry.slug}
+    authors={entry.data.authors}
+    publication={entry.data.publication}
+    doi={entry.data.doi}
+    arxiv={entry.data.arxiv}
+    tags={entry.data.tags}
+  />
+  <BreadcrumbSchema
+    slot="head"
+    items={[
+      { name: "Home", url: "/" },
+      { name: "Research", url: "/research/" },
+      { name: entry.data.title }
+    ]}
+  />
 
   <ContentPage type="research" entry={entry} Content={Content} />
 </Layout>

@@ -5,6 +5,7 @@ import HomeLayout from "@/layouts/HomeLayout.astro";
 import SocialLinks from "@/components/SocialLinks.astro";
 import ContentCard from "@/components/ContentCard.astro";
 import Link from "@/components/shared/Link.astro";
+import PersonSchema from "@/components/seo/PersonSchema.astro";
 import convertAsteriskToStrongTag from "@/utils/convertAsteriskToStrongTag";
 
 import presentation from "@/data/presentation";
@@ -18,9 +19,17 @@ const projects = (await getCollection("projects")).sort(function (first, second)
 const research = (await getCollection("research")).filter(r => r.data.isPublished).sort(function (first, second) {
   return second.data.publishedAt.getTime() - first.data.publishedAt.getTime();
 });
+
+const seoDescription = "Siddhant Shah - Research Assistant at Boston University specializing in quantitative finance, machine learning, and data analytics. Published researcher in trading strategies and portfolio optimization.";
 ---
 
-<HomeLayout title="About | Siddhant Shah">
+<HomeLayout
+  title="Siddhant Shah | Quantitative Research & Data Analytics"
+  description={seoDescription}
+  canonical="/"
+>
+  <PersonSchema slot="head" />
+
   <main class="flex flex-col gap-16">
     <!-- Hero Section -->
     <article class="glass-card p-8 md:p-12 relative overflow-hidden">
@@ -127,7 +136,7 @@ const research = (await getCollection("research")).filter(r => r.data.isPublishe
         <h3 class="text-3xl font-bold text-white">Latest Posts</h3>
         <Link href="./blog" label="See All Posts" isUnderline='True' />
       </header>
-      {posts.length === 0 && <p>Soon, stay connected 👀...</p>}
+      {posts.length === 0 && <p>Soon, stay connected...</p>}
       <section class="flex flex-col gap-2 md:flex-row md:flex-wrap">
         {
           posts.length !== 0 &&

@@ -6,19 +6,28 @@ import presentation from "@/data/presentation";
 
 type Props = HeadTags;
 
-const { title, description, noindex, og } = Astro.props;
+const { title, description, noindex, canonical, og } = Astro.props;
 
 const DEFAULT_TITLE_PAGE = "Siddhant Shah";
-const DEFAULT_DESCRIPTION_PAGE = presentation.description;
-const DEFAULT_URL_SITE = SITE_URL;
+const DEFAULT_DESCRIPTION_PAGE = presentation.description.replace(/\*/g, '');
+
+// Build canonical URL
+const canonicalUrl = canonical
+  ? (canonical.startsWith('http') ? canonical : `${SITE_URL}${canonical}`)
+  : `${SITE_URL}${Astro.url.pathname}`;
+
+// Build OG image URL
+const ogImage = og?.image
+  ? (og.image.startsWith('http') ? og.image : `${SITE_URL}${og.image}`)
+  : `${SITE_URL}/social-prev.png`;
 
 const openGraph = {
-  title: "Hello! I'm Siddhant.",
-  type: "website",
-  image: "/social-prev.png",
-  alt: "Siddhant Shah",
-  url: DEFAULT_URL_SITE,
-  description: DEFAULT_DESCRIPTION_PAGE,
+  title: og?.title || title || "Hello! I'm Siddhant.",
+  type: og?.type || "website",
+  image: ogImage,
+  alt: og?.alt || "Siddhant Shah",
+  url: canonicalUrl,
+  description: og?.description || description || DEFAULT_DESCRIPTION_PAGE,
 };
 ---
 
@@ -28,6 +37,7 @@ const openGraph = {
     title={title || DEFAULT_TITLE_PAGE}
     description={description || DEFAULT_DESCRIPTION_PAGE}
     noindex={noindex || false}
+    canonical={canonicalUrl}
     openGraph={{
       basic: {
         title: openGraph.title,
@@ -42,6 +52,12 @@ const openGraph = {
         alt: openGraph.alt,
       },
     }}
+    twitter={{
+      card: "summary_large_image",
+      title: openGraph.title,
+      description: openGraph.description,
+      image: openGraph.image,
+    }}
     extend={{
       link: [
         { rel: "icon", href: "/favicon.svg" },
@@ -50,6 +66,7 @@ const openGraph = {
       meta: [
         { name: "viewport", content: "width=device-width, initial-scale=1" },
         { name: "generator", content: Astro.generator },
+        { name: "author", content: "Siddhant Shah" },
       ],
     }}
   />

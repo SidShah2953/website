@@ -1,0 +1,58 @@
+---
+import JsonLd from "./JsonLd.astro";
+import { SITE_URL } from "@/data/config";
+
+interface Props {
+  title: string;
+  description: string;
+  publishedAt: Date;
+  updatedAt?: Date;
+  slug: string;
+  author?: string;
+  image?: string;
+  tags?: string[];
+}
+
+const {
+  title,
+  description,
+  publishedAt,
+  updatedAt,
+  slug,
+  author = "Siddhant Shah",
+  image,
+  tags = []
+} = Astro.props;
+
+const articleUrl = `${SITE_URL}/blog/${slug}/`;
+const authorUrl = SITE_URL;
+const imageUrl = image ? (image.startsWith('http') ? image : `${SITE_URL}${image}`) : `${SITE_URL}/social-prev.png`;
+
+const schema = {
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": title,
+  "description": description,
+  "image": imageUrl,
+  "datePublished": publishedAt.toISOString(),
+  "dateModified": (updatedAt || publishedAt).toISOString(),
+  "author": {
+    "@type": "Person",
+    "name": author,
+    "url": authorUrl
+  },
+  "publisher": {
+    "@type": "Person",
+    "name": "Siddhant Shah",
+    "url": SITE_URL
+  },
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": articleUrl
+  },
+  "url": articleUrl,
+  ...(tags.length > 0 && { "keywords": tags.join(", ") })
+};
+---
+
+<JsonLd schema={schema} />

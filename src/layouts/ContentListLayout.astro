@@ -1,5 +1,6 @@
 ---
 import Layout from '@/layouts/Layout.astro';
+import BreadcrumbSchema from '@/components/seo/BreadcrumbSchema.astro';
 
 export type ContentListType = 'blog' | 'research' | 'projects' | 'education' | 'experience';
 
@@ -20,9 +21,18 @@ const {
   enableTagFilter = false,
   contentType
 } = Astro.props;
+
+// Build breadcrumb items
+const breadcrumbItems = [
+  { name: "Home", url: "/" },
+  { name: title }
+];
 ---
 
-<Layout title={pageTitle} description={description}>
+<Layout title={pageTitle} description={description} canonical={`/${contentType}/`}>
+  <BreadcrumbSchema slot="head" items={breadcrumbItems} />
+  <slot name="head" />
+
   <main class="flex flex-col gap-16">
     <article class="flex flex-col gap-10">
       <header class="flex w-full flex-col gap-3">
