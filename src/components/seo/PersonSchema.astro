@@ -1,0 +1,46 @@
+---
+import JsonLd from "./JsonLd.astro";
+import { SITE_URL } from "@/data/config";
+import presentation from "@/data/presentation";
+
+const socialLinks = presentation.socials
+  .filter(s => s.link.startsWith('http'))
+  .map(s => s.link);
+
+const schema = {
+  "@context": "https://schema.org",
+  "@type": "Person",
+  "name": presentation.name,
+  "url": SITE_URL,
+  "email": presentation.mail,
+  "description": presentation.description.replace(/\*/g, ''),
+  "jobTitle": "Research Assistant",
+  "worksFor": {
+    "@type": "Organization",
+    "name": "Boston University",
+    "department": "Department of Computer Science"
+  },
+  "alumniOf": [
+    {
+      "@type": "CollegeOrUniversity",
+      "name": "Boston University",
+      "sameAs": "https://www.bu.edu"
+    },
+    {
+      "@type": "CollegeOrUniversity",
+      "name": "Chennai Mathematical Institute"
+    }
+  ],
+  "knowsAbout": [
+    "Machine Learning",
+    "Quantitative Finance",
+    "Data Analytics",
+    "Python",
+    "Portfolio Optimization",
+    "Trading Strategies"
+  ],
+  "sameAs": socialLinks
+};
+---
+
+<JsonLd schema={schema} />

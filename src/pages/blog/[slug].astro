@@ -2,6 +2,8 @@
 import { getCollection } from 'astro:content';
 import Layout from '@/layouts/Layout.astro';
 import ContentPage from '@/components/ContentPage.astro';
+import ArticleSchema from '@/components/seo/ArticleSchema.astro';
+import BreadcrumbSchema from '@/components/seo/BreadcrumbSchema.astro';
 import { estimateReadingTime } from '@/utils/estimateReadingTime';
 
 export async function getStaticPaths() {
@@ -14,8 +16,23 @@ export async function getStaticPaths() {
 const { entry } = Astro.props;
 const stats = estimateReadingTime(entry.body);
 const { Content } = await entry.render();
+
+// Build SEO props from frontmatter
+const canonicalUrl = entry.data.canonical || `/blog/${entry.slug}/`;
+const ogImage = entry.data.ogImage || '/social-prev.png';
 ---
-<Layout title={entry.data.title + ' | Siddhant Shah'} description={entry.data.description}>
+<Layout
+  title={entry.data.title + ' | Siddhant Shah'}
+  description={entry.data.description}
+  canonical={canonicalUrl}
+  og={{
+    title: entry.data.title,
+    type: "article",
+    description: entry.data.description,
+    image: ogImage,
+    alt: entry.data.title
+  }}
+>
   <link
     slot="head"
     rel="stylesheet"
@@ -25,6 +42,25 @@ const { Content } = await entry.render();
   />
   <script slot="head" defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "e709a605fa1c4a3895e2987e5a9ca9c6"}'></script>
   {import.meta.env.PROD && <script slot="head" data-goatcounter="https://siddhants.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>}
+
+  <ArticleSchema
+    slot="head"
+    title={entry.data.title}
+    description={entry.data.description}
+    publishedAt={entry.data.publishedAt}
+    updatedAt={entry.data.updatedAt}
+    slug={entry.slug}
+    image={ogImage}
+    tags={entry.data.tags}
+  />
+  <BreadcrumbSchema
+    slot="head"
+    items={[
+      { name: "Home", url: "/" },
+      { name: "Blog", url: "/blog/" },
+      { name: entry.data.title }
+    ]}
+  />
 
   <ContentPage type="blog" entry={entry} Content={Content} readingTime={stats.minutes} />
 </Layout>

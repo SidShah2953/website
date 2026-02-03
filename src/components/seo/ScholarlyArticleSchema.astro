@@ -1,0 +1,64 @@
+---
+import JsonLd from "./JsonLd.astro";
+import { SITE_URL } from "@/data/config";
+
+interface Props {
+  title: string;
+  description: string;
+  publishedAt: Date;
+  slug: string;
+  authors: string[];
+  publication?: string;
+  doi?: string;
+  arxiv?: string;
+  tags?: string[];
+}
+
+const {
+  title,
+  description,
+  publishedAt,
+  slug,
+  authors,
+  publication,
+  doi,
+  arxiv,
+  tags = []
+} = Astro.props;
+
+const articleUrl = `${SITE_URL}/research/${slug}/`;
+
+const authorObjects = authors.map(name => ({
+  "@type": "Person",
+  "name": name,
+  ...(name === "Siddhant Shah" && { "url": SITE_URL })
+}));
+
+const schema = {
+  "@context": "https://schema.org",
+  "@type": "ScholarlyArticle",
+  "headline": title,
+  "name": title,
+  "description": description,
+  "datePublished": publishedAt.toISOString(),
+  "author": authorObjects,
+  "url": articleUrl,
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": articleUrl
+  },
+  ...(publication && { "isPartOf": {
+    "@type": "Periodical",
+    "name": publication
+  }}),
+  ...(doi && { "sameAs": `https://doi.org/${doi}` }),
+  ...(arxiv && { "identifier": {
+    "@type": "PropertyValue",
+    "propertyID": "arXiv",
+    "value": arxiv
+  }}),
+  ...(tags.length > 0 && { "keywords": tags.join(", ") })
+};
+---
+
+<JsonLd schema={schema} />
