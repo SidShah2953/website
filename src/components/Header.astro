@@ -7,28 +7,111 @@ const pathname = removeTrailingSlash(Astro.url.pathname);
 ---
 
 <header id="header" class="sticky top-4 z-50 mb-8 transition-all duration-300">
-  <div class="px-6 py-4 bg-glass backdrop-blur-xl border border-glass-border rounded-2xl shadow-glass">
-  <div class="flex w-full flex-col gap-6 md:flex-row md:justify-between md:items-center">
-    <a href={`/`} class="hover:opacity-80 transition-opacity group"
-      >
-      <Image
-        src={stylisedName}
-        class="left-0 inline-block align-bottom transition-opacity"
-        alt="Siddhant Shah"
-        width="143"
-        height="50"
-        loading="eager"
-        fetchpriority="high"
-      />
-    </a>
+  <div class="px-6 py-4 glass-card">
+    <!-- Mobile: Logo + Hamburger | Desktop: Logo + Nav -->
+    <div class="flex w-full items-center justify-between md:justify-between">
+      <a href={`/`} class="hover:opacity-80 transition-opacity group">
+        <Image
+          src={stylisedName}
+          class="inline-block align-bottom transition-opacity"
+          alt="Siddhant Shah"
+          width="143"
+          height="50"
+          loading="eager"
+          fetchpriority="high"
+        />
+      </a>
 
-    <nav role="navigation">
-      <ul role="list" class="flex flex-row flex-wrap gap-2 items-center text-sm md:text-base">
+      <!-- Hamburger button (mobile only) -->
+      <button
+        id="menu-toggle"
+        class="md:hidden p-2 rounded-lg hover:bg-glass transition-colors"
+        aria-label="Toggle navigation menu"
+        aria-expanded="false"
+      >
+        <svg id="menu-icon" class="w-6 h-6 text-neutral-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
+        <svg id="close-icon" class="w-6 h-6 text-neutral-300 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+
+      <!-- Desktop nav (hidden on mobile) -->
+      <nav role="navigation" class="hidden md:block">
+        <ul role="list" class="flex flex-row gap-1 items-center text-base">
+          <li>
+            <a
+              href="/"
+              class:list={{
+                ["px-4 py-2 rounded-lg transition-all duration-200"]: true,
+                ["bg-finance-cyan/10 text-finance-cyan border border-finance-cyan/30"]: pathname === "/",
+                ["hover:bg-glass text-neutral-300 hover:text-neutral-100"]: pathname !== "/",
+              }}>Home</a
+            >
+          </li>
+          <li>
+            <a
+              href="/education"
+              class:list={{
+                ["px-4 py-2 rounded-lg transition-all duration-200"]: true,
+                ["bg-finance-cyan/10 text-finance-cyan border border-finance-cyan/30"]: pathname === "/education",
+                ["hover:bg-glass text-neutral-300 hover:text-neutral-100"]: pathname !== "/education",
+              }}>Education</a
+            >
+          </li>
+          <li>
+            <a
+              href="/experience"
+              class:list={{
+                ["px-4 py-2 rounded-lg transition-all duration-200"]: true,
+                ["bg-finance-cyan/10 text-finance-cyan border border-finance-cyan/30"]: pathname === "/experience",
+                ["hover:bg-glass text-neutral-300 hover:text-neutral-100"]: pathname !== "/experience",
+              }}>Experience</a
+            >
+          </li>
+          <li>
+            <a
+              href="/projects"
+              class:list={{
+                ["px-4 py-2 rounded-lg transition-all duration-200"]: true,
+                ["bg-finance-cyan/10 text-finance-cyan border border-finance-cyan/30"]: pathname === "/projects",
+                ["hover:bg-glass text-neutral-300 hover:text-neutral-100"]: pathname !== "/projects",
+              }}>Projects</a
+            >
+          </li>
+          <li>
+            <a
+              href="/research"
+              class:list={{
+                ["px-4 py-2 rounded-lg transition-all duration-200"]: true,
+                ["bg-finance-cyan/10 text-finance-cyan border border-finance-cyan/30"]: pathname === "/research" || pathname.startsWith("/research/"),
+                ["hover:bg-glass text-neutral-300 hover:text-neutral-100"]: pathname !== "/research" && !pathname.startsWith("/research/"),
+              }}>Research</a
+            >
+          </li>
+          <li>
+            <a
+              href="/blog"
+              class:list={{
+                ["px-4 py-2 rounded-lg transition-all duration-200"]: true,
+                ["bg-finance-cyan/10 text-finance-cyan border border-finance-cyan/30"]: pathname === "/blog" || pathname.startsWith("/blog/"),
+                ["hover:bg-glass text-neutral-300 hover:text-neutral-100"]: pathname !== "/blog" && !pathname.startsWith("/blog/"),
+              }}>Blog</a
+            >
+          </li>
+        </ul>
+      </nav>
+    </div>
+
+    <!-- Mobile nav dropdown -->
+    <nav id="mobile-nav" role="navigation" class="hidden md:hidden mt-4 pt-4 border-t border-glass-border">
+      <ul role="list" class="flex flex-col gap-2 text-sm">
         <li>
           <a
             href="/"
             class:list={{
-              ["px-3 py-1.5 md:px-4 md:py-2 rounded-lg transition-all duration-200"]: true,
+              ["block px-4 py-2.5 rounded-lg transition-all duration-200"]: true,
               ["bg-finance-cyan/10 text-finance-cyan border border-finance-cyan/30"]: pathname === "/",
               ["hover:bg-glass text-neutral-300 hover:text-neutral-100"]: pathname !== "/",
             }}>Home</a
@@ -38,7 +121,7 @@ const pathname = removeTrailingSlash(Astro.url.pathname);
           <a
             href="/education"
             class:list={{
-              ["px-3 py-1.5 md:px-4 md:py-2 rounded-lg transition-all duration-200"]: true,
+              ["block px-4 py-2.5 rounded-lg transition-all duration-200"]: true,
               ["bg-finance-cyan/10 text-finance-cyan border border-finance-cyan/30"]: pathname === "/education",
               ["hover:bg-glass text-neutral-300 hover:text-neutral-100"]: pathname !== "/education",
             }}>Education</a
@@ -48,7 +131,7 @@ const pathname = removeTrailingSlash(Astro.url.pathname);
           <a
             href="/experience"
             class:list={{
-              ["px-3 py-1.5 md:px-4 md:py-2 rounded-lg transition-all duration-200"]: true,
+              ["block px-4 py-2.5 rounded-lg transition-all duration-200"]: true,
               ["bg-finance-cyan/10 text-finance-cyan border border-finance-cyan/30"]: pathname === "/experience",
               ["hover:bg-glass text-neutral-300 hover:text-neutral-100"]: pathname !== "/experience",
             }}>Experience</a
@@ -58,7 +141,7 @@ const pathname = removeTrailingSlash(Astro.url.pathname);
           <a
             href="/projects"
             class:list={{
-              ["px-3 py-1.5 md:px-4 md:py-2 rounded-lg transition-all duration-200"]: true,
+              ["block px-4 py-2.5 rounded-lg transition-all duration-200"]: true,
               ["bg-finance-cyan/10 text-finance-cyan border border-finance-cyan/30"]: pathname === "/projects",
               ["hover:bg-glass text-neutral-300 hover:text-neutral-100"]: pathname !== "/projects",
             }}>Projects</a
@@ -68,7 +151,7 @@ const pathname = removeTrailingSlash(Astro.url.pathname);
           <a
             href="/research"
             class:list={{
-              ["px-3 py-1.5 md:px-4 md:py-2 rounded-lg transition-all duration-200"]: true,
+              ["block px-4 py-2.5 rounded-lg transition-all duration-200"]: true,
               ["bg-finance-cyan/10 text-finance-cyan border border-finance-cyan/30"]: pathname === "/research" || pathname.startsWith("/research/"),
               ["hover:bg-glass text-neutral-300 hover:text-neutral-100"]: pathname !== "/research" && !pathname.startsWith("/research/"),
             }}>Research</a
@@ -78,7 +161,7 @@ const pathname = removeTrailingSlash(Astro.url.pathname);
           <a
             href="/blog"
             class:list={{
-              ["px-3 py-1.5 md:px-4 md:py-2 rounded-lg transition-all duration-200"]: true,
+              ["block px-4 py-2.5 rounded-lg transition-all duration-200"]: true,
               ["bg-finance-cyan/10 text-finance-cyan border border-finance-cyan/30"]: pathname === "/blog" || pathname.startsWith("/blog/"),
               ["hover:bg-glass text-neutral-300 hover:text-neutral-100"]: pathname !== "/blog" && !pathname.startsWith("/blog/"),
             }}>Blog</a
@@ -86,6 +169,21 @@ const pathname = removeTrailingSlash(Astro.url.pathname);
         </li>
       </ul>
     </nav>
-    </div>
   </div>
 </header>
+
+<script>
+  const menuToggle = document.getElementById('menu-toggle');
+  const mobileNav = document.getElementById('mobile-nav');
+  const menuIcon = document.getElementById('menu-icon');
+  const closeIcon = document.getElementById('close-icon');
+
+  menuToggle?.addEventListener('click', () => {
+    const isExpanded = menuToggle.getAttribute('aria-expanded') === 'true';
+
+    menuToggle.setAttribute('aria-expanded', (!isExpanded).toString());
+    mobileNav?.classList.toggle('hidden');
+    menuIcon?.classList.toggle('hidden');
+    closeIcon?.classList.toggle('hidden');
+  });
+</script>
