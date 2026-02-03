@@ -24,11 +24,11 @@
 }
 
 .post nav ol a{
-  @apply text-finance-blue no-underline hover:text-finance-purple transition-colors;
+  @apply text-finance-blue no-underline hover:text-finance-cyan transition-colors;
 }
 
 .post a {
-  @apply text-finance-blue hover:text-finance-purple underline decoration-finance-blue/30 hover:decoration-finance-purple/60 transition-all underline-offset-2;
+  @apply text-finance-blue hover:text-finance-cyan underline decoration-finance-blue/30 hover:decoration-finance-cyan/60 transition-all underline-offset-2;
 }
 
 .post ul {
@@ -91,7 +91,7 @@
 }
 
 .research a {
-  @apply text-finance-blue hover:text-finance-purple underline decoration-finance-blue/30 hover:decoration-finance-purple/60 transition-all underline-offset-2;
+  @apply text-finance-blue hover:text-finance-cyan underline decoration-finance-blue/30 hover:decoration-finance-cyan/60 transition-all underline-offset-2;
 }
 
 .research ul {

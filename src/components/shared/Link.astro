@@ -12,8 +12,8 @@ const { label, href, isUnderline } = Astro.props;
 <a
   href={href}
   class:list={{
-    ["text-finance-cyan hover:text-finance-blue transition-colors cursor-pointer inline-flex items-center gap-2 group"]: true,
-    ["underline underline-offset-2 decoration-finance-cyan/30 hover:decoration-finance-blue/60"]: (isUnderline == 'True'),
+    ["text-finance-cyan hover:text-white transition-colors cursor-pointer inline-flex items-center gap-2 group"]: true,
+    ["underline underline-offset-2 decoration-finance-cyan/30 hover:decoration-white/60"]: (isUnderline == 'True'),
   }}
 >
   {label}

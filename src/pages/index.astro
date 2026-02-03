@@ -78,31 +78,72 @@ const research = (await getCollection("research")).filter(r => r.data.isPublishe
       </div>
     </article>
 
-    <!-- Research Publications -->
+    <!-- Technical Skills -->
+    <article class="flex flex-col gap-6">
+      <header>
+        <h3 class="text-3xl font-bold text-white">Technical Expertise</h3>
+      </header>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="glass-card p-6">
+          <h4 class="text-lg font-semibold text-white mb-3">Programming & Tools</h4>
+          <ul class="space-y-2 text-neutral-400 text-sm">
+            <li>Python (Pandas, NumPy, scikit-learn, PyTorch)</li>
+            <li>R (Statistical Analysis & Visualization)</li>
+            <li>SQL, PySpark, KDB+/q</li>
+            <li>Git, LaTeX, Advanced Excel/VBA</li>
+          </ul>
+        </div>
+        <div class="glass-card p-6">
+          <h4 class="text-lg font-semibold text-white mb-3">Certifications & Education</h4>
+          <ul class="space-y-2 text-neutral-400 text-sm">
+            <li>Cleared Level 1 of the CFA Program </li>
+            <li>MS in Applied Data Analytics (Boston University)</li>
+            <li>BS in Mathematics & CS (Chennai Mathematical Institute)</li>
+          </ul>
+        </div>
+        <div class="glass-card p-6">
+          <h4 class="text-lg font-semibold text-white mb-3">Quantitative Finance</h4>
+          <ul class="space-y-2 text-neutral-400 text-sm">
+            <li>Portfolio Optimization & Risk Management</li>
+            <li>Algorithmic Trading Strategy Development</li>
+            <li>Statistical Arbitrage & Alpha Generation</li>
+            <li>Backtesting & Performance Attribution</li>
+          </ul>
+        </div>
+        <div class="glass-card p-6">
+          <h4 class="text-lg font-semibold text-white mb-3">Machine Learning & Data Science</h4>
+          <ul class="space-y-2 text-neutral-400 text-sm">
+            <li>Ensemble Methods & Random Forests</li>
+            <li>Time-Series Analysis & Forecasting</li>
+            <li>Feature Engineering & Model Optimization</li>
+            <li>Statistical Modeling & Hypothesis Testing</li>
+          </ul>
+        </div>
+      </div>
+    </article>
+
+    <!-- Blog Posts -->
     <article class="flex flex-col gap-8">
       <header class="flex w-full flex-row justify-between items-center gap-2">
-        <h3 class="text-3xl font-bold text-white">Published Research</h3>
-        <Link href="./research" label="See All Publications" isUnderline='True' />
+        <h3 class="text-3xl font-bold text-white">Latest Posts</h3>
+        <Link href="./blog" label="See All Posts" isUnderline='True' />
       </header>
-      {research.length !== 0 && (
-        <section class="flex flex-col gap-4">
-          {research.slice(0, 3).map((paper) => (
-            <a href={`/research/${paper.slug}`} class="group glass-card-hover p-6 flex flex-col gap-3">
-              <div>
-                <h4 class="text-xl font-semibold text-white group-hover:text-finance-cyan transition-colors leading-tight">{paper.data.title}</h4>
-                <p class="text-sm text-neutral-500 mt-2">{paper.data.authors.join(", ")}</p>
-                {paper.data.publication && <p class="text-sm text-neutral-400 mt-1">{paper.data.publication}</p>}
-                <p class="text-neutral-400 mt-3 line-clamp-2">{paper.data.description}</p>
-                <div class="flex gap-2 mt-3 flex-wrap">
-                  {paper.data.tags.slice(0, 3).map(tag => (
-                    <span class="text-xs text-neutral-500">{tag}</span>
-                  ))}
-                </div>
-              </div>
-            </a>
-          ))}
-        </section>
-      )}
+      {posts.length === 0 && <p>Soon, stay connected 👀...</p>}
+      <section class="flex flex-col gap-2 md:flex-row md:flex-wrap">
+        {
+          posts.length !== 0 &&
+            posts
+              .slice(0, 2)
+              .map((post) => (
+                <PostCard
+                  publishedAt={post.data.publishedAt}
+                  title={post.data.title}
+                  description={post.data.description}
+                  slug={post.slug}
+                />
+              ))
+        }
+      </section>
     </article>
 
     <!-- Key Projects -->
@@ -128,73 +169,31 @@ const research = (await getCollection("research")).filter(r => r.data.isPublishe
       </section>
     </article>
 
-    <!-- Technical Skills -->
-    <article class="flex flex-col gap-6">
-      <header>
-        <h3 class="text-3xl font-bold text-white">Technical Expertise</h3>
-      </header>
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div class="glass-card p-6">
-          <h4 class="text-lg font-semibold text-white mb-3">Quantitative Finance</h4>
-          <ul class="space-y-2 text-neutral-400 text-sm">
-            <li>Portfolio Optimization & Risk Management</li>
-            <li>Algorithmic Trading Strategy Development</li>
-            <li>Statistical Arbitrage & Alpha Generation</li>
-            <li>Backtesting & Performance Attribution</li>
-          </ul>
-        </div>
-        <div class="glass-card p-6">
-          <h4 class="text-lg font-semibold text-white mb-3">Machine Learning & Data Science</h4>
-          <ul class="space-y-2 text-neutral-400 text-sm">
-            <li>Ensemble Methods & Random Forests</li>
-            <li>Time-Series Analysis & Forecasting</li>
-            <li>Feature Engineering & Model Optimization</li>
-            <li>Statistical Modeling & Hypothesis Testing</li>
-          </ul>
-        </div>
-        <div class="glass-card p-6">
-          <h4 class="text-lg font-semibold text-white mb-3">Programming & Tools</h4>
-          <ul class="space-y-2 text-neutral-400 text-sm">
-            <li>Python (Pandas, NumPy, scikit-learn, PyTorch)</li>
-            <li>R (Statistical Analysis & Visualization)</li>
-            <li>SQL, PySpark, KDB+/q</li>
-            <li>Git, LaTeX, Advanced Excel/VBA</li>
-          </ul>
-        </div>
-        <div class="glass-card p-6">
-          <h4 class="text-lg font-semibold text-white mb-3">Certifications & Education</h4>
-          <ul class="space-y-2 text-neutral-400 text-sm">
-            <li>MS in Applied Data Analytics (Boston University)</li>
-            <li>BS in Mathematics & CS (Chennai Mathematical Institute)</li>
-            <li>CFA Level 1 Candidate (CFA Scholarship Recipient)</li>
-            <li>Bloomberg Market Concepts Certified</li>
-          </ul>
-        </div>
-      </div>
-    </article>
-
-    <!-- Blog Posts -->
+    <!-- Research Publications -->
     <article class="flex flex-col gap-8">
       <header class="flex w-full flex-row justify-between items-center gap-2">
-        <h3 class="text-3xl font-bold text-white">Latest Insights</h3>
-        <Link href="./blog" label="See All Posts" isUnderline='True' />
+        <h3 class="text-3xl font-bold text-white">Published Research</h3>
+        <Link href="./research" label="See All Publications" isUnderline='True' />
       </header>
-      {posts.length === 0 && <p>Soon, stay connected 👀...</p>}
-      <section class="flex flex-col gap-2 md:flex-row md:flex-wrap">
-        {
-          posts.length !== 0 &&
-            posts
-              .slice(0, 2)
-              .map((post) => (
-                <PostCard
-                  publishedAt={post.data.publishedAt}
-                  title={post.data.title}
-                  description={post.data.description}
-                  slug={post.slug}
-                />
-              ))
-        }
-      </section>
+      {research.length !== 0 && (
+        <section class="flex flex-col gap-4">
+          {research.slice(0, 3).map((paper) => (
+            <a href={`/research/${paper.slug}`} class="group glass-card-hover p-6 flex flex-col gap-3">
+              <div>
+                <h4 class="text-xl font-semibold text-white group-hover:text-finance-cyan transition-colors leading-tight">{paper.data.title}</h4>
+                <p class="text-sm text-neutral-500 mt-2">{paper.data.authors.join(", ")}</p>
+                {paper.data.publication && <p class="text-sm text-neutral-400 mt-1">{paper.data.publication}</p>}
+                <p class="text-neutral-400 mt-3 line-clamp-2">{paper.data.description}</p>
+                <div class="flex gap-2 mt-3 flex-wrap">
+                  {paper.data.tags.slice(0, 3).map(tag => (
+                    <span class="text-xs text-neutral-500">{tag}</span>
+                  ))}
+                </div>
+              </div>
+            </a>
+          ))}
+        </section>
+      )}
     </article>
   </main>
 </HomeLayout>

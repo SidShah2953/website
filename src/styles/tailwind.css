@@ -47,6 +47,15 @@
   .glow-blue {
     @apply shadow-[0_0_30px_rgba(59,130,246,0.3)];
   }
+
+  /* Common link styles */
+  .link-primary {
+    @apply text-white hover:text-finance-cyan transition-colors;
+  }
+
+  .link-accent {
+    @apply text-finance-cyan hover:text-finance-cyan/80 transition-colors;
+  }
 }
 
 @layer utilities {

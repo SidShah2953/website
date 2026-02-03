@@ -23,11 +23,11 @@ const research = (await getCollection("research")).filter(r => r.data.isPublishe
             href={`/research/${paper.slug}`}
             class="group glass-card-hover p-6 md:p-8 flex flex-col gap-4 relative overflow-hidden"
           >
-            <div class="absolute inset-0 bg-gradient-to-br from-finance-green/0 to-finance-cyan/0 group-hover:from-finance-green/5 group-hover:to-finance-cyan/5 transition-all duration-300 rounded-2xl"></div>
-            
+            <div class="absolute inset-0 bg-gradient-to-br from-finance-cyan/0 to-finance-blue/0 group-hover:from-finance-cyan/5 group-hover:to-finance-blue/5 transition-all duration-300 rounded-2xl"></div>
+
             <div class="relative z-10">
               <div class="flex justify-between items-start gap-4 flex-wrap">
-                <h2 class="text-2xl font-bold text-white group-hover:text-finance-green transition-colors leading-tight flex-1">{paper.data.title}</h2>
+                <h2 class="text-2xl font-bold text-white group-hover:text-finance-cyan transition-colors leading-tight flex-1">{paper.data.title}</h2>
                 <time datetime={paper.data.publishedAt.toISOString()} class="text-sm text-neutral-400 shrink-0">{formatDate(paper.data.publishedAt)}</time>
               </div>
               
@@ -41,7 +41,7 @@ const research = (await getCollection("research")).filter(r => r.data.isPublishe
               
               <div class="flex gap-3 mt-4 flex-wrap items-center">
                 {paper.data.tags.map(tag => (
-                  <span class="text-xs px-3 py-1 rounded-lg bg-finance-green/10 text-finance-green border border-finance-green/30">
+                  <span class="text-xs px-3 py-1 rounded-lg bg-finance-cyan/10 text-finance-cyan border border-finance-cyan/30">
                     {tag}
                   </span>
                 ))}
