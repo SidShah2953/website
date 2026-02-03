@@ -50,27 +50,27 @@ export class FinanceScene {
 
   private createGeometricMesh(): void {
     // Icosahedron wireframe - clean geometric aesthetic
-    const geometry = new THREE.IcosahedronGeometry(15, 1);
+    const geometry = new THREE.IcosahedronGeometry(25, 1);
     const material = new THREE.MeshBasicMaterial({
       color: 0x3b82f6,
       wireframe: true,
       transparent: true,
-      opacity: 0.08,
+      opacity: 0.15,
     });
     this.geometricMesh = new THREE.Mesh(geometry, material);
-    this.geometricMesh.position.set(25, 5, -30);
+    this.geometricMesh.position.set(25, 5, -20);
     this.scene.add(this.geometricMesh);
 
     // Second mesh for depth
-    const geometry2 = new THREE.OctahedronGeometry(10, 0);
+    const geometry2 = new THREE.OctahedronGeometry(18, 0);
     const material2 = new THREE.MeshBasicMaterial({
       color: 0x0ea5e9,
       wireframe: true,
       transparent: true,
-      opacity: 0.06,
+      opacity: 0.12,
     });
     this.geometricMesh2 = new THREE.Mesh(geometry2, material2);
-    this.geometricMesh2.position.set(-30, -10, -40);
+    this.geometricMesh2.position.set(-30, -10, -25);
     this.scene.add(this.geometricMesh2);
   }
 
@@ -100,10 +100,10 @@ export class FinanceScene {
     geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
 
     const material = new THREE.PointsMaterial({
-      size: 0.8,
+      size: 1.75,
       vertexColors: true,
       transparent: true,
-      opacity: 0.4,
+      opacity: 0.5,
       sizeAttenuation: true,
     });
 

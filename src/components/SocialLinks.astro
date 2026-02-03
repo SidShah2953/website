@@ -3,7 +3,7 @@ import Link from "./shared/Link.astro";
 import presentation from "@/data/presentation";
 ---
 
-<ul role="list" class="flex flex-row flex-wrap gap-3">
+<ul role="list" class="grid grid-cols-3 gap-x-1 gap-y-1 justify-items-center max-w-[280px] md:max-w-none md:flex md:flex-row md:flex-wrap md:gap-3 text-xs md:text-base">
   {
     presentation.socials.map((social) => (
       <li>
