@@ -9,6 +9,7 @@ const projects = defineCollection({
     description: z.string(),
     isPublish: z.boolean(),
     isOngoing: z.boolean().default(false),
+    thesis: z.string().optional(),
   }),
 });
 
@@ -31,6 +32,7 @@ const blog = defineCollection({
     readingTimeMinutes: z.number().optional(), // injected at build
     canonical: z.string().url().optional(),
     ogImage: z.string().optional(),
+    thesis: z.string().optional(),
   }),
 });
 
@@ -48,6 +50,7 @@ const research = defineCollection({
     pdfUrl: z.string().url().optional(),
     tags: z.array(z.string()).default([]),
     isPublished: z.boolean().default(true),
+    thesis: z.string().optional(),
   }),
 });
 
