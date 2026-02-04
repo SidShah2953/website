@@ -2,6 +2,15 @@
 
 /* Unified Content Styles for Blog, Projects, and Research */
 
+/* Thesis block paragraph spacing */
+.thesis-content p {
+  @apply mb-4;
+}
+
+.thesis-content p:last-child {
+  @apply mb-0;
+}
+
 /* Base paragraph styles */
 .content-article .content-body p {
   @apply text-neutral-300 mb-4 leading-relaxed;
@@ -19,7 +28,7 @@
 
 /* Headings */
 .content-article .content-body h2 {
-  @apply mt-8 mb-4 text-3xl font-bold bg-gradient-to-r from-white to-neutral-300 bg-clip-text text-transparent;
+  @apply mt-8 mb-4 text-3xl font-bold text-finance-cyan;
 }
 
 .content-article .content-body h3 {

@@ -41,9 +41,9 @@
     @apply transition-all duration-200 hover:bg-glass-light hover:border-white/20;
   }
 
-  /* Gradient text */
+  /* Text accent color (formerly gradient) */
   .gradient-text {
-    @apply bg-gradient-to-r from-finance-blue via-finance-cyan to-finance-purple bg-clip-text text-transparent;
+    @apply text-finance-cyan;
   }
 
   /* Accent glow */

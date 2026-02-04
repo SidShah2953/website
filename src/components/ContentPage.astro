@@ -1,5 +1,6 @@
 ---
 import type { CollectionEntry } from "astro:content";
+import { marked } from "marked";
 
 export type ContentType = "blog" | "project" | "research";
 
@@ -33,32 +34,16 @@ const formatDate = (date: Date, style: "long" | "short" = "long") => {
 // Type guards
 const isBlogEntry = (e: typeof entry): e is BlogEntry => type === "blog";
 const isResearchEntry = (e: typeof entry): e is ResearchEntry => type === "research";
+
+// Get thesis if present and render as markdown
+const thesis = entry.data.thesis;
+const thesisHtml = thesis ? await marked.parse(thesis) : null;
 ---
 
-<main class="flex flex-col lg:flex-row gap-8 w-full">
-  <!-- Table of Contents Sidebar -->
-  <aside class="lg:w-64 shrink-0 order-last lg:order-first">
-    <nav class="glass-card p-6 relative overflow-hidden lg:sticky lg:top-8 lg:max-h-[calc(100vh-4rem)] lg:overflow-y-auto">
-      {isResearch ? (
-        <div class="absolute top-0 left-0 w-32 h-32 bg-gradient-to-br from-finance-green/5 to-finance-cyan/5 blur-2xl rounded-full"></div>
-      ) : (
-        <div class="absolute top-0 left-0 w-32 h-32 bg-gradient-to-br from-finance-blue/5 to-finance-purple/5 blur-2xl rounded-full"></div>
-      )}
-      <h2 class="text-xl font-semibold gradient-text mb-4 relative z-10">Table of Contents</h2>
-      <div id="toc-container" class="relative z-10"></div>
-    </nav>
-  </aside>
-
-  <!-- Main Content -->
-  <article class={`content-article ${type} glass-card p-8 md:p-12 relative overflow-hidden flex-1 min-w-0`}>
-    <!-- Decorative gradient -->
-    {isResearch ? (
-      <div class="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-finance-green/10 to-finance-cyan/10 blur-3xl rounded-full"></div>
-    ) : (
-      <div class="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-finance-blue/10 to-finance-purple/10 blur-3xl rounded-full"></div>
-    )}
-
-    <header class="flex w-full flex-col gap-4 relative z-10">
+<main class="flex flex-col gap-8 w-full">
+  <!-- Full-width Article Metadata Section -->
+  <header class="glass-card p-8 md:p-12 w-full">
+    <div class="flex flex-col gap-4">
       <h1 class="text-4xl md:text-5xl font-bold gradient-text leading-tight">{entry.data.title}</h1>
 
       {entry.data.description && (
@@ -157,12 +142,35 @@ const isResearchEntry = (e: typeof entry): e is ResearchEntry => type === "resea
           )}
         </div>
       )}
-    </header>
-
-    <div class="content-body relative z-10 mt-8">
-      <Content />
     </div>
-  </article>
+  </header>
+
+  <!-- Two-column layout: TOC on left, Thesis + Content on right -->
+  <div class="flex flex-col lg:flex-row gap-8">
+    <!-- Table of Contents Sidebar (order-2 on mobile, order-1 on desktop) -->
+    <aside class="order-2 lg:order-1 w-full lg:w-64 shrink-0">
+      <nav class="glass-card p-6 lg:sticky lg:top-8 lg:max-h-[calc(100vh-4rem)] lg:overflow-y-auto">
+        <h2 class="text-xl font-semibold gradient-text mb-4">Table of Contents</h2>
+        <div id="toc-container"></div>
+      </nav>
+    </aside>
+
+    <!-- Main Content Area: Thesis + Article (uses contents on mobile for flat ordering) -->
+    <div class="contents lg:order-2 lg:flex lg:flex-col lg:gap-8 lg:flex-1 lg:min-w-0">
+      {thesisHtml && (
+        <div class="order-1 lg:order-0 glass-card p-6 md:p-8">
+          <h2 class="text-xl font-semibold gradient-text mb-4">Thesis</h2>
+          <div class="thesis-content text-neutral-300 leading-relaxed" set:html={thesisHtml} />
+        </div>
+      )}
+
+      <article class={`order-3 lg:order-0 content-article ${type} glass-card p-8 md:p-12`}>
+        <div class="content-body">
+          <Content />
+        </div>
+      </article>
+    </div>
+  </div>
 </main>
 
 <script>
