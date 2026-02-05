@@ -12,6 +12,7 @@ import remarkMath from 'remark-math';
 
 // https://astro.build/config
 export default defineConfig({
+  output: 'static',
   vite: {
     plugins: [tailwindcss()],
   },
