@@ -8,7 +8,7 @@ isDraft: false
 thesis: |
     We're analyzing a crypto protocol generating millions in transaction fees. Our finance brain immediately reaches for the discounted cash flow model—the workhorse of corporate valuation. But then we spot something weird on the balance sheet: a \$100 million reserve of the company's own tokens. These aren't treasury shares. They're tradable assets deriving value from network effects, not corporate profits. 
 
-    Here's my thesis: **DCF absolutely works for crypto companies, but we need to flip our mental model inside out** - traditional capital structure assumptions break down completely, but the underlying cash flow logic holds perfectly.
+    Here's my thesis: **DCF works for crypto companies, but we need to flip our mental model inside out** - traditional capital structure assumptions break down completely, but the underlying cash flow logic holds perfectly.
 
     At its heart, DCF values an enterprise by projecting future cash flows and discounting them to present value. Crypto protocols generating transaction fees fit this framework perfectly: they provide services, charge fees, and generate measurable revenue streams. The fact that these services run on blockchain infrastructure instead of AWS doesn't invalidate the methodology.
 ---
@@ -18,7 +18,10 @@ import sotpFigure from '@/assets/posts/dcf-for-crypto/sotp-framework.png';
 
 ## Why DCF Still Works: The Fundamental Structure Holds
 
-I believe the core DCF logic is completely unshaken in crypto. Take Ethereum. Each transaction pays a gas fee: a real charge for computational resources. Users pay these fees willingly because the network provides utility. As adoption grows, transaction volume increases. As volume increases, revenue rises. This is the exact same relationship we'd find in Visa's payment processing business: $\text{Volume} \times \text{Per-unit Pricing} = \text{Revenue}$.
+I believe the core DCF logic is completely unshaken in crypto. Take Ethereum. Each transaction pays a gas fee: a real charge for computational resources. Users pay these fees willingly because the network provides utility. As adoption grows, transaction volume increases. As volume increases, revenue rises. This is the exact same relationship we'd find in Visa's payment processing business: 
+$$
+\text{Volume} \times \text{Per-unit Pricing} = \text{Revenue}
+$$
 
 The structural components translate directly. Free cash flow to the firm becomes protocol fee revenue minus operating expenses. Terminal value follows similar logic. WACC must account for regulatory and technology obsolescence risk, but this is conceptually identical to adjusting WACC for a fintech startup in an evolving regulatory environment.
 
@@ -60,13 +63,21 @@ Revenue forecasting for crypto protocols requires translating blockchain-native 
 
 Transaction fee protocols are the most straightforward. These include decentralized exchanges (Uniswap), layer-1 blockchains (Ethereum, Solana), and payment networks (Ripple). Revenue equals transaction volume times fee rate. Uniswap charges $0.3\%$ on trades, generating \$$542$ million in fees over the past year. A portion goes to liquidity providers, the remainder is protocol revenue. To forecast this, we model transaction volume growth and fee rates.
 
-**Bottoms-Up:** Build transaction volume from granular drivers. For a decentralized exchange: number of active traders, average trades per user per month, average trade size, fee percentage. Each component gets its own growth assumption. If we project $100,000$ active users in Year 1 growing $50\%$ annually, with $10$ trades per month averaging \$$1,000$, at $0.3\%$ fees, we forecast: $100,000 \times 10 \times 12 \times$ \$$1,000 \times 0.3\% = $\$$36$ million in Year 1 revenue. The advantage is granularity: we can stress-test user growth separately from trading frequency.
+**Bottoms-Up:** Build transaction volume from granular drivers. For a decentralized exchange: number of active traders, average trades per user per month, average trade size, fee percentage. Each component gets its own growth assumption. If we project $100,000$ active users in Year 1 growing $50\%$ annually, with $10$ trades per month averaging \$$1,000$, at $0.3\%$ fees, we forecast: 
+$$
+\$100,000 \times 10 \times 12 \times \$1,000 \times 0.3\% = \$36 \operatorname{ million}
+$$
+in Year 1 revenue. The advantage is granularity: we can stress-test user growth separately from trading frequency.
 
 **Top-down:** This starts with total addressable market. Estimate global DeFi trading volume (\$$2$ trillion annually), assume our addressable market is $10\%$ (\$$200$ billion), project $5\%$ market share (\$$10$ billion), apply the $0.3\%$ fee rate to get \$$30$ million in revenue. Top-down works for early-stage protocols without user history, or when creating scenarios tied to macro crypto adoption.
 
 #### Lending Protocols
 
-Lending protocols (Aave, Compound) generate revenue by capturing the spread between borrowing and lending rates. Borrowers pay interest, lenders receive most of it, the protocol captures a small percentage (often $10-30$ basis points). We need to model total value locked (TVL) in lending pools, utilization rates (percentage of deposited assets actively borrowed), interest rate curves, and the protocol's take rate. Simplified: \$$1$ billion TVL, $60\%$ utilization, $5\%$ average borrowing rate, $15$ basis point protocol take yields \$$1B \times 60\% \times 5\% \times 0.15 = $\$$450,000$ annually. As TVL grows, revenue scales proportionally.
+Lending protocols (Aave, Compound) generate revenue by capturing the spread between borrowing and lending rates. Borrowers pay interest, lenders receive most of it, the protocol captures a small percentage (often $10-30$ basis points). We need to model total value locked (TVL) in lending pools, utilization rates (percentage of deposited assets actively borrowed), interest rate curves, and the protocol's take rate. Simplified: \$$1$ billion TVL, $60\%$ utilization, $5\%$ average borrowing rate, $15$ basis point protocol take yields:
+$$
+\$1B \times 60\% \times 5\% \times 0.15\% = \$450,000
+$$
+on an annual basis. As TVL grows, revenue scales proportionally.
 
 ### The Discount Rate Problem: WACC in a World Without Comparable Companies
 
