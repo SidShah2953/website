@@ -93,6 +93,9 @@
 /* Tables */
 .content-article .content-body table {
   @apply w-full my-6 border-collapse text-sm;
+  display: block;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .content-article .content-body th {
