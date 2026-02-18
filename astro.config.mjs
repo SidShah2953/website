@@ -1,4 +1,4 @@
-import { defineConfig } from "astro/config";
+import { defineConfig, passthroughImageService } from "astro/config";
 import tailwindcss from "@tailwindcss/vite";
 import sitemap from "@astrojs/sitemap";
 import robotsTxt from "astro-robots-txt";
@@ -10,9 +10,12 @@ import mdx from "@astrojs/mdx";
 import rehypeKatex from 'rehype-katex';
 import remarkMath from 'remark-math';
 
+const isDev = process.env.NODE_ENV === 'development';
+
 // https://astro.build/config
 export default defineConfig({
   output: 'static',
+  ...(isDev ? { image: { service: passthroughImageService() } } : {}),
   vite: {
     plugins: [tailwindcss()],
   },
