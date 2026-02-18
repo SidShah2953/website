@@ -13,8 +13,6 @@ import img4 from '/src/assets/posts/svi-with-pyro/Image-4.png';
 import img5 from '/src/assets/posts/svi-with-pyro/Image-5.png';
 import img6 from '/src/assets/posts/svi-with-pyro/Image-6.png';
 
----
-
 ## Abstract of _Ruggedness: The blessing of bad geography in Africa_
 
 We show that geography, through its impact on history, can have important effects on current economic development. The analysis focuses on the historic interaction between ruggedness and Africa's slave trades. Although rugged terrain hinders trade and most productive activities, negatively affecting income globally, within Africa rugged terrain afforded protection to those being raided during the slave trades. Since the slave trades retarded subsequent economic development, within Africa ruggedness has also had a historic indirect positive effect on income. Studying all countries worldwide, we estimate the differential effect of ruggedness on income for Africa. We show that:
@@ -24,11 +22,7 @@ We show that geography, through its impact on history, can have important effect
 - it cannot be explained by other factors like Africa's unique geographic environment, and
 - it is fully accounted for by the history of the slave trades.
 
----
-
 We model the analysis of these data points in Pyro as given below.
-
----
 
 ## Set Up
 
@@ -107,7 +101,7 @@ ax[1].set(xlabel="Terrain Ruggedness Index",
 This displays a somewhat superficial claim that there is indeed a possible relationship between ruggedness and GDP, but that further analysis will be needed to confirm it.  
 
 <Image src={img1} alt="Preliminary Visualisation"/>
----
+
 
 ## Our Mathematical Model
 
@@ -182,7 +176,7 @@ In a Bayesian Linear Regression model, we need to specify prior distributions on
 - For the other regression coefficients, we use standard Normal priors (centered at 0) to represent our lack of apriori knowledge of whether the relationship between covariates and GDP is positive or negative.
 - For the observation noise $\sigma$, we use a flat prior bounded below by $0$ because this value must be positive to be a valid standard deviation.
 
----
+
 
 ## Process of Inference
 
@@ -220,7 +214,7 @@ $$
 \theta_{max} = \argmax_{\theta} p_\theta(\textbf{x})
 $$
 
----
+
 
 ## Estimating the Learnable Parameters
 
@@ -265,7 +259,7 @@ pyro.render_model(auto_guide,
 ```
 <Image src={img3} alt="AutoGuide Parameter Visualisation"/>
 
----
+
 
 ### ELBO Minimisation
 
@@ -317,7 +311,7 @@ AutoNormal.locs.sigma -2.2117462
 AutoNormal.scales.sigma 0.053564996
 ```
 
----
+
 
 By plotting a histogram of the density(frequency) of slope of the $\log$(GDP) vs. Terrain Ruggedness graph, i.e. the slope of the regression line ($\gamma$), we reiterate on the fact that $\gamma$ approximately follows a normal distribution.
 
