@@ -10,7 +10,7 @@ import convertAsteriskToStrongTag from "@/utils/convertAsteriskToStrongTag";
 
 import presentation from "@/data/presentation";
 
-const posts = (await getCollection("blog")).filter(p => !p.data.isDraft).sort(function (first, second) {
+const posts = (await getCollection("blog")).filter(p => !p.data.isHidden && !p.slug.includes('/')).sort(function (first, second) {
   return second.data.publishedAt.getTime() - first.data.publishedAt.getTime();
 });
 const projects = (await getCollection("projects")).sort(function (first, second) {
