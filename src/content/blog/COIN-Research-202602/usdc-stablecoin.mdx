@@ -1,0 +1,69 @@
+---
+title: "Coinbase's Stablecoin Business Is Not What You Think It Is"
+publishedAt: 2026-03-02
+description: "The Mechanics Behind USDC Revenue — And Why the 2026 Renewal Changes Everything"
+tags: ["Crypto", "Finance"]
+isHidden: false
+articleNumber: 1
+thesis: |
+    At $1,348.8M in FY2025, stablecoin revenue is the single largest recurring revenue line Coinbase generates — larger than institutional transaction revenue, larger than staking, larger than every other subscription and services line. Almost none of the analysis written about it explains what it actually is.
+---
+import CallOutForMDX from "@/components/CallOutForMDX.astro";
+import ImageWithCaption from "@/components/ImageWithCaption.astro";
+import figure from '@/assets/posts/lego-fication-of-finance/bull.png';
+
+## Coinbase Does Not Operate a Stablecoin
+
+Coinbase does not issue USDC. Does not hold its reserves. Does not set its yield or determine reserve allocation. Circle does all of that. What Coinbase holds is a contractual revenue-sharing arrangement — confirmed in Circle's S-1 — that entitles it to a defined share of the interest income Circle earns on the Treasury securities and money market funds backing USDC's reserves.
+
+The specific terms: $100\%$ of reserve interest on USDC balances held on Coinbase's own platform, and $50\%$ of reserve interest on USDC held through any other channel. When the Fed Funds rate is elevated, reserve income is substantial. When rates fall, it contracts — and Coinbase's stablecoin revenue contracts with it.
+
+In FY2025, the average on-platform USDC balance was \$$17.8$B — an all-time high. Total USDC market cap as of February 25, 2026 was \$$74.9$B. Coinbase holds approximately $24\%$ of total USDC supply on its platform and earns $100\%$ of the interest on that share. The remaining ~$76\%$ is off-platform, on which Coinbase earns $50\%$. Applied to a ~$5.3\%$ reserve yield: \$$1,348.8$M. Up $48\%$ year-over-year — driven by balance growth, not rate movement, since rates were relatively stable year-over-year.
+
+
+
+## The Gross vs. Net Distinction
+
+The \$$1,348.8$M is the gross figure. The net contribution is meaningfully lower, for a reason that doesn't appear in the stablecoin revenue line itself: Coinbase pays approximately \$$203$M per year in USDC-denominated rewards to users who hold USDC on-platform. Those payments are classified in Sales & Marketing — not as a reduction to stablecoin revenue — making the gross margin look cleaner than the economics actually are.
+
+Adjust for the rewards subsidy and the effective net USDC contribution is approximately \$$1,146$M. Still the largest recurring revenue line in the business. Still growing. But roughly $15\%$ below the gross figure that headlines carry.
+
+The USDC Scenarios tab in the attached model presents both gross and net revenue across all scenario paths.
+
+
+
+## The 2026 Renewal: The Most Consequential Event in the Model
+
+The revenue-sharing agreement renews every three years. The next renewal is in 2026.
+
+Two things make this renewal different from routine contract cadence. First, Circle is pursuing an IPO. A public Circle has shareholders who will scrutinize the revenue it cedes to Coinbase — and the cost of the $100\%$/$50\%$ share will appear explicitly in Circle's margin analysis for the first time. Second, Circle has already demonstrated its willingness to pay for distribution at market rates: it paid Binance \$$60.25$M upfront plus monthly fees to carry USDC. That deal is the market precedent.
+
+If Coinbase's terms shift to $80\%$/$40\%$ with the current rate and balance environment held constant, FY2026 stablecoin revenue falls by \$$130$–$180$M versus consensus. In a stress scenario with renegotiated terms and a 100bps Fed Funds rate cut, the impact extends to \$$250$–$300$M. The consensus FY2026E of \$$1,436$M I've seen does not model any renewal scenario. It's a mechanical projection of current terms applied to a slightly adjusted rate path.
+
+That \$$1,436$M consensus estimate should be treated as the ceiling of a wide distribution, not a point estimate.
+
+
+
+## Rate Sensitivity: The Other Variable
+
+The renewal terms are the structural risk. Rates are the sensitivity variable.
+
+Each 25bps Fed Funds cut reduces Coinbase's USDC revenue by approximately \$$35$–$45$M annually at current on-platform balance levels, before any change in the balance itself. The USDC Scenarios tab models three rate paths — flat, −100bps, and −200bps — against three sharing-rate scenarios, producing a 3×3 matrix of FY2026 and FY2027 outcomes. The range across all nine cells: \$$780$M to \$$1,460$M.
+
+That's a \$$680$M spread on a single revenue line.
+
+
+
+## The Flywheel Risk Inside the Revenue Risk
+
+In the flywheel framework, USDC revenue isn't merely one layer. It's the layer that makes the Adjusted EBITDA margin defensible. At \$$1.35$B in essentially zero-incremental-cost revenue — the infrastructure and operations are Circle's — USDC contributes disproportionately to the $44.4\%$ Adjusted EBITDA margin. Remove \$$130$–$180$M without a corresponding cost reduction, and the company-wide margin compresses by roughly $180$–$250$ basis points.
+
+Not catastrophic. But not priced into consensus either.
+
+
+
+## What to Watch
+
+Any disclosure by Coinbase or Circle referencing "revenue-sharing agreement terms" or "Circle partnership renewal" in the context of the IPO roadshow, prospectus, or quarterly calls is the most analytically significant data release of the year. Watch Circle's S-1 amendments closely. Watch Coinbase quarterly calls for language that hedges the USDC revenue line. The absence of disclosure is also informative — it suggests the negotiation is ongoing and the outcome undetermined.
+
+The consensus estimate is the ceiling. Model from there.
