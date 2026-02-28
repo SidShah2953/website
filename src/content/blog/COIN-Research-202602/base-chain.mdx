@@ -8,7 +8,7 @@ articleNumber: 2
 thesis: |
     Base generated $75.4M in gross sequencer revenue in FY2025. That's 30x year-over-year growth. It commands 46% of total L2 DeFi TVL at $4.63B and 62% of the L2 fee market by revenue. By February 2026 it's processing approximately 10.7 million transactions per day at ~$147,000 in daily fees.
 
-    Most financial models I've come across don't have this in a dedicated revenue line. The entire Base revenue stream gets buried inside "Other Transaction" with no sub-breakout and no forward estimate for sequencer economics specifically. For a line growing 30x per year, that gap is not a minor oversight.    
+    Most financial models I've come across don't have this in a dedicated revenue line. The entire Base revenue stream gets buried inside "Other Transaction" with no sub-breakout and no forward estimate for sequencer economics specifically. For a line growing 30x per year, that gap is not a minor oversight.
 ---
 import CallOutForMDX from "@/components/CallOutForMDX.astro";
 import ImageWithCaption from "@/components/ImageWithCaption.astro";
@@ -16,15 +16,15 @@ import figure from '@/assets/posts/lego-fication-of-finance/bull.png';
 
 ## How the Sequencer Revenue Works
 
-Base processes user transactions off the Ethereum mainnet, batches them, and submits cryptographic proofs to Ethereum for final settlement. The sequencer — the node that orders and processes transactions — collects a fee from users for that service. That fee is the gross sequencer revenue. Out of it, the sequencer pays L1 settlement costs to Ethereum validators (approximately 8–10% of gross revenue on Base) and, under the previous architecture, shared approximately 12% with the Optimism Protocol.
+Base processes user transactions off the Ethereum mainnet, batches them, and submits cryptographic proofs to Ethereum for final settlement. The sequencer — the node that orders and processes transactions — collects a fee from users for that service. That fee is the gross sequencer revenue. Out of it, the sequencer pays L1 settlement costs to Ethereum validators (approximately $8$–$10\%$ of gross revenue on Base) and, under the previous architecture, shared approximately $12\%$ with the Optimism Protocol.
 
 Base is operated by Coinbase. Coinbase is the sequencer. Every transaction that flows through Base generates fee income that shows up on Coinbase's books — inside "Other Transaction," with no disclosure of how much.
 
 ## What Changed on February 18, 2026
 
-On February 18, 2026, Coinbase announced Base is departing the OP Stack — the shared rollup framework Optimism developed that Base had been built on since 2023. The OP Stack gave Base technical infrastructure and collaborative governance. In exchange, the Optimism Protocol received approximately 12% of Base's sequencer revenue as a protocol fee.
+On February 18, 2026, Coinbase announced Base is departing the OP Stack — the shared rollup framework Optimism developed that Base had been built on since 2023. The OP Stack gave Base technical infrastructure and collaborative governance. In exchange, the Optimism Protocol received approximately $12\%$ of Base's sequencer revenue as a protocol fee.
 
-Departure means that beginning Q2 2026, Coinbase retains 100% of sequencer fees. The Optimism Protocol share is eliminated. At $75.4M gross sequencer revenue and a 12% share, the departure eliminates ~$9M in annual cost at current run-rates — and eliminates it as a percentage of a growing line. If Base reaches $100M in gross sequencer revenue in FY2026 (conservative given the current daily run-rate), the OP departure saves ~$12M versus the prior structure.
+Departure means that beginning Q2 2026, Coinbase retains $100\%$ of sequencer fees. The Optimism Protocol share is eliminated. At \$$75.4$M gross sequencer revenue and a $12\%$ share, the departure eliminates ~\$$9$M in annual cost at current run-rates — and eliminates it as a percentage of a growing line. If Base reaches \$$100$M in gross sequencer revenue in FY2026 (conservative given the current daily run-rate), the OP departure saves ~\$$12$M versus the prior structure.
 
 The consensus models I've reviewed carry no representation of this event. The February 18, 2026 announcement postdates many model updates, but the analytical implication is straightforward: net sequencer margin improves beginning Q2 2026, on a revenue base that is still growing fast.
 
@@ -32,7 +32,7 @@ The consensus models I've reviewed carry no representation of this event. The Fe
 
 ## The Forward Estimates
 
-The Multiple Periods tab in the attached model includes analyst FY2026E net sequencer revenue of ~$50M and FY2027E of ~$65M. Deliberately conservative: partial-year OP departure benefit (Q2–Q4 only), cautious growth assumptions that don't extrapolate the 30x FY2025 trajectory.
+The Multiple Periods tab in the attached model includes analyst FY2026E net sequencer revenue of ~\$$50$M and FY2027E of ~\$$65$M. Deliberately conservative: partial-year OP departure benefit (Q2–Q4 only), cautious growth assumptions that don't extrapolate the $30$x FY2025 trajectory.
 
 The upside scenario — not in the base case — is direct flywheel acceleration. Every enterprise or government client Coinbase onboards to the CDP, and every application those clients build, has the potential to drive Base transaction volume. The connection is mechanical: CDP adoption feeds Base volume, which feeds sequencer revenue, which flows to Coinbase's income statement.
 
