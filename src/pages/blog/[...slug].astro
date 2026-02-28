@@ -7,11 +7,13 @@ import BreadcrumbSchema from '@/components/seo/BreadcrumbSchema.astro';
 import { estimateReadingTime } from '@/utils/estimateReadingTime';
 
 export async function getStaticPaths() {
+  const toSlug = (id: string) => id.replace(/\.(md|mdx)$/, '').toLowerCase();
   const allPosts = await getCollection('blog');
 
   return allPosts.map(p => {
-    const isSubArticle = p.slug.includes('/');
-    const isSeriesHome = !isSubArticle && allPosts.some(a => a.slug.startsWith(p.slug + '/'));
+    const slug = toSlug(p.id);
+    const isSubArticle = slug.includes('/');
+    const isSeriesHome = !isSubArticle && allPosts.some(a => toSlug(a.id).startsWith(slug + '/'));
 
     let seriesArticles = undefined;
     let parentSeries = undefined;
@@ -20,24 +22,24 @@ export async function getStaticPaths() {
 
     if (isSeriesHome) {
       seriesArticles = allPosts
-        .filter(a => a.slug.startsWith(p.slug + '/'))
+        .filter(a => toSlug(a.id).startsWith(slug + '/'))
         .sort((a, b) => (a.data.articleNumber ?? 0) - (b.data.articleNumber ?? 0));
     }
 
     if (isSubArticle) {
-      const parentSlug = p.slug.split('/')[0];
+      const parentSlug = slug.split('/')[0];
       const siblings = allPosts
-        .filter(a => a.slug.startsWith(parentSlug + '/'))
+        .filter(a => toSlug(a.id).startsWith(parentSlug + '/'))
         .sort((a, b) => (a.data.articleNumber ?? 0) - (b.data.articleNumber ?? 0));
-      parentSeries = allPosts.find(a => a.slug === parentSlug);
-      const idx = siblings.findIndex(a => a.slug === p.slug);
+      parentSeries = allPosts.find(a => toSlug(a.id) === parentSlug);
+      const idx = siblings.findIndex(a => a.id === p.id);
       prevArticle = idx > 0 ? siblings[idx - 1] : undefined;
       nextArticle = idx < siblings.length - 1 ? siblings[idx + 1] : undefined;
       seriesArticles = siblings;
     }
 
     return {
-      params: { slug: p.slug },
+      params: { slug },
       props: { entry: p, seriesArticles, parentSeries, prevArticle, nextArticle },
     };
   });
@@ -48,7 +50,8 @@ const stats = estimateReadingTime(entry.body);
 const { Content } = await entry.render();
 
 // Build SEO props from frontmatter
-const canonicalUrl = entry.data.canonical || `/blog/${entry.slug}/`;
+const entrySlug = entry.id.replace(/\.(md|mdx)$/, '').toLowerCase();
+const canonicalUrl = entry.data.canonical || `/blog/${entrySlug}/`;
 const ogImage = entry.data.ogImage || '/social-prev.png';
 ---
 <Layout
@@ -79,7 +82,7 @@ const ogImage = entry.data.ogImage || '/social-prev.png';
     description={entry.data.description}
     publishedAt={entry.data.publishedAt}
     updatedAt={entry.data.updatedAt}
-    slug={entry.slug}
+    slug={entrySlug}
     image={ogImage}
     tags={entry.data.tags}
   />
@@ -88,7 +91,7 @@ const ogImage = entry.data.ogImage || '/social-prev.png';
     items={parentSeries ? [
       { name: "Home", url: "/" },
       { name: "Blog", url: "/blog/" },
-      { name: parentSeries.data.title, url: `/blog/${parentSeries.slug}/` },
+      { name: parentSeries.data.title, url: `/blog/${parentSeries.id.replace(/\.(md|mdx)$/, '')}/` },
       { name: entry.data.title }
     ] : [
       { name: "Home", url: "/" },
