@@ -7,13 +7,43 @@ import BreadcrumbSchema from '@/components/seo/BreadcrumbSchema.astro';
 import { estimateReadingTime } from '@/utils/estimateReadingTime';
 
 export async function getStaticPaths() {
-  const posts = await getCollection('blog');
-  return posts
-    .filter(p => !p.data.isDraft)
-    .map(p => ({ params: { slug: p.slug }, props: { entry: p } }));
+  const allPosts = await getCollection('blog');
+
+  return allPosts.map(p => {
+    const isSubArticle = p.slug.includes('/');
+    const isSeriesHome = !isSubArticle && allPosts.some(a => a.slug.startsWith(p.slug + '/'));
+
+    let seriesArticles = undefined;
+    let parentSeries = undefined;
+    let prevArticle = undefined;
+    let nextArticle = undefined;
+
+    if (isSeriesHome) {
+      seriesArticles = allPosts
+        .filter(a => a.slug.startsWith(p.slug + '/'))
+        .sort((a, b) => (a.data.articleNumber ?? 0) - (b.data.articleNumber ?? 0));
+    }
+
+    if (isSubArticle) {
+      const parentSlug = p.slug.split('/')[0];
+      const siblings = allPosts
+        .filter(a => a.slug.startsWith(parentSlug + '/'))
+        .sort((a, b) => (a.data.articleNumber ?? 0) - (b.data.articleNumber ?? 0));
+      parentSeries = allPosts.find(a => a.slug === parentSlug);
+      const idx = siblings.findIndex(a => a.slug === p.slug);
+      prevArticle = idx > 0 ? siblings[idx - 1] : undefined;
+      nextArticle = idx < siblings.length - 1 ? siblings[idx + 1] : undefined;
+      seriesArticles = siblings;
+    }
+
+    return {
+      params: { slug: p.slug },
+      props: { entry: p, seriesArticles, parentSeries, prevArticle, nextArticle },
+    };
+  });
 }
 
-const { entry } = Astro.props;
+const { entry, seriesArticles, parentSeries, prevArticle, nextArticle } = Astro.props;
 const stats = estimateReadingTime(entry.body);
 const { Content } = await entry.render();
 
@@ -55,12 +85,26 @@ const ogImage = entry.data.ogImage || '/social-prev.png';
   />
   <BreadcrumbSchema
     slot="head"
-    items={[
+    items={parentSeries ? [
+      { name: "Home", url: "/" },
+      { name: "Blog", url: "/blog/" },
+      { name: parentSeries.data.title, url: `/blog/${parentSeries.slug}/` },
+      { name: entry.data.title }
+    ] : [
       { name: "Home", url: "/" },
       { name: "Blog", url: "/blog/" },
       { name: entry.data.title }
     ]}
   />
 
-  <ContentPage type="blog" entry={entry} Content={Content} readingTime={stats.minutes} />
+  <ContentPage
+    type="blog"
+    entry={entry}
+    Content={Content}
+    readingTime={stats.minutes}
+    seriesArticles={seriesArticles}
+    parentSeries={parentSeries}
+    prevArticle={prevArticle}
+    nextArticle={nextArticle}
+  />
 </Layout>

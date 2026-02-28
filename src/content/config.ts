@@ -28,11 +28,12 @@ const blog = defineCollection({
     publishedAt: z.date(),
     updatedAt: z.date().optional(),
     tags: z.array(z.string()).default([]),
-    isDraft: z.boolean().default(false),
+    isHidden: z.boolean().default(false),
     readingTimeMinutes: z.number().optional(), // injected at build
     canonical: z.string().url().optional(),
     ogImage: z.string().optional(),
     thesis: z.string().optional(),
+    articleNumber: z.number().optional(), // sub-articles: sort order within series
   }),
 });
 

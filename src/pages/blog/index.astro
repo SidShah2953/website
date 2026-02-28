@@ -4,8 +4,23 @@ import ContentListLayout from '@/layouts/ContentListLayout.astro';
 import ContentCard from '@/components/ContentCard.astro';
 import { estimateReadingTime } from '@/utils/estimateReadingTime';
 
-const blogPosts = (await getCollection('blog'))
-  .filter(p => !p.data.isDraft)
+const allBlogPosts = await getCollection('blog');
+
+// Count sub-articles per series (slug prefix = parent slug)
+const seriesArticleCounts: Record<string, number> = {};
+allBlogPosts
+  .filter(p => p.slug.includes('/'))
+  .forEach(p => {
+    const parentSlug = p.slug.split('/')[0];
+    seriesArticleCounts[parentSlug] = (seriesArticleCounts[parentSlug] ?? 0) + 1;
+  });
+
+// Derive which top-level posts are series homes
+const seriesHomeSlugs = new Set(Object.keys(seriesArticleCounts));
+
+// Blog index: top-level posts only (no sub-articles), not hidden
+const blogPosts = allBlogPosts
+  .filter(p => !p.data.isHidden && !p.slug.includes('/'))
   .sort((a, b) => b.data.publishedAt.getTime() - a.data.publishedAt.getTime());
 
 // Inject reading time (if not stored yet)
@@ -26,7 +41,9 @@ const postsData = enriched.map(p => ({
   title: p.data.title,
   description: p.data.description,
   publishedAt: p.data.publishedAt.toISOString(),
-  tags: p.data.tags
+  tags: p.data.tags,
+  isSeries: seriesHomeSlugs.has(p.slug),
+  articleCount: seriesArticleCounts[p.slug] ?? 0,
 }));
 ---
 
@@ -46,6 +63,8 @@ const postsData = enriched.map(p => ({
       description={post.data.description}
       publishedAt={post.data.publishedAt}
       tags={post.data.tags}
+      isSeries={seriesHomeSlugs.has(post.slug)}
+      articleCount={seriesArticleCounts[post.slug]}
     />
   ))}
 </ContentListLayout>
@@ -69,12 +88,26 @@ const postsData = enriched.map(p => ({
 
     container.innerHTML = filtered.map(post => {
       const date = new Date(post.publishedAt).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' }).replace(/\//g, '/');
+      const seriesBadge = post.isSeries
+        ? `<div class="flex items-center gap-2 mb-2">
+            <span class="inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-md bg-finance-purple/20 text-finance-purple border border-finance-purple/40 uppercase tracking-wide">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/>
+                <line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/>
+              </svg>
+              Series${post.articleCount ? ` · ${post.articleCount} parts` : ''}
+            </span>
+          </div>`
+        : '';
       return `
         <a class="content-card content-card--blog group glass-card-hover p-6 flex flex-col gap-3 relative overflow-hidden" href="/blog/${post.slug}" data-tags="${post.tags.join(',')}">
           <div class="absolute inset-0 bg-gradient-to-br from-finance-cyan/0 to-finance-blue/0 group-hover:from-finance-cyan/5 group-hover:to-finance-blue/5 transition-all duration-300 rounded-2xl"></div>
           <div class="relative z-10">
             <div class="flex w-full items-start justify-between gap-4 flex-wrap">
-              <h2 class="font-semibold text-white group-hover:text-finance-cyan transition-colors leading-tight flex-1 text-xl">${post.title}</h2>
+              <div class="flex-1">
+                ${seriesBadge}
+                <h2 class="font-semibold text-white group-hover:text-finance-cyan transition-colors leading-tight text-xl">${post.title}</h2>
+              </div>
               <div class="flex flex-row items-center gap-3 text-sm text-neutral-400 shrink-0">
                 <time datetime="${post.publishedAt}">${date}</time>
                 <svg width="20" height="20" viewBox="0 0 18 18" fill="none" class="transition-all duration-300 group-hover:translate-x-1 group-hover:translate-y-[-2px] opacity-60 group-hover:opacity-100">

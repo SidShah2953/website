@@ -4,7 +4,7 @@ import { SITE_URL } from '@/data/config';
 
 export async function GET() {
   const posts = (await getCollection('blog'))
-    .filter(p => !p.data.isDraft)
+    .filter(p => !p.data.isHidden && !p.slug.includes('/'))
     .sort((a, b) => b.data.publishedAt.getTime() - a.data.publishedAt.getTime());
 
   return rss({
