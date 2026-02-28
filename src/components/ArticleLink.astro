@@ -1,0 +1,26 @@
+---
+type Props = {
+  href: string;
+  title: string;
+};
+
+const { href, title } = Astro.props;
+---
+
+<a
+  href={href}
+  class="group not-prose flex items-stretch gap-3 px-3 py-2 my-4 rounded-lg border border-finance-cyan/25 bg-finance-cyan/5 hover:bg-finance-cyan/10 hover:border-finance-cyan/50 transition-all duration-200 no-underline"
+>
+  <div class="flex-shrink-0 aspect-square flex items-center justify-center w-8 rounded-md bg-finance-cyan/10 border border-finance-cyan/20">
+    <svg class="w-5 h-5 text-finance-cyan" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+    </svg>
+  </div>
+  <div class="flex-1 min-w-0 flex flex-col justify-center gap-1.5">
+    <span class="text-xs text-finance-cyan/50 font-medium uppercase tracking-wider leading-none">Deep Dive</span>
+    <span class="text-finance-cyan font-medium text-sm leading-tight">{title}</span>
+  </div>
+  <svg class="self-center w-4 h-4 text-finance-cyan/50 group-hover:text-finance-cyan group-hover:translate-x-1 transition-all duration-200 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+  </svg>
+</a>
