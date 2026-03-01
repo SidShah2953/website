@@ -217,6 +217,12 @@ const thesisHtml = thesis ? await marked.parse(thesis) : null;
         </div>
       )}
 
+      <article class={`order-3 lg:order-0 content-article ${type} glass-card p-8 md:p-12`}>
+        <div class="content-body">
+          <Content />
+        </div>
+      </article>
+
       <!-- Sub-article: prev/next navigation (after thesis, before article) -->
       {isBlogEntry(entry) && parentSeries && (
         <div class="order-2 lg:order-0 grid grid-cols-2 gap-4">
@@ -276,12 +282,6 @@ const thesisHtml = thesis ? await marked.parse(thesis) : null;
           )}
         </div>
       )}
-
-      <article class={`order-3 lg:order-0 content-article ${type} glass-card p-8 md:p-12`}>
-        <div class="content-body">
-          <Content />
-        </div>
-      </article>
     </div>
   </div>
 </main>
