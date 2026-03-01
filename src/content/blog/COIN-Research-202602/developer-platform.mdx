@@ -6,19 +6,12 @@ tags: ["Crypto", "Finance"]
 isHidden: false
 articleNumber: 6
 thesis: |
-    At $1,348.8M in FY2025, stablecoin revenue is the single largest recurring revenue line Coinbase generates — larger than institutional transaction revenue, larger than staking, larger than every other subscription and services line. Almost none of the analysis written about it explains what it actually is.
+    Coinbase's developer platform serves 270+ enterprise clients — Citi, JPMorgan, BlackRock, Stripe, PayPal, Revolut, Shopify — and 150+ government agencies. Brian Armstrong has used the AWS analogy explicitly: an infrastructure layer that financial services companies plug into, the way cloud companies plugged into Amazon. The FY2025 operating metrics suggest the thesis is already materializing.
+
+    And yet the models I've come across don't have a dedicated revenue line for the CDP. The revenue flows into two catch-all segments and disappears.
 ---
 import CallOutForMDX from "@/components/CallOutForMDX.astro";
 import ImageWithCaption from "@/components/ImageWithCaption.astro";
-import figure from '@/assets/posts/lego-fication-of-finance/bull.png';
-
-
-## The Business With No Revenue Line
-
-Coinbase's developer platform serves 270+ enterprise clients — Citi, JPMorgan, BlackRock, Stripe, PayPal, Revolut, Shopify — and 150+ government agencies. Brian Armstrong has used the AWS analogy explicitly: an infrastructure layer that financial services companies plug into, the way cloud companies plugged into Amazon. The FY2025 operating metrics suggest the thesis is already materializing.
-
-And yet the models I've come across don't have a dedicated revenue line for the CDP. The revenue flows into two catch-all segments and disappears.
-
 
 
 ## What the CDP Is
@@ -28,25 +21,22 @@ The Coinbase Developer Platform is Coinbase's institutional infrastructure offer
 The CDP includes Coinbase Prime (institutional prime brokerage and custody), the Coinbase Cloud developer API suite, the Coinbase Wallet SDK, and Base infrastructure access. It's the interface through which a payments company adds crypto acceptance, a bank adds digital asset custody, or a government agency settles cross-border payments on a blockchain. The business model is API-based and custody-fee-based: enterprises pay on transaction volume, on assets under custody, or on fixed platform access fees depending on their product configuration.
 
 
-
 ## The Client List and What It Actually Implies
 
 JPMorgan, Citi, and BlackRock are not proof-of-concept clients. They are fully operational financial institutions with compliance, legal, and technology requirements that took months or years to satisfy before any integration was approved. Their presence on the CDP client list is evidence of a deep commercial relationship, not a logo on a press release.
 
 The October 2025 Citi partnership is the most significant recent disclosure: Coinbase announced collaboration with Citi to develop digital asset payment solutions, representing one of the largest global banks integrating Coinbase's infrastructure into its payments stack. That partnership alone implies significant custody and transaction infrastructure usage — none of which is separately disclosed in revenue.
 
-The 150+ government agency clients span multiple continents and use cases including central bank digital currency pilots, cross-border settlement projects, and digital asset policy research. These are long-cycle, compliance-intensive relationships. They represent recurring contractual infrastructure revenue, not one-time project fees.
-
+The $150+$ government agency clients span multiple continents and use cases including central bank digital currency pilots, cross-border settlement projects, and digital asset policy research. These are long-cycle, compliance-intensive relationships. They represent recurring contractual infrastructure revenue, not one-time project fees.
 
 
 ## The Revenue Opacity Problem
 
-Every dollar of CDP revenue is buried inside either "Other Transaction" (\$$252.9$M, +$20\%$ YoY in FY2025) or "Other Sub & Services" (\$$554.8$M, +$30\%$ YoY). Neither line has a sub-breakout in any public filing. The models I've come across have no sub-model for either.
+Every dollar of CDP revenue is buried inside either "Other Transaction" (\$$252.9$M, +$20\%$ YoY in FY2025) or "Other Sub & Services" (\$$554.8$M, +$30\%$ YoY). Neither line has a sub-breakout in any public filing.
 
-This opacity is deliberate. Disclosing CDP revenue in detail would reveal client-level economics to competitors — primarily Fireblocks, BitGo, and emerging bank-built alternatives. The strategic benefit of opacity outweighs the investor communication cost. That's a rational management decision.
+This opacity is deliberate. Disclosing CDP revenue in detail would reveal client-level economics to competitors — primarily Fireblocks, BitGo, and emerging bank-built alternatives. The strategic benefit of opacity outweighs the investor communication cost.
 
 It's also exactly what Amazon did with AWS for the first several years of the business, before the revenue scale made continued consolidation untenable.
-
 
 
 ## Platform Scale as a Revenue Proxy
@@ -55,8 +45,7 @@ In the absence of direct disclosure, platform metrics are the best available pro
 
 FY2025 trading volume: \$$5.2$T, up $156\%$ YoY — including institutional activity routed through Coinbase Prime and the CDP. Total assets on platform: \$$516$B as of Q3 2025. Monthly transacting users: $9.2$M. Coinbase's share of total crypto trading volume doubled to $6.4\%$.
 
-At institutional custody fee rates of $0.5$–$1.5$bps applied to \$$516$B in platform assets, implied custody fee revenue alone ranges from \$$258$M to \$$774$M annually — a range that substantially overlaps with the combined catch-all lines. Even the low end of that range would make the CDP the second-largest revenue segment in the business. The disclosed custodial fee revenue line (\$$198.2$M, +$40\%$ YoY in FY2025) is almost certainly a partial view of total custody economics — likely excluding API and platform access revenue classified elsewhere.
-
+At institutional custody fee rates of $0.5$-$1.5$bps applied to \$$516$B in platform assets, implied custody fee revenue alone ranges from \$$258$M to \$$774$M annually — a range that substantially overlaps with the combined catch-all lines. Even the low end of that range would make the CDP the second-largest revenue segment in the business. The disclosed custodial fee revenue line (\$$198.2$M, +$40\%$ YoY in FY2025) is almost certainly a partial view of total custody economics — likely excluding API and platform access revenue classified elsewhere.
 
 
 ## The AWS Analogy: Taking It Seriously
@@ -66,9 +55,8 @@ AWS captured approximately \$$25$B in revenue by FY2019 — roughly $12\%$ of Am
 The question isn't whether the analogy is aspirational. It's whether the disclosure cadence ever catches up to the business reality.
 
 
-
 ## What to Watch
 
 Any earnings call comment referencing CDP client count, CDP revenue as a percentage of Other Transaction, or disclosed per-client economics should be treated as highly analytically material. The disclosure of AWS revenue as a separate segment in 2015 — after years of consolidation — was a revaluation event for Amazon. A similar disclosure decision by Coinbase could reprice the Other Transaction and Other Sub & Services multiples immediately.
 
-Watch also for Citi, JPMorgan, or BlackRock disclosures in their own earnings calls about digital asset infrastructure partnerships. Any quantification by the client side provides an indirect read on CDP economics. Both catch-all lines are flagged as opaque and high-priority for monitoring in Column O of the Multiple Periods tab.
+Watch also for Citi, JPMorgan, or BlackRock disclosures in their own earnings calls about digital asset infrastructure partnerships. Any quantification by the client side provides an indirect read on CDP economics.
