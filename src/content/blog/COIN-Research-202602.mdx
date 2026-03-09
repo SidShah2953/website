@@ -16,6 +16,8 @@ thesis: |
 import CallOutForMDX from "@/components/CallOutForMDX.astro";
 import ImageWithCaption from "@/components/ImageWithCaption.astro";
 import ArticleLink from "@/components/ArticleLink.astro";
+import ExcelEmbed from "@/components/ExcelEmbed.astro";
+import ModelDownload from "@/components/ModelDownload.astro";
 
 ## Financial Snapshot — FY2025 Actuals
 
@@ -163,6 +165,8 @@ The model contains ten tabs:
 
 - `Supporting Schedules` consolidate the Debt Schedule, PP&E Schedule, Share Count, Working Capital, and Tax Schedule into a single reference tab.
 
+<ExcelEmbed src="/COIN_Model.xlsx" filename="COIN_Model.xlsx" />
+<ModelDownload href="/COIN_Model.xlsx" filename="COIN_Model.xlsx" />
 <ArticleLink href="/blog/coin-research-202602/model-walkthrough" title="Inside the Model: A Walk-Through of the Coinbase FY2019-FY2030 Equity Research Framework" />
 
 

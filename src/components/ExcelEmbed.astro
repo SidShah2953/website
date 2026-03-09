@@ -1,0 +1,12 @@
+---
+import ExcelViewer from './ExcelViewer.tsx';
+
+interface Props {
+  src: string;
+  filename?: string;
+}
+
+const { src, filename } = Astro.props;
+---
+
+<ExcelViewer src={src} filename={filename} client:load />
