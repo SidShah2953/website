@@ -18,9 +18,6 @@ import ExcelEmbed from "@/components/ExcelEmbed.astro";
 import ModelDownload from "@/components/ModelDownload.astro";
 
 
-<ExcelEmbed src="/COIN Model.xlsx" filename="COIN Model.xlsx" />
-<ModelDownload href="/COIN Model.xlsx" filename="COIN Model.xlsx" />
-
 ## Model Architecture
 
 The workbook has nine tabs organized into five functional categories.
@@ -37,6 +34,9 @@ The four `Supporting` tabs are USDC Scenarios (the 3x3 Circle renewal risk matri
 
 
 ## Where to Start
+
+<ModelDownload href="/COIN Model.xlsx" filename="COIN Model.xlsx" />
+{/* <ExcelEmbed src="/COIN Model.xlsx" filename="COIN Model.xlsx" /> */}
 
 The model is designed to be read in a specific sequence that builds analytical context before introducing complexity.
 
