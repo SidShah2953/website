@@ -30,7 +30,7 @@
     "sharp": "^0.34.5",
     "tailwindcss": "^4.1.18",
     "three": "^0.183.2",
-    "xlsx": "file:xlsx-0.20.3.tgz"
+    "xlsx": "file:.packages/xlsx-0.20.3.tgz"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^8.57.0",
