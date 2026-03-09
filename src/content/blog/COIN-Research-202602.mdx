@@ -5,7 +5,7 @@ description: "A bottom-up look at seven business lines, one accounting rule chan
 tags: ["Crypto", "Finance"]
 isHidden: false
 thesis: |
-    Coinbase is not an exchange with side projects. It is a vertically integrated financial infrastructure company — seven distinct layers of the crypto financial stack, each generating standalone revenue and each feeding the others. The FY2025 numbers confirm what the strategy has been building toward: $7.2B in total revenue, 44.4% Adjusted EBITDA margin, $11.3B in cash, and $1.7B in buybacks. More than 41% of revenue now comes from subscription and services — sources that don't require a single trade to be executed.
+    Coinbase is not an exchange with side projects. It is a vertically integrated financial infrastructure company — seven distinct layers of the crypto financial stack, each generating standalone revenue and each feeding the others. The FY2025 numbers confirm what the strategy has been building toward: $7.2B in total revenue, 44.4% Adjusted EBITDA margin, $11.3B in cash, and $1.2B in buybacks executed. More than 39% of revenue now comes from subscription and services — sources that don't require a single trade to be executed.
 
     The compounding is real, and it's already in the financials. But so is the primary risk. One contractual renegotiation — the `USDC` revenue-sharing agreement with Circle, up for renewal in 2026 — has the potential to remove $130-180M from the P&L in a single event. A company executing one of the most sophisticated vertical integration strategies in financial services has a single-counterparty concentration risk at the center of its recurring revenue base.
 
@@ -22,16 +22,18 @@ import ArticleLink from "@/components/ArticleLink.astro";
 | Metric | FY2025 |
 | --- | --- |
 | Total Revenue | \$$7.2$B |
-| Subscription & Services Revenue | \$$2.95$B ($41\%$ of total) |
+| Subscription & Services Revenue | \$$2.83$B ($39\%$ of total) |
 | Adjusted EBITDA | \$$3,193.7$M |
 | Adjusted EBITDA Margin | $44.4\%$ |
 | Adjusted EPS | \$$6.95$ |
 | GAAP Net Income / (Loss) — Q4 2025 | (\$$667$M) |
 | Cash & Cash Equivalents | \$$11.3$B |
-| Buybacks Executed | \$$1.7$B |
+| Buybacks Executed | \$$1.2$B |
 | Assets on Platform (Q3 2025) | \$$516$B |
 | Monthly Transacting Users | $9.2$M |
 | Total Trading Volume | \$$5.2$T ($+156\%$ YoY) |
+
+*Adjusted EBITDA of \$$3,193.7$M is Coinbase's company-reported figure, which adds back all non-cash and non-recurring items including crypto mark-to-market, investment gains/losses, and restructuring charges. My model uses a narrower definition (GAAP EBIT + SBC + acquisition-related amortization + D&A) that produces \$$2,530$M. The difference is entirely definitional — the operating inputs are identical.*
 
 *Note: The Q4 2025 GAAP net loss is driven almost entirely by non-cash ASC 350-60 fair-value accounting on the crypto portfolio and Circle equity stake — not operating deterioration. Adjusted metrics are the economically meaningful read. Full explanation in [later](#digital-asset-portfolio-&-asc-350-60-—-the-accounting-story-behind-the-$667m-loss).*
 
@@ -40,13 +42,13 @@ import ArticleLink from "@/components/ArticleLink.astro";
 
 **FY2025 Revenue: \$1,348.8M | % of Total: 18.8% | YoY Growth: +48%**
 
-Coinbase does not issue `USDC`, does not hold its reserves, and does not set its yield. What Coinbase holds is a revenue-sharing agreement — confirmed in Circle's S-1 — entitling it to $100\%$ of reserve interest on `USDC` balances held on-platform and $50\%$ on `USDC` held off-platform. At an average on-platform balance of \$$17.8$B in FY2025 and am approx. $5.3\%$ reserve yield, that contract produced \$$1,348.8$M — the single largest recurring revenue line in the business, growing $48\%$ year-over-year on balance growth rather than rate movement.
+Coinbase does not issue `USDC`, does not hold its reserves, and does not set its yield. What Coinbase holds is a revenue-sharing agreement — confirmed in Circle's S-1 — entitling it to $100\%$ of reserve interest on `USDC` balances held on-platform and $50\%$ on `USDC` held off-platform. At an average on-platform balance of \$$17.8$B in FY2025 and an approx. $3.9\%$ effective net yield to Coinbase (after the on-platform/off-platform sharing split), that contract produced \$$1,348.8$M — the single largest recurring revenue line in the business, growing $48\%$ year-over-year on balance growth rather than rate movement.
 
 The agreement renews in 2026. Circle is pursuing its IPO — which means its shareholders will see exactly what it pays Coinbase — and Circle has already paid Binance \$$60.25$M upfront plus monthly distribution fees to carry `USDC`. That deal is the market precedent. A shift to $80\%/40\%$ sharing terms removes \$$130$-$180$M from Coinbase's FY2026 P&L before any rate sensitivity is applied.
 
-{/* The `USDC Scenarios` tab in my model maps the full $3\times 3$ matrix of sharing-rate and rate-path outcomes — a \$$680$M spread across nine cells on a single revenue line. */}
+The `USDC Scenarios` tab in my model maps the full $3\times 3$ matrix of sharing-rate and rate-path outcomes — a \$$910$M spread across nine cells on a single revenue line.
 
-**Primary risk: `USDC` renewal terms. Secondary risk: Fed rate sensitivity (approx. \$35-45M per 25bps cut at current balance levels).**
+**Primary risk: `USDC` renewal terms. Secondary risk: Fed rate sensitivity.**
 
 <ArticleLink href="/blog/coin-research-202602/usdc-stablecoin" title="Coinbase's Stablecoin Business Is Not What You Think It Is" />
 
@@ -58,8 +60,6 @@ The agreement renews in 2026. Circle is pursuing its IPO — which means its sha
 Base generated \$$75.4$M in gross sequencer revenue in FY2025 — 30x year-over-year — while commanding 46% of total L2 DeFi TVL at \$$4.63$B and 62% of the L2 fee market by revenue. As of February 2026, it processes approx. $10.7$ million transactions per day at roughly \$$147,000$ in daily fees.
 
 Most models I've come across bury the entire Base revenue stream inside "Other Transaction" with no sub-breakout and no forward estimate for sequencer economics specifically. Here's what makes the gap more significant than it looks: on February 18, 2026, Coinbase announced Base is departing the OP Stack, eliminating the approx. $12\%$ Optimism Protocol revenue share beginning Q2 2026. Coinbase now retains $100\%$ of sequencer fees. That event has not been incorporated into consensus models I've reviewed.
-
-{/* My estimates in the `Multiple Periods` tab project net sequencer revenue of approx. \$$50$M in FY2026 and approx. \$$65$M in FY2027, deliberately conservative to account for partial-year OP departure timing and cautious volume growth assumptions. */}
 
 **Primary risk: DeFi activity cyclicality. Upside catalyst: CDP enterprise client growth driving Base transaction volume.**
 
@@ -74,7 +74,7 @@ On August 14, 2025, Coinbase closed Deribit — the world's largest crypto deriv
 
 FY2026 is the first full year. At the \$$33$-$35$M monthly run-rate implied by Q4 2025, annualized Deribit revenue alone approaches \$$400$-$420$M — roughly $7$x forward institutional revenue on the acquisition price, defensible given the franchise position. The GAAP cost is real: the Deribit PPA Schedule tab estimates approx. \$$194$M in annual amortization beginning FY2026, a \$$127$M step-up from the partial-year FY2025 figure of \$$67.1$M.
 
-CME Group's 24/7 crypto futures and options launch on May 29, 2026 is the first credible institutional competitor to materialize since the acquisition closed. The consensus FY2026E for institutional revenue of \$$695.9$M (+45% YoY) carries no adjustment for it.
+CME Group's 24/7 crypto futures and options launch on May 29, 2026 is the first credible institutional competitor to materialize since the acquisition closed. The consensus FY2026E for institutional revenue of \$$695.9$M (+45% YoY) carries no adjustment for it. My model estimates \$$950$M for FY2026E institutional transaction revenue, inclusive of a \$$400$M first-full-year Deribit contribution — materially above consensus.
 
 **Primary risk: CME competitive entry in H2 2026 and PPA amortization drag on GAAP EBIT. Strategic case intact on medium-term horizon.**
 
@@ -83,14 +83,15 @@ CME Group's 24/7 crypto futures and options launch on May 29, 2026 is the first 
 
 ## Ethereum Staking — A Math Problem Disguised as a Growth Story
 
-**FY2025 Revenue: \$677.4M | Q4 2025: \$152M (-18% QoQ) | Consensus FY2026E: \$595.2M (-12% YoY)**
+**FY2025 Revenue: \$677.4M | Q4 2025: \$152M (-18% QoQ) | Consensus FY2026E: \$595.2M (-12% YoY) | Model FY2026E: \$249.8M (-63% YoY)**
 
 Coinbase earns a commission of approx. $29$-$35\%$ on gross `ETH` staking rewards — high-margin, recurring, zero customer acquisition cost. In FY2025 that produced \$$677.4$M. The problem is that the same mechanics that made this a growth driver in 2023-2024 are now working in reverse.
 
 ETH staking participation has crossed 30% of total supply, with $36$M+ `ETH` staked. Block rewards are fixed in aggregate — divided across a growing validator set, per-validator yields decline. From approx. $5\%+$ APY in early 2024 to $3.5$-$4.2\%$ APY by early 2026, with approx. $20$-$30$ basis points of further annual compression expected. Q4 2025 staking revenue was \$$152$M, down $18\%$ sequentially, in a quarter where `ETH` prices were relatively stable — consistent with yield compression driving the decline rather than price movement alone.
 
 The consensus FY2026E of \$$595.2$M is in the right direction but it requires `ETH` prices to hold roughly flat to materialize.
-{/* In a compound scenario — yield compression plus a flat or declining `ETH` price — I estimate the downside to be \$$20$-$30$M below consensus on staking revenue alone. Not dramatic on its own but additive across multiple model lines. */}
+
+My model estimates \$$249.8$M — substantially below consensus — driven by formula: $2.7$M ETH in custody × \$$2,500$ average ETH price × $3.7\%$ net user yield. The gap versus consensus reflects the compounding effect of yield compression applied to the full balance, which most consensus estimates do not fully capture.
 
 **Primary risk: `ETH` price appreciation required to offset structural yield dilution.**
 
@@ -133,7 +134,7 @@ AWS was also buried inside Amazon's consolidated North America revenue for years
 
 Coinbase One reached approx. $971$K subscribers by end of 2025 — all-time high, $3$x growth in three years. The product offers zero-commission trading, enhanced support, and staking rate boosts at \$$4.99$/month base. Revenue is inside "Other Sub & Services" with no public breakout. Estimated annual subscription revenue: \$$60$-$350$M depending on tier mix. The range is wide because the premium tier pricing is undisclosed.
 
-The more important number is what Coinbase One costs. At approx. $971$K subscribers trading approx. \$$500$/month and a $131$bps blended take rate, the annual transaction fee revenue Coinbase does not collect is approximately \$$76$M. That sum grows with the subscriber base. The net P&L effect is positive only if subscriber lifetime value — lower churn, higher on-platform balances, incremental staking, deeper engagement — exceeds the cumulative fee sacrifice. Coinbase has not disclosed the data needed to verify that calculation externally.
+The more important number is what Coinbase One costs. At approx. $971$K subscribers trading approx. \$$500$/month and a $139$bps blended take rate, the annual transaction fee revenue Coinbase does not collect is approximately \$$81$M. That sum grows with the subscriber base. The net P&L effect is positive only if subscriber lifetime value — lower churn, higher on-platform balances, incremental staking, deeper engagement — exceeds the cumulative fee sacrifice. Coinbase has not disclosed the data needed to verify that calculation externally.
 
 Most model coverage I've seen applies a approx. $30\%$ growth rate to the full Other Sub & Services aggregation as a placeholder. That approach can't capture whether subscription growth is accelerating relative to cannibalization, or whether the flywheel retention effects are materializing. The disclosure that would close this gap: separate Coinbase One subscriber count, average revenue per subscriber, and churn rate. Until then, the net P&L analysis above is the best available external approximation.
 
@@ -144,25 +145,31 @@ Most model coverage I've seen applies a approx. $30\%$ growth rate to the full O
 
 ## The Financial Model
 
-I am currently working on a detailed Model for `COIN`, which I will updated here shortly.
+My financial model ([View Model](#)) is the analytical foundation for every financial claim above. Built on Bloomberg Terminal standardized data for FY2019A-FY2025A, it extends through FY2030E across a full three-statement architecture.
 
-{/* My financial model (View Model) is the analytical foundation for every financial claim above. Based on the foundational data and layout from the Bloomberg Terminal, I've built it up into Four Tabs:
+The model contains ten tabs:
 
-- The `Multiple Periods` tab covers FY2018 through FY2027E, with analyst-added sub-rows for Base chain sequencer revenue inside Other Transaction and analyst notes in Column O flagging the `USDC` renewal risk, CME competitive entry, OP Stack departure timing, and yield compression trajectory throughout.
+- The `Income Statement` covers FY2019A through FY2030E with analyst-added sub-rows for Base chain sequencer revenue inside Other Transaction, Deribit contribution inside Institutional Revenue, and Coinbase One ARR inside Other Subscription & Services. All historical line items are reconciled to Bloomberg standardized data.
 
-- The `Deribit PPA Schedule` tab contains the acquisition summary, balance sheet confirmation of the goodwill and intangibles step-up, the analyst's estimated PPA breakdown, and the annual amortization schedule FY2025 through FY2032 — including the $127M annual GAAP drag beginning FY2026.
+- The `Balance Sheet` and `Cash Flow Statement` complete the three-statement model, with cash computed as a roll-forward from CFS operating, investing, and financing activities.
 
-- The `USDC Scenarios` tab maps three revenue-sharing scenarios across three Fed Funds rate paths, with delta versus consensus displayed for each cell. Range of outcomes across nine cells: $780M to $1,460M.
+- The `DCF Model` contains a full CAPM-based WACC build (Blume-adjusted beta = 2.80x, WACC = 14.3%), FCFF projections through FY2030E, terminal value via both Gordon Growth (g = 6%) and Exit EV/EBITDA Multiple (18x) methods, two 5×5 sensitivity tables, and a peer multiple calibration panel (CME, ICE, NDAQ, HOOD).
 
-- The `Notes` tab contains the full change log: confirmed FY2025 actuals verified against the earnings release, Type A risk flags, Type B analyst additions (forward estimates not in consensus), and Type C scenario overlays. Confirmed actuals are unchanged throughout; all additions are clearly labeled. */}
+- The `Assumptions` tab is the single source of truth for all driver inputs: macro/market assumptions (FFR path, ETH yield curve, BTC price), revenue line-item drivers (volumes, take rates, USDC balances, staking custody), OpEx margin assumptions, D&A schedules, balance sheet items, and cash flow assumptions. Every forecast cell in the three statements references this tab.
+
+- The `USDC Scenarios` tab maps three revenue-sharing scenarios (Base: current 100%/50% terms, Bear: renegotiated 80%/40%, Stress: no off-platform share) across three Fed Funds rate paths (4.0%, 3.5%, 3.0%). Range of outcomes: \$$570$M to \$$1,480$M — a \$$910$M spread on a single revenue line.
+
+- The `Deribit Acquisition` tab contains the acquisition summary, purchase price allocation, and annual amortization schedule FY2025A through FY2032E — including the \$$194$M annual GAAP drag beginning FY2026E.
+
+- `Supporting Schedules` consolidate the Debt Schedule, PP&E Schedule, Share Count, Working Capital, and Tax Schedule into a single reference tab.
 
 
 ## Key Risks
 
-**1. `USDC` contract renewal:** A renegotiation to 80%/40% sharing terms removes \$$130$-$180$M from FY2026 revenue in a single event. This is the only risk in the model that is fully within a counterparty's control rather than Coinbase's.
+1. **`USDC` contract renewal:** A renegotiation to 80%/40% sharing terms removes \$$130$-$180$M from FY2026 revenue in a single event. This is the only risk in the model that is fully within a counterparty's control rather than Coinbase's.
 
-**2. CME Group institutional competition:** The May 29, 2026 24/7 crypto options launch introduces direct competition to Deribit's institutional franchise. A 10-15% institutional flow shift to CME in H2 2026 implies \$$40$-$65$M of revenue downside versus current estimates.
+2. **CME Group institutional competition:** The May 29, 2026 24/7 crypto options launch introduces direct competition to Deribit's institutional franchise. A 10-15% institutional flow shift to CME in H2 2026 implies \$$40$-$65$M of revenue downside versus current estimates.
 
-**3. `ETH` staking yield compression:** 20-30bps of annual yield dilution as the validator set grows. Requires `ETH` price appreciation to offset on a dollar-revenue basis. Bear case: compound compression plus flat `ETH` prices.
+3. **`ETH` staking yield compression:** 20-30bps of annual yield dilution as the validator set grows. Requires `ETH` price appreciation to offset on a dollar-revenue basis. Bear case: compound compression plus flat `ETH` prices.
 
-**4. ASC 350-60 GAAP volatility:** Crypto price moves will continue to produce large GAAP swings that bear no relation to operating performance. The risk is misinterpretation, not operational deterioration.
+4. **ASC 350-60 GAAP volatility:** Crypto price moves will continue to produce large GAAP swings that bear no relation to operating performance. The risk is misinterpretation, not operational deterioration.
