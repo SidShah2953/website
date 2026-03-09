@@ -1,0 +1,189 @@
+---
+title: "Inside the Model: A Walk-Through of the Coinbase FY2019-FY2030 Equity Research Framework"
+publishedAt: 2026-03-09
+description: "Architecture, assumptions, and outputs of the nine-tab financial model behind the Coinbase Infrastructure Flywheel series"
+tags: ["Crypto", "Finance"]
+isHidden: false
+articleNumber: 8
+thesis: |
+    The model covers Coinbase Global, Inc. (Nasdaq: COIN) from FY2019A through FY2030E — eleven years of data. FY2019-2025 actuals are drawn from standardized financials and Coinbase's SEC filings. FY2026-2030 are built from editable analyst assumptions. It is a fully integrated three-statement model culminating in a two-method DCF.
+
+    The question the model is built to answer: is Coinbase's transition from a cyclically leveraged trading business into a diversified crypto infrastructure platform durable — and at what price is that transition already priced in?
+
+    The two-method DCF produces a valuation range of $146-$279 against a spot price of approximately $205 at model date. The $205 spot sits near the midpoint — consistent with a market that has partially priced the infrastructure transition but has not fully resolved the renewal and competitive risks.
+---
+import CallOutForMDX from "@/components/CallOutForMDX.astro";
+import ImageWithCaption from "@/components/ImageWithCaption.astro";
+
+
+## Model Architecture
+
+The workbook has nine tabs organized into five functional categories.
+
+The `Cover` tab is a live-linked dashboard displaying KPIs, trading multiples, the DCF price range, and navigation links. The thesis and the valuation summary are visible before opening anything else — by design.
+
+The `Assumptions` tab is the single control panel for the entire model. Every forecast-period driver — macro variables, revenue build-ups, operating margin targets, balance sheet mechanics — flows from here. Change one cell and it propagates through all three financial statements, the DCF, and every supporting schedule simultaneously.
+
+The three `Financial Statement` tabs (Income Statement, Balance Sheet, Cash Flow Statement) span FY2019A through FY2030E and are fully integrated: cash is the balance sheet plug, the cash flow statement reconciles net income to cash, and every major line traces back to Assumptions.
+
+The `DCF` tab contains the WACC build, unlevered FCFF projections, terminal value under two methods, the equity bridge to per-share value, and two 5x5 sensitivity grids.
+
+The four `Supporting` tabs are USDC Scenarios (the 3x3 Circle renewal risk matrix), Deribit Acquisition (PPA summary and annual amortization schedule), and Supporting Schedules (five sub-models covering debt, PP&E, share count, working capital, and tax).
+
+
+## Where to Start
+
+The model is designed to be read in a specific sequence that builds analytical context before introducing complexity.
+
+Start with the `Cover` tab — thesis and valuation range upfront. Move to `Assumptions` next. This is the engine room, and understanding what drives the forecasts makes every subsequent tab legible. Then work through the `Income Statement` to see how the eight revenue lines collapse into EBIT and net income, the `Balance Sheet` to confirm the cash plug and the balance check row, and the `Cash Flow Statement` to see how OCF, ICF, and FCF connect the first two statements.
+
+Once the three-statement model is clear, the `DCF` tab follows naturally: WACC inputs, FCFF derivation from the IS, terminal value under both methods, and the equity bridge. From there, the two scenario tabs — `USDC Scenarios` and `Deribit Acquisition` — add the risk and acquisition overlays. The `Supporting Schedules` tab closes the loop on the mechanics underlying the balance sheet and share count.
+
+
+## Assumptions Tab
+
+### Macro & Market
+
+The Federal Funds Rate is the single most important exogenous variable in the model. It drives USDC revenue directly — through reserve interest income — and interest income on Coinbase's cash balance. The modeled FOMC path runs from $4.33\%$ in FY2025A to $2.25\%$ by FY2030E, producing a stablecoin revenue profile that peaks in FY2027E and then declines as rates normalize.
+
+Crypto market cap grows from \$$3.2$T to \$$6.5$T across the forecast period — approximately $12\%$ CAGR — serving as the macroeconomic backdrop against which trading volumes and asset balances are sized. ETH staking yield compresses from $4.0\%$ to $2.7\%$ as network participation rises from $30\%$ to $40\%$ of total ETH supply. BTC year-end price assumptions range from \$$80$K to \$$120$K; ETH average price assumptions from \$$2,500$ to \$$4,500$.
+
+### Transaction Revenue
+
+Consumer transaction revenue is volume times take rate. Volume grows from \$$239$B (FY2026E) to \$$900$B (FY2030E); take rate compresses from $139$bps to $85$bps, reflecting the combined effect of Coinbase One zero-commission waivers and increasing competitive pressure from offshore venues. Institutional volume grows from \$$982$B to \$$3,500$B — driven primarily by Deribit integration — at a blended take rate of approximately $5$bps.
+
+Deribit is modeled as a standalone revenue line growing from \$$400$M to \$$600$M on \$$200$-\$$400$B in notional volume at $15$-$20$bps, reflecting its options-heavy mix, which commands higher per-notional fees than spot or futures. Other Transaction revenue (\$$75$M growing to \$$160$M) captures Base sequencer fees and CDP residual revenue not classifiable elsewhere.
+
+### Subscription & Services
+
+USDC revenue is built from first principles: on-platform USDC balance (\$$17.8$B growing to \$$28$B) multiplied by $100\%$ of reserve yield, plus off-platform USDC (\$$52$B growing to \$$92$B) multiplied by $50\%$ of reserve yield. The resulting gross revenue line is the most rate-sensitive in the model and the primary subject of the USDC Scenarios tab.
+
+Blockchain rewards revenue is built from ETH custody volume ($2.5$M to $3.5$M ETH) multiplied by price and yield — and declines from \$$677$M in FY2025A to \$$425$M by FY2030E as yield compression outpaces asset appreciation in the base case. Coinbase One ARR grows from \$$180$M to \$$672$M as the subscriber base expands from $0.97$M to $2.8$M at an average revenue per subscriber of \$$185$-\$$240$ annually. Interest income steps up significantly in FY2026E (Deribit balance sheet addition) then declines as rates fall, ending at \$$185$M.
+
+### Operating Expense & Margins
+
+Gross margin expands from $80.5\%$ to $87.0\%$ as the revenue mix shifts toward higher-margin subscription and services lines. Sales & marketing declines from $14.7\%$ to $13.0\%$ of revenue. R&D declines from $23.3\%$ to $19.0\%$. G&A is elevated in FY2026E at $25.0\%$ to reflect Deribit integration costs, then normalizes to $18.0\%$ by the terminal year. SBC declines from $11.7\%$ to $8.0\%$ of revenue as the post-IPO equity program matures.
+
+
+## Income Statement
+
+The income statement spans FY2019A through FY2030E, with column C frozen for navigation. Historical figures are sourced from standardized filings; all forecast columns link directly to Assumptions.
+
+Total revenue grows from \$$516$M (FY2019A) to \$$14.6$B (FY2030E). The composition changes materially: consumer transaction revenue — approximately $84\%$ of revenue in FY2019 — falls to approximately $52\%$ by FY2030E as institutional ($16\%$), USDC ($11\%$), subscriptions ($7\%$), and other revenue lines ($14\%$) absorb an increasing share. This is the diversification thesis made visible in the numbers.
+
+COGS represents $13$-$20\%$ of revenue, with gross margin expanding to $87.0\%$ in the terminal year. Total operating expense falls from $60.5\%$ to $50.0\%$ of revenue. D&A includes three components: PP&E depreciation (from the PP&E schedule), Deribit acquired intangibles amortization (\$$194$M/year as detailed in the Deribit tab), and other intangibles. EBIT grows from \$$1.4$B to \$$5.4$B, with margin expanding from approximately $20\%$ to $37\%$. Below the line: interest expense of \$$230$M declining as debt is repaid, and an effective tax rate of $21\%$ from FY2026E forward. The Adjusted EBITDA memo at the bottom of the income statement shows margin expanding from $35.2\%$ to $49.1\%$ across the forecast period.
+
+
+## Balance Sheet
+
+Cash is the model's balance sheet plug. It equals prior-period cash plus the net change from the cash flow statement — no independent assumption. Under this structure, cash grows to \$$18.2$B by FY2030E and the company moves to a deeply net cash position of \$$15.4$B as debt is repaid and operating cash generation accumulates.
+
+Crypto assets receivable and payable are modeled at \$$6$-\$$8$B gross, netting to approximately zero — consistent with Coinbase's custodial balance sheet treatment. PP&E is driven by the PP&E schedule. Goodwill is held flat at \$$4.17$B post-Deribit; no additional acquisitions are modeled. Intangibles decline from \$$3.4$B to \$$2.4$B as Deribit acquired intangibles amortize through the forecast period. Debt is modeled by named tranche, declining from \$$7.8$B to \$$2.8$B as tranches mature. Total equity grows from \$$14.8$B to \$$27.3$B.
+
+The Balance Check row confirms model integrity every period. The two pre-IPO periods (FY2019 and FY2020) carry small residual balance check artefacts of \$$34$M and \$$316$M respectively — both traceable to pre-IPO capitalization treatment in the source data rather than model error, and flagged in the Analyst Notes tab.
+
+
+## Cash Flow Statement
+
+The cash flow statement is the integration layer connecting the income statement to the balance sheet via the cash plug.
+
+Operating cash flow opens with net income, adds back non-cash charges (D&A, SBC, deferred tax), and incorporates working capital changes sourced from the Working Capital schedule. OCF grows from \$$2.4$B to \$$6.0$B across the forecast period, with FCF conversion above $1.0$x in every year — a reflection of the asset-light nature of Coinbase's core business.
+
+Investing cash flow consists primarily of capex (\$$171$M-\$$292$M, modeled at $2\%$ of revenue) and the Deribit-related outflows in FY2025-2026. Financing cash flow includes no new debt issuance post-FY2025, debt repayments of \$$1.3$-\$$1.7$B per year, share buybacks of \$$1.5$B per year, and ESPP proceeds of approximately \$$100$M per year. The Levered FCF memo (CFO plus capex) grows from \$$1.9$B to \$$5.7$B.
+
+
+## DCF Model
+
+### WACC Build
+
+The WACC is constructed from first principles with sourced inputs.
+
+Risk-free rate: $4.02\%$, sourced from the FRED DGS10 10-year Treasury yield as of February 2026. Equity risk premium: $4.23\%$, sourced from Damodaran's implied ERP as of January 2026. Raw beta: $3.70$x, estimated from a five-year monthly OLS regression of COIN versus the S&P 500. Blume-adjusted beta — applying the standard two-thirds/one-third formula — is $2.80$x, reflecting mean reversion toward $1.0$x over time.
+
+Cost of equity under CAPM: $15.86\%$ ($4.02\%$ + $2.80 \times 4.23\%$). Cost of debt: $3.5\%$, blended from Coinbase's actual debt tranches ($0.25\%$ convertible, $0.50\%$ convertible, $3.375\%$ senior, $3.625\%$ senior). After-tax cost of debt at $21\%$: $2.77\%$. Capital structure: $88.3\%$ equity (\$$58.8$B market cap) and $11.7\%$ debt (\$$7.8$B).
+
+The resulting WACC is **$14.33\%$** — high by large-cap standards, and appropriate for a company whose cash flows carry $2.8$x systematic risk relative to the S&P 500.
+
+### FCFF Bridge
+
+Unlevered free cash flow to firm is derived as: GAAP EBIT x ($1 -$ tax rate) = NOPAT; plus D&A; minus capex; minus change in net working capital.
+
+FY2026E FCFF is unusually low at \$$132$M due to a \$$1.6$B working capital outflow associated with Deribit integration. This is a one-time distortion — not a structural signal. FCFF normalizes to \$$2.4$-\$$4.4$B from FY2027E onward.
+
+### Terminal Value
+
+Two methods applied in parallel.
+
+- **Method A — Gordon Growth Model:** Terminal growth rate of $6\%$, reflecting an aggressive but defensible assumption for a company exposed to secular crypto adoption tailwinds in a global TAM still in early innings. The $6\%$ rate is above long-run nominal GDP growth — which requires justification — but is calibrated against the trajectory of transaction volume and subscription ARR in the final explicit forecast year. Terminal value: \$$56.7$B; present value: \$$29.0$B.
+
+- **Method B — Exit EV/Adj. EBITDA Multiple:** $18$x applied to FY2030E Adjusted EBITDA of \$$7.18$B. Terminal value: \$$129.2$B; present value: \$$66.2$B. The $18$x is calibrated against the peer set: CME Group at $22$-$24$x, ICE at $16$-$17$x, Nasdaq at $20$-$22$x, Robinhood at $25$-$33$x. At $18$x, Coinbase is discounted relative to pure-play exchange peers — appropriate given its higher cash flow volatility and crypto beta.
+
+Terminal value represents $77\%$ of total enterprise value under the Gordon Growth method and $89\%$ under the exit multiple method. Both figures are typical for high-growth, back-loaded cash flow profiles and underscore how sensitive the valuation is to terminal assumptions.
+
+### Equity Bridge & Price Targets
+
+Enterprise value equals discounted FCFFs plus the present value of terminal value. Add net cash of \$$3.45$B, divide by $280.3$M diluted shares.
+
+Gordon Growth method: **\$$146$ per share** (approximately $29\%$ downside to spot). Exit multiple method: **\$$279$ per share** (approximately $36\%$ upside to spot). The \$$205$ spot sits near the midpoint — consistent with a market that has partially priced the infrastructure transition but hasn't fully resolved the renewal and competitive risks.
+
+### Sensitivity Tables
+
+Two 5x5 grids let you stress the valuation against changing assumptions. The first crosses WACC ($10\%$-$18\%$) against terminal growth rate ($4\%$-$8\%$) for the Gordon Growth method. The second crosses WACC ($10\%$-$18\%$) against exit multiple ($14$x-$22$x) for the exit multiple method. Base case assumptions are centered in each grid. The grids show how quickly the upside case collapses at higher discount rates — and what the downside case looks like at lower terminal assumptions.
+
+
+## USDC Scenarios Tab
+
+This tab isolates the single largest binary risk in the model: the Circle-Coinbase revenue-sharing agreement renewal, due in 2026. Current terms — confirmed in Circle's S-1 — entitle Coinbase to $100\%$ of reserve interest on on-platform USDC balances and $50\%$ on off-platform balances.
+
+The tab presents a 3x3 matrix crossing three Federal Funds Rate scenarios ($4.0\%$, $3.5\%$, $3.0\%$) against three sharing-rate scenarios.
+
+The **Base case** preserves current terms ($100\%$/$50\%$). The **Bear case** reflects a renegotiation to $80\%$/$40\%$. The **Stress case** reflects a scenario where off-platform sharing drops to zero — pricing in a structure similar to Circle's disclosed Binance agreement (\$$60.25$M upfront plus monthly distribution fees), where Coinbase receives no flow-through from off-platform balances.
+
+The output range across all nine cells: \$$570$M (stress terms, $3.0\%$ FFR) to \$$1,480$M (base terms, $4.0\%$ FFR). The model's base case USDC revenue assumption of approximately \$$1,436$M sits in the upper-left corner of the matrix — a reminder that any combination of rate cuts and renegotiated terms compresses this line significantly. The FY2025A implied yield of $3.08\%$ ($71\%$ of the average Fed Funds Rate) provides the sanity check anchor for the yield assumptions applied across scenarios.
+
+
+## Deribit Acquisition Tab
+
+This tab documents the \$$2.9$B acquisition (August 14, 2025) and its balance sheet and income statement consequences.
+
+Total consideration: \$$700$M in cash plus approximately $11$ million COIN shares at approximately \$$200$/share, implying roughly \$$2.2$B in equity consideration. The deal was struck at approximately $9.7$x revenue on Deribit's estimated \$$300$M FY2024 revenue — a premium consistent with the platform's options market leadership and open interest depth.
+
+Purchase price allocation is an analyst estimate; official PPA has not been published by Coinbase. The estimated breakdown: goodwill of \$$2,929$M; customer relationships of \$$710$M amortized over 8 years (\$$88.75$M/year); technology platform of \$$480$M over 6 years (\$$80$M/year); trade name of \$$120$M over 10 years (\$$12$M/year); non-compete agreements of \$$40$M over 3 years (\$$13.3$M/year); net working capital step-up of \$$91.5$M; deferred tax liability of −\$$471$M. Total annual amortization of acquired intangibles (ARI) is \$$194.1$M per year for FY2026-2028, declining to \$$180.8$M in FY2029-2030 as the non-compete agreements expire, and \$$100.8$M from FY2031 onward as the technology platform intangible rolls off.
+
+This ARI flows directly into the D&A line on the income statement and into the intangibles balance on the balance sheet. It's a GAAP cost that doesn't appear in Adjusted EBITDA — meaning the \$$127$M step-up from partial-year FY2025 to full-year FY2026 affects GAAP EBIT comparability but not the Adjusted metrics. Any FY2026E EBIT comparison against FY2025 actuals that doesn't account for this step-up will draw the wrong conclusions about operating leverage.
+
+
+## Supporting Schedules
+
+Five sub-models underpin the balance sheet and cash flow mechanics.
+
+The `Debt schedule` models each named tranche individually, calculates interest at approximately $3\%$ of beginning-of-period balance, and splits outstanding balance between current and long-term portions based on maturity. Total debt declines from \$$7.8$B to \$$2.8$B as tranches mature through the forecast period.
+
+The `PP&E schedule` applies a standard roll-forward: beginning balance plus capex (modeled at $2\%$ of revenue, or \$$171$M-\$$292$M) minus depreciation ($55\%$ of prior-period net PP&E). Net PP&E grows modestly from \$$354$M to \$$486$M — consistent with Coinbase's asset-light model, where infrastructure investment is primarily software and cloud rather than physical assets.
+
+The `Shares schedule` starts with a basic share count of $256$M and applies \$$1.5$B per year in buybacks at the prevailing share price. Diluted share count includes outstanding RSUs and options under the treasury stock method, declining from $287$M to approximately $259$M as buybacks more than offset new equity awards over the forecast period.
+
+The `Working Capital schedule` derives accounts receivable from DSO assumptions (declining from $16$ to $12$ days), accounts payable from DPO assumptions (declining from $31$ to $14$ days), and accrued liabilities from $14$-$15\%$ of operating expenses. The large working capital jump from \$$41$M to \$$1,679$M in FY2026E reflects the Deribit balance sheet reclassification — a one-time integration step that drives the low FY2026E FCFF in the DCF. Not a structural signal.
+
+The `Tax schedule` calculates the income tax provision as pretax income multiplied by the $21\%$ effective tax rate from FY2026E forward, consistent with Coinbase's disclosed forward ETR guidance. The deferred tax asset starts at \$$571$M and draws down at approximately \$$50$M per year as temporary timing differences reverse.
+
+
+## Sources & Data Provenance
+
+Historical financials are sourced from standardized financials (COIN US Equity) and confirmed against Coinbase's 10-K and 10-Q filings on SEC EDGAR. The Deribit PPA is an analyst estimate; official allocation has not been published. WACC inputs are sourced as follows: risk-free rate from FRED DGS10 (February 2026); equity risk premium from Damodaran's implied ERP (January 2026); beta from a five-year monthly OLS regression; cost of debt from Coinbase's publicly filed bond indentures. Macro assumptions are based on the FOMC dot-plot as of February 2026 for the Fed Funds Rate path and analyst estimates for crypto market cap. Peer multiples are sourced from consensus data as of March 2026.
+
+
+## Key Risks & Sensitivity Levers
+
+Seven variables drive the majority of valuation uncertainty in the model.
+
+A $100$bps upward shift in the Fed Funds Rate adds approximately \$$350$-\$$450$M to annual USDC revenue relative to the base case path. A Circle renewal that reduces the off-platform share from $50\%$ to $40\%$ removes approximately \$$150$-\$$200$M per year from the P&L — permanently. A $10$bps compression in the consumer take rate — through Coinbase One adoption, competitive pressure, or mix shift — reduces annual revenue by approximately \$$500$M at projected FY2028 volumes.
+
+Terminal value represents $77$-$89\%$ of enterprise value. A ±$2\%$ change in the terminal growth rate moves implied per-share price by approximately \$$50$-\$$100$. A beta compression from $2.8$x to $2.0$x would reduce WACC to approximately $12\%$, adding \$$40$-\$$60$ per share to equity value.
+
+Deribit integration execution and SBC dilution intensity are qualitative risks that don't translate cleanly to a point sensitivity but are flagged throughout the Analyst Notes tab.
+
+
+## Disclaimer
+
+This model is produced for educational and illustrative purposes only. It does not constitute investment advice, a recommendation, or an offer to buy or sell any security. All forward-looking estimates are my own opinion and are subject to significant uncertainty. The model has not been independently audited. Users should conduct their own due diligence and consult a qualified financial advisor before making any investment decision. Cryptocurrency markets are highly volatile and speculative in nature. I may hold positions in the securities discussed.
