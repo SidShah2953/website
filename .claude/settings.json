@@ -1,9 +1,0 @@
-{
-  "permissions": {
-    "allow": [
-      "Bash(conda activate:*)",
-      "Bash(python:*)",
-      "Bash($HOME/miniconda3/envs/finance/bin/pip install:*)"
-    ]
-  }
-}
