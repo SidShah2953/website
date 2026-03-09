@@ -18,6 +18,11 @@ export default defineConfig({
   ...(isDev ? { image: { service: passthroughImageService() } } : {}),
   vite: {
     plugins: [tailwindcss()],
+    server: {
+      watch: {
+        ignored: ['**/node_modules/**', '**/.git/**'],
+      },
+    },
   },
   integrations: [
     sitemap(),
