@@ -7,7 +7,7 @@ isHidden: false
 thesis: |
     Coinbase is not an exchange with side projects. It is a vertically integrated financial infrastructure company — seven distinct layers of the crypto financial stack, each generating standalone revenue and each feeding the others. The FY2025 numbers confirm what the strategy has been building toward: $7.2B in total revenue, 44.4% Adjusted EBITDA margin, $11.3B in cash, and $1.2B in buybacks executed. More than 39% of revenue now comes from subscription and services — sources that don't require a single trade to be executed.
 
-    The compounding is real, and it's already in the financials. But so is the primary risk. One contractual renegotiation — the `USDC` revenue-sharing agreement with Circle, up for renewal in 2026 — has the potential to remove $130-180M from the P&L in a single event. A company executing one of the most sophisticated vertical integration strategies in financial services has a single-counterparty concentration risk at the center of its recurring revenue base.
+    The compounding is real, and it's already in the financials. But so is the primary risk. One contractual renegotiation — the `USDC` revenue-sharing agreement with Circle, up for renewal in 2026 — has the potential to remove $220-300M from the P&L in a single event. A company executing one of the most sophisticated vertical integration strategies in financial services has a single-counterparty concentration risk at the center of its recurring revenue base.
 
     That's the tension 2026 will resolve.
 
@@ -46,13 +46,13 @@ import ModelDownload from "@/components/ModelDownload.astro";
 
 Coinbase does not issue `USDC`, does not hold its reserves, and does not set its yield. What Coinbase holds is a revenue-sharing agreement — confirmed in Circle's S-1 — entitling it to $100\%$ of reserve interest on `USDC` balances held on-platform and $50\%$ on `USDC` held off-platform. At an average on-platform balance of \$$17.8$B in FY2025 and an approx. $3.9\%$ effective net yield to Coinbase (after the on-platform/off-platform sharing split), that contract produced \$$1,348.8$M — the single largest recurring revenue line in the business, growing $48\%$ year-over-year on balance growth rather than rate movement.
 
-The agreement renews in 2026. Circle is pursuing its IPO — which means its shareholders will see exactly what it pays Coinbase — and Circle has already paid Binance \$$60.25$M upfront plus monthly distribution fees to carry `USDC`. That deal is the market precedent. A shift to $80\%/40\%$ sharing terms removes \$$130$-$180$M from Coinbase's FY2026 P&L before any rate sensitivity is applied.
+The agreement renews in 2026. Circle is pursuing its IPO — which means its shareholders will see exactly what it pays Coinbase — and Circle has already paid Binance \$$60.25$M upfront plus monthly distribution fees to carry `USDC`. That deal is the market precedent. A shift to $80\%/40\%$ sharing terms removes \$$220$-$300$M from Coinbase's FY2026 P&L depending on the rate path — \$$259$M at the modeled $3.5\%$ Fed Funds Rate.
 
 The `USDC Scenarios` tab in my model maps the full $3\times 3$ matrix of sharing-rate and rate-path outcomes — a \$$910$M spread across nine cells on a single revenue line.
 
 **Primary risk: `USDC` renewal terms. Secondary risk: Fed rate sensitivity.**
 
-<ArticleLink href="/blog/coin-research-202602/usdc-stablecoin" title="Coinbase's Stablecoin Business Is Not What You Think It Is" />
+<ArticleLink href="/blog/coin-research-202603/usdc-stablecoin" title="Coinbase's Stablecoin Business Is Not What You Think It Is" />
 
 
 ## Base Chain — 30x Growth, Zero Consensus Coverage
@@ -65,7 +65,7 @@ Most models I've come across bury the entire Base revenue stream inside "Other T
 
 **Primary risk: DeFi activity cyclicality. Upside catalyst: CDP enterprise client growth driving Base transaction volume.**
 
-<ArticleLink href="/blog/coin-research-202602/base-chain" title="Base Is Coinbase's Best-Kept Secret — And the Numbers Are Starting to Show It" />
+<ArticleLink href="/blog/coin-research-202603/base-chain" title="Base Is Coinbase's Best-Kept Secret — And the Numbers Are Starting to Show It" />
 
 
 ## Deribit — Transforming the Institutional Revenue Profile
@@ -80,7 +80,7 @@ CME Group's 24/7 crypto futures and options launch on May 29, 2026 is the first 
 
 **Primary risk: CME competitive entry in H2 2026 and PPA amortization drag on GAAP EBIT. Strategic case intact on medium-term horizon.**
 
-<ArticleLink href="/blog/coin-research-202602/deribit" title="The Deribit Bet: What Coinbase Actually Bought for $2.9 Billion" />
+<ArticleLink href="/blog/coin-research-202603/deribit" title="The Deribit Bet: What Coinbase Actually Bought for $2.9 Billion" />
 
 
 ## Ethereum Staking — A Math Problem Disguised as a Growth Story
@@ -97,7 +97,7 @@ My model estimates \$$249.8$M — substantially below consensus — driven by fo
 
 **Primary risk: `ETH` price appreciation required to offset structural yield dilution.**
 
-<ArticleLink href="/blog/coin-research-202602/eth-staking" title="Why Coinbase's Staking Business Is Structurally Getting Smaller" />
+<ArticleLink href="/blog/coin-research-202603/eth-staking" title="Why Coinbase's Staking Business Is Structurally Getting Smaller" />
 
 
 ## Digital Asset Portfolio & ASC 350-60 — The Accounting Story Behind the \$667M Loss
@@ -106,13 +106,13 @@ My model estimates \$$249.8$M — substantially below consensus — driven by fo
 
 Coinbase reported a (\$$667$M) GAAP net loss in Q4 2025. The cause: \$$718$M in unrealized losses on its corporate crypto portfolio and \$$395$M in fair-value markdown on its Circle equity stake, both flowing through net income under ASC 350-60 — adopted January 1, 2025. No cash changed hands. No position was sold.
 
-Under ASC 350-60, digital assets classified as held for investment are marked to fair value each quarter, with gains and losses flowing directly to the income statement. Coinbase held $15,389$ `BTC` (approx. \$$1.01$B) and $151,175$ `ETH` (approx. \$$297$M) at year-end 2025. Every $10\%$ move in those assets produces a approx. \$$101$M GAAP income impact with zero connection to the operating business. GAAP EPS for Coinbase is now structurally a hybrid: part operating earnings, part crypto mark-to-market.
+Under ASC 350-60, digital assets classified as held for investment are marked to fair value each quarter, with gains and losses flowing directly to the income statement. Coinbase held $15,389$ `BTC` (approx. \$$1.34$B at year-end $87{,}000$/BTC) and $151,175$ `ETH` (approx. \$$297$M) at year-end 2025. Every $10\%$ move in those assets produces a approx. \$$101$M GAAP income impact with zero connection to the operating business. GAAP EPS for Coinbase is now structurally a hybrid: part operating earnings, part crypto mark-to-market.
 
 Adjusted EPS of \$$6.95$ is the economically meaningful number. Adjusted EBITDA of \$$3,193.7$M at a $44.4\%$ margin is the operating story. Any screen or model filtering by GAAP earnings will systematically misread every quarterly result for as long as Coinbase holds a material crypto portfolio.
 
 **Key implication: Use Adjusted metrics exclusively. GAAP headlines will continue to distort in both directions every quarter.**
 
-<ArticleLink href="/blog/coin-research-202602/asc350-gaap-loss" title="Why Coinbase Reported a $667 Million Loss Last Quarter — And Why It Doesn't Mean What You Think" />
+<ArticleLink href="/blog/coin-research-202603/asc350-gaap-loss" title="Why Coinbase Reported a $667 Million Loss Last Quarter — And Why It Doesn't Mean What You Think" />
 
 
 ## Developer Platform & Institutional Infrastructure — The Business with No Revenue Line
@@ -127,12 +127,12 @@ AWS was also buried inside Amazon's consolidated North America revenue for years
 
 **Key catalyst: Separate CDP revenue disclosure. Watch for client-side disclosures from Citi, JPMorgan, BlackRock on digital asset infrastructure spending.**
 
-<ArticleLink href="/blog/coin-research-202602/developer-platform" title="Coinbase's Invisible Business: The Developer Platform That 270 Enterprises Are Already Using" />
+<ArticleLink href="/blog/coin-research-202603/developer-platform" title="Coinbase's Invisible Business: The Developer Platform That 270 Enterprises Are Already Using" />
 
 
 ## Coinbase One — Building a Subscriber Base and Cannibalizing Transaction Revenue Simultaneously
 
-**Subscribers: approx. 971K (ATH, 3x in 3 years) | Estimated Annual Subscription Revenue: \$60-350M | Estimated Fee Revenue Foregone: approx. \$76M/year**
+**Subscribers: approx. 971K (ATH, 3x in 3 years) | Estimated Annual Subscription Revenue: \$60-350M | Estimated Fee Revenue Foregone: approx. \$81M/year**
 
 Coinbase One reached approx. $971$K subscribers by end of 2025 — all-time high, $3$x growth in three years. The product offers zero-commission trading, enhanced support, and staking rate boosts at \$$4.99$/month base. Revenue is inside "Other Sub & Services" with no public breakout. Estimated annual subscription revenue: \$$60$-$350$M depending on tier mix. The range is wide because the premium tier pricing is undisclosed.
 
@@ -142,7 +142,7 @@ Most model coverage I've seen applies a approx. $30\%$ growth rate to the full O
 
 **Key catalyst: Coinbase One revenue disclosed as standalone line (as previously done with custodial fees) — that disclosure reprices the recurring revenue multiple.**
 
-<ArticleLink href="/blog/coin-research-202602/coinbase-one" title="Coinbase One Has 971,000 Subscribers — Here's What That Actually Means for the P&L" />
+<ArticleLink href="/blog/coin-research-202603/coinbase-one" title="Coinbase One Has 971,000 Subscribers — Here's What That Actually Means for the P&L" />
 
 
 ## The Financial Model
@@ -172,7 +172,7 @@ The model contains ten tabs:
 
 ## Key Risks
 
-1. **`USDC` contract renewal:** A renegotiation to 80%/40% sharing terms removes \$$130$-$180$M from FY2026 revenue in a single event. This is the only risk in the model that is fully within a counterparty's control rather than Coinbase's.
+1. **`USDC` contract renewal:** A renegotiation to 80%/40% sharing terms removes \$$220$-$300$M from FY2026 revenue in a single event, depending on the rate path. This is the only risk in the model that is fully within a counterparty's control rather than Coinbase's.
 
 2. **CME Group institutional competition:** The May 29, 2026 24/7 crypto options launch introduces direct competition to Deribit's institutional franchise. A 10-15% institutional flow shift to CME in H2 2026 implies \$$40$-$65$M of revenue downside versus current estimates.
 
