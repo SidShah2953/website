@@ -18,7 +18,7 @@
     "@fontsource/montserrat": "^5.2.7",
     "@fontsource/roboto": "^5.2.7",
     "@tailwindcss/vite": "^4.1.18",
-    "@types/three": "^0.182.0",
+    "@types/three": "^0.183.1",
     "astro-robots-txt": "^1.0.0",
     "astro-seo": "1.1.0",
     "marked": "^17.0.1",
@@ -29,17 +29,30 @@
     "remark-math": "^6.0.0",
     "sharp": "^0.34.5",
     "tailwindcss": "^4.1.18",
-    "three": "^0.182.0",
-    "xlsx": "^0.18.5"
+    "three": "^0.183.2",
+    "xlsx": "file:xlsx-0.20.3.tgz"
   },
   "devDependencies": {
-    "@typescript-eslint/eslint-plugin": "8.54.0",
-    "@typescript-eslint/parser": "8.54.0",
-    "astro": "^5.17.1",
-    "eslint": "9.39.2",
-    "eslint-plugin-astro": "1.5.0",
+    "@typescript-eslint/eslint-plugin": "^8.57.0",
+    "@typescript-eslint/parser": "^8.57.0",
+    "astro": "^5.18.0",
+    "eslint": "^10.0.3",
+    "eslint-plugin-astro": "^1.6.0",
     "prettier": "3.8.1",
     "prettier-plugin-astro": "0.14.1",
     "prettier-plugin-tailwindcss": "0.7.2"
-  }
+  },
+  "description": "",
+  "main": ".eslintrc.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SidShah2953/website.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/SidShah2953/website/issues"
+  },
+  "homepage": "https://github.com/SidShah2953/website#readme"
 }
