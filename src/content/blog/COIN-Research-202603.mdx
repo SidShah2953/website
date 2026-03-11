@@ -4,6 +4,7 @@ publishedAt: 2026-03-02
 description: "A bottom-up look at seven business lines, one accounting rule change, and the single contract renewal that determines whether the margin story holds in 2026"
 tags: ["Crypto", "Finance"]
 isHidden: false
+ogImage: /og/coin-research-202603.png
 thesis: |
     Coinbase is not an exchange with side projects. It is a vertically integrated financial infrastructure company — seven distinct layers of the crypto financial stack, each generating standalone revenue and each feeding the others. The FY2025 numbers confirm what the strategy has been building toward: $7.2B in total revenue, 44.4% Adjusted EBITDA margin, $11.3B in cash, and $1.2B in buybacks executed. More than 39% of revenue now comes from subscription and services — sources that don't require a single trade to be executed.
 
@@ -14,10 +15,13 @@ thesis: |
     This series analyzes all seven layers. What follows is the analytical case for each one, the financial evidence behind it, and the specific risks most models I've come across have not yet priced.
 ---
 import CallOutForMDX from "@/components/CallOutForMDX.astro";
-import ImageWithCaption from "@/components/ImageWithCaption.astro";
 import ArticleLink from "@/components/ArticleLink.astro";
-import ExcelEmbed from "@/components/ExcelEmbed.astro";
+
+// import ExcelEmbed from "@/components/ExcelEmbed.astro";
 import ModelDownload from "@/components/ModelDownload.astro";
+
+import ImageWithCaption from "@/components/ImageWithCaption.astro";
+import flywheelFigure from '@/assets/posts/COIN-Research-202603/flywheel.png';
 
 ## Financial Snapshot — FY2025 Actuals
 
@@ -40,6 +44,8 @@ import ModelDownload from "@/components/ModelDownload.astro";
 *Note: The Q4 2025 GAAP net loss is driven almost entirely by non-cash ASC 350-60 fair-value accounting on the crypto portfolio and Circle equity stake — not operating deterioration. Adjusted metrics are the economically meaningful read. Full explanation in [later](#digital-asset-portfolio-&-asc-350-60-—-the-accounting-story-behind-the-$667m-loss).*
 
 <ModelDownload href="/COIN Model.xlsx" filename="COIN Model.xlsx" />
+
+<ImageWithCaption src={flywheelFigure} caption="The Seven Layers of the Coinbase Flywheel" />
 
 ## USDC — The \$1.35 Billion Revenue Stream Coinbase Does Not Operate
 
