@@ -52,7 +52,7 @@ const { Content } = await entry.render();
 // Build SEO props from frontmatter
 const entrySlug = entry.id.replace(/\.(md|mdx)$/, '').toLowerCase();
 const canonicalUrl = entry.data.canonical || `/blog/${entrySlug}/`;
-const ogImage = entry.data.ogImage || '/social-prev.png';
+const ogImage = entry.data.ogImage || parentSeries?.data.ogImage || '/social-prev.png';
 ---
 <Layout
   title={entry.data.title + ' | Siddhant Shah'}
