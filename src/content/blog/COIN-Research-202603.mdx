@@ -17,13 +17,15 @@ thesis: |
 import CallOutForMDX from "@/components/CallOutForMDX.astro";
 import ArticleLink from "@/components/ArticleLink.astro";
 
-// import ExcelEmbed from "@/components/ExcelEmbed.astro";
+{/* // import ExcelEmbed from "@/components/ExcelEmbed.astro"; */}
 import ModelDownload from "@/components/ModelDownload.astro";
 
 import ImageWithCaption from "@/components/ImageWithCaption.astro";
 import flywheelFigure from '@/assets/posts/COIN-Research-202603/flywheel.png';
 
 ## Financial Snapshot — FY2025 Actuals
+
+<ImageWithCaption src={flywheelFigure} caption="The Seven Layers of the Coinbase Flywheel" alt="The Seven Layers of the Coinbase Flywheel" />
 
 | Metric | FY2025 |
 | --- | --- |
@@ -44,8 +46,6 @@ import flywheelFigure from '@/assets/posts/COIN-Research-202603/flywheel.png';
 *Note: The Q4 2025 GAAP net loss is driven almost entirely by non-cash ASC 350-60 fair-value accounting on the crypto portfolio and Circle equity stake — not operating deterioration. Adjusted metrics are the economically meaningful read. Full explanation in [later](#digital-asset-portfolio-&-asc-350-60-—-the-accounting-story-behind-the-$667m-loss).*
 
 <ModelDownload href="/COIN Model.xlsx" filename="COIN Model.xlsx" />
-
-<ImageWithCaption src={flywheelFigure} caption="The Seven Layers of the Coinbase Flywheel" />
 
 ## USDC — The \$1.35 Billion Revenue Stream Coinbase Does Not Operate
 
