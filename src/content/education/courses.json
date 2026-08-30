@@ -1,13 +1,53 @@
 [
     {
-        "title": "Finance & Quantitative Modeling for Analysts Specialization",
-        "completedOn": "2023-01-01",
-        "offeredBy": "UPenn via Coursera"
-    }, 
+        "title": "CFA Program, Level I",
+        "completedOn": "2026-01-15",
+        "offeredBy": "CFA Institute"
+    },
+    {
+        "title": "Mergers & Acquisitions Specialization",
+        "completedOn": "2025-12-01",
+        "offeredBy": "University of Illinois via Coursera"
+    },
+    {
+        "title": "Options 101",
+        "completedOn": "2025-06-01",
+        "offeredBy": "Akuna Capital"
+    },
+    {
+        "title": "Bloomberg Market Concepts",
+        "completedOn": "2025-02-01",
+        "offeredBy": "Bloomberg"
+    },
+    {
+        "title": "Bloomberg Finance Fundamentals",
+        "completedOn": "2025-02-01",
+        "offeredBy": "Bloomberg"
+    },
+    {
+        "title": "LLM Applications (7-Day Challenge)",
+        "completedOn": "2025-01-20",
+        "offeredBy": "DeepLearning.AI / AI Camp"
+    },
+    {
+        "title": "Finance Theory I",
+        "completedOn": "2024-06-01",
+        "offeredBy": "MIT OpenCourseWare"
+    },
     {
         "title": "Decentralised Finance (DeFi) Primitives",
         "completedOn": "2023-07-10",
         "offeredBy": "Duke University via Coursera"
+    },
+    {
+        "title": "Finance & Quantitative Modeling for Analysts Specialization",
+        "completedOn": "2023-01-01",
+        "offeredBy": "UPenn via Coursera"
+    },
+    {
+        "title": "Quantum Wonder",
+        "completedOn": "2022-08-16",
+        "offeredBy": "Raising A Mathematician Foundation"
     },
     {
         "title": "Principles of Corporate Finance",
@@ -23,11 +63,6 @@
         "title": "Single Variable Calculus",
         "completedOn": "2020-09-28",
         "offeredBy": "UPenn via Coursera"
-    },
-    {
-        "title": "Quantum Wonder",
-        "completedOn": "2022-08-16",
-        "offeredBy": "Raising A Mathematician Foundation"
     },
     {
         "title": "Ethical Hacking",
