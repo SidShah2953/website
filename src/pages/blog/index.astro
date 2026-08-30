@@ -4,12 +4,32 @@ import BreadcrumbSchema from "@/components/seo/BreadcrumbSchema.astro";
 import { getFeed, fmtDate, readingMinutes } from "@/utils/feed";
 import { marked } from "marked";
 import Disclosure from "@/components/Disclosure.astro";
+import { AREAS, THEMES, type AreaId } from "@/data/themes";
+import { countThemes } from "@/utils/themeIndex";
 
 const feed = await getFeed();
 const posts = feed.reduce((n, f) => n + (f.kind === "post" ? 1 + (f.children?.length ?? 0) : 0), 0);
 const notes = feed.filter((f) => f.kind === "note").length;
 // notes render inline in the feed — they're too short to deserve their own click
 const inline = (md: string) => marked.parse(md.trim(), { async: false }) as string;
+
+// Filtering runs on the client over data already in the page — no index to ship,
+// no request to make, and it still works if the JS never loads (every row is
+// rendered; the controls simply do nothing).
+const areasOf = (f: (typeof feed)[number]): AreaId[] => {
+  const bodies = [f.body, ...(f.children ?? []).map((c) => c.body)];
+  const set = new Set<AreaId>();
+  for (const b of bodies)
+    for (const [slug] of countThemes(b))
+      if (THEMES[slug]) set.add(THEMES[slug].area);
+  return [...set];
+};
+const haystack = (f: (typeof feed)[number]) =>
+  [f.title, f.description, ...(f.children ?? []).map((c) => c.title)]
+    .filter(Boolean).join(" ").toLowerCase();
+
+const usedAreas = (Object.keys(AREAS) as AreaId[])
+  .filter((a) => feed.some((f) => areasOf(f).includes(a)));
 ---
 <Shell title="Writing | Siddhant Shah"
   description="Essays on finance, digital assets and technology, plus shorter notes."
@@ -27,9 +47,24 @@ const inline = (md: string) => marked.parse(md.trim(), { async: false }) as stri
     </div>
 
     <div class="wrap wrap--narrow">
-      <ul class="feed">
+      <form class="tools" role="search" id="tools" onsubmit="return false">
+        <label class="sr" for="q">Search writing</label>
+        <input id="q" type="search" placeholder="Search titles and descriptions…"
+          autocomplete="off" spellcheck="false" />
+        <div class="chips" role="group" aria-label="Filter by area">
+          <button type="button" data-area="all" aria-pressed="true">All</button>
+          {usedAreas.map((a) => (
+            <button type="button" data-area={a} aria-pressed="false"
+              style={`--ac: rgb(${AREAS[a].rgb.join(",")})`}>{AREAS[a].label}</button>
+          ))}
+          <button type="button" data-area="note" aria-pressed="false">Notes</button>
+        </div>
+        <p class="count" id="count" aria-live="polite"></p>
+      </form>
+
+      <ul class="feed" id="feed">
         {feed.map((f) => (
-          <li>
+          <li data-kind={f.kind} data-areas={areasOf(f).join(" ")} data-text={haystack(f)}>
             {f.kind === "post" && f.children?.length ? (
               <div class="series">
                 <a class="row" href={f.href}>
@@ -80,12 +115,43 @@ const inline = (md: string) => marked.parse(md.trim(), { async: false }) as stri
           </li>
         ))}
       </ul>
+      <p class="empty" id="empty" hidden>Nothing matches that. <button type="button" id="reset">Clear filters</button></p>
       <Disclosure />
     </div>
   </div>
 </Shell>
 
 <style>
+  .tools{ display:grid;gap:12px;margin-bottom:clamp(18px,2.6vw,28px); }
+  .tools input{
+    width:100%;background:var(--surface-1);border:1px solid var(--rule);
+    border-radius:999px;padding:12px 18px;color:var(--text);
+    font-family:var(--sans);font-size:15px;transition:border-color .25s,background .25s;
+  }
+  .tools input::placeholder{ color:var(--text-3); }
+  .tools input:focus{ outline:none;border-color:var(--peacock);background:var(--surface-2); }
+  .chips{ display:flex;flex-wrap:wrap;gap:7px; }
+  .chips button{
+    appearance:none;cursor:pointer;background:var(--surface-1);color:var(--text-2);
+    border:1px solid var(--rule);border-radius:999px;padding:7px 14px;
+    font-family:var(--sans);font-size:13px;transition:all .2s;
+  }
+  .chips button:hover{ color:var(--text);border-color:var(--rule-strong); }
+  .chips button[aria-pressed="true"]{
+    color:var(--ac,var(--glow));border-color:var(--ac,var(--peacock));
+    background:var(--peacock-wash);
+  }
+  .chips button:focus-visible{ outline:2px solid var(--glow);outline-offset:2px; }
+  .count{ font-family:var(--sans);font-size:12.5px;color:var(--text-3);margin:0; }
+  .empty{
+    font-family:var(--sans);font-size:15px;color:var(--text-2);
+    padding:clamp(22px,4vw,38px) 0;margin:0;text-align:center;
+  }
+  .empty button{
+    appearance:none;background:none;border:0;cursor:pointer;color:var(--glow);
+    font:inherit;text-decoration:underline;padding:0;
+  }
+  .sr{ position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap; }
   .series .row{ padding-bottom:10px; }
   .parts{ padding:0 0 clamp(14px,2vw,20px); }
   .parts summary{
@@ -136,3 +202,64 @@ const inline = (md: string) => marked.parse(md.trim(), { async: false }) as stri
   .nb :global(em){ font-style:italic;color:var(--text); }
   .nb :global(strong){ color:var(--text);font-weight:500; }
 </style>
+
+<script>
+  const feed = document.getElementById('feed');
+  const q = document.getElementById('q') as HTMLInputElement | null;
+  const tools = document.getElementById('tools');
+  const count = document.getElementById('count');
+  const empty = document.getElementById('empty');
+  if (feed && q && tools && count && empty) {
+    const rows = [...feed.querySelectorAll<HTMLElement>('li')];
+    const chips = [...tools.querySelectorAll<HTMLButtonElement>('[data-area]')];
+    let area = 'all';
+
+    const apply = () => {
+      const term = q.value.trim().toLowerCase();
+      let shown = 0;
+      for (const r of rows) {
+        const okArea =
+          area === 'all' ||
+          (area === 'note' ? r.dataset.kind === 'note'
+                           : (r.dataset.areas ?? '').split(' ').includes(area));
+        const okTerm = !term || (r.dataset.text ?? '').includes(term);
+        const on = okArea && okTerm;
+        r.hidden = !on;
+        if (on) shown++;
+      }
+      empty.hidden = shown > 0;
+      count.textContent =
+        term || area !== 'all'
+          ? `${shown} of ${rows.length} ${rows.length === 1 ? 'entry' : 'entries'}`
+          : '';
+      const url = new URL(location.href);
+      term ? url.searchParams.set('q', term) : url.searchParams.delete('q');
+      area !== 'all' ? url.searchParams.set('area', area) : url.searchParams.delete('area');
+      history.replaceState(null, '', url);
+    };
+
+    for (const c of chips) {
+      c.addEventListener('click', () => {
+        area = c.dataset.area!;
+        for (const o of chips) o.setAttribute('aria-pressed', String(o === c));
+        apply();
+      });
+    }
+    q.addEventListener('input', apply);
+    document.getElementById('reset')?.addEventListener('click', () => {
+      q.value = ''; area = 'all';
+      for (const o of chips) o.setAttribute('aria-pressed', String(o.dataset.area === 'all'));
+      apply(); q.focus();
+    });
+
+    // deep links: /blog/?q=stablecoin&area=da
+    const p = new URLSearchParams(location.search);
+    if (p.get('q')) q.value = p.get('q')!;
+    const a = p.get('area');
+    if (a && chips.some((c) => c.dataset.area === a)) {
+      area = a;
+      for (const o of chips) o.setAttribute('aria-pressed', String(o.dataset.area === a));
+    }
+    apply();
+  }
+</script>

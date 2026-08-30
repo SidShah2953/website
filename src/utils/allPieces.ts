@@ -17,7 +17,13 @@ export async function allPieces() {
     ...projects.map((e) => ({ e, kind: "projects" as const })),
     ...research.map((e) => ({ e, kind: "research" as const })),
   ];
-  return live(rows.map((r) => r.e)).map((e) => {
+  // Draft research (isPublished: false) emits no page, so anything linking to it
+  // is a dead link. It must not reach the word map or the theme pages either.
+  const published = rows
+    .map((r) => r.e)
+    .filter((e) => (e.data as { isPublished?: boolean }).isPublished !== false);
+
+  return live(published).map((e) => {
     const kind = rows.find((r) => r.e === e)!.kind;
     const slug = slugOf(e.id);
     return { entry: e, kind, slug, areas: areasFor(slug) };
