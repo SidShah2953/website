@@ -166,6 +166,14 @@ const nav = [
         --header-bg:var(--header-bg);
         --code-bg:var(--code-bg);
         --selection:var(--selection);
+        /* Radius scale. Ten values were in use (10/12/14/16/26px and friends),
+           all doing panel duty, which is why panels disagreed by a couple of
+           pixels wherever two sat side by side. */
+        --r-sm:8px;      /* inline code, small chips */
+        --r-md:16px;     /* cards, callouts, inputs, figures */
+        --r-lg:20px;     /* large containers: word map, spreadsheet, hero panels */
+        --r-pill:999px;  /* buttons, badges, tags */
+
         --serif:"Newsreader Variable",Georgia,"Times New Roman",serif;
         --sans:"Schibsted Grotesk Variable","Helvetica Neue",Arial,sans-serif;
         --hdr-h:64px;
@@ -277,10 +285,10 @@ const nav = [
         border-left:2px solid var(--peacock);color:var(--text-2);font-style:italic; }
       .prose code{ font-family:ui-monospace,SFMono-Regular,monospace;font-size:.86em;
         background:var(--surface-3);padding:.15em .4em;border-radius:4px; }
-      .prose pre{ overflow-x:auto;padding:clamp(14px,2vw,20px);border-radius:12px;
+      .prose pre{ overflow-x:auto;padding:clamp(14px,2vw,20px);border-radius:var(--r-md);
         border:1px solid var(--rule);background:var(--code-bg);font-size:.86em;line-height:1.6; }
       .prose pre code{ background:none;padding:0; }
-      .prose img,.prose video{ max-width:100%;height:auto;border-radius:12px; }
+      .prose img,.prose video{ max-width:100%;height:auto;border-radius:var(--r-md); }
       /* wide things scroll themselves rather than the page */
       .prose table{ display:block;overflow-x:auto;max-width:100%;border-collapse:collapse;font-size:.92em; }
       .prose th,.prose td{ border-bottom:1px solid var(--rule);padding:.55em .8em;text-align:left;white-space:nowrap; }

@@ -31,14 +31,6 @@ const presentation: Presentation = {
       label: "GitHub",
       link: "https://github.com/SidShah2953",
     },
-    {
-      label: "RSS",
-      link: "/blog/rss.xml",
-    },
-    {
-      label: "Resume",
-      link: "/Resume.pdf",
-    },
   ],
 };
 

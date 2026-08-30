@@ -17,6 +17,13 @@ const themes = buildIndex(pieces.map((p) => ({ entry: p.entry, areas: p.areas })
 // nested rather than filling this list
 const latest = (await getFeed()).slice(0, 3);
 
+// counted, not typed — the previous copy said "four" and had been wrong since
+// the IJFS paper went live
+const papers = pieces.filter((p) => p.kind === "research").length;
+// spelled out: a sentence should not open with a numeral
+const WORDS = ["No", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten"];
+const papersWord = WORDS[papers] ?? String(papers);
+
 const email = presentation.mail;
 const desc =
   "Siddhant Shah — equity research associate. I write about finance, digital assets, technology, and whatever else I end up measuring.";
@@ -35,9 +42,9 @@ const desc =
     <p class="kicker">Hi — I'm</p>
     <h1>Siddhant Shah</h1>
     <p class="line">
-      I'm an equity research associate. I work out what businesses are actually
-      worth — and I write here about <em>tokenization, digital assets and AI</em>,
-      which is where most of that work now points.
+      I'm an equity research associate. My days go on working out what a business
+      is actually worth. My evenings go on <em>tokenization, digital assets and
+      the AI tools</em> that are starting to do part of that work with us.
     </p>
     </div>
     <div class="scroll-cue" aria-hidden="true"><span></span></div>
@@ -48,14 +55,14 @@ const desc =
     <div class="band"><h2 class="eyebrow">Who I am</h2>
     <div class="two">
       <p class="big">
-        The method is always the same: build the dataset first, name the
-        mechanism you think is driving it, then test whether the numbers actually
-        support you — and say so plainly when they don't.
+        The method never changes, only the subject does. Build the dataset before
+        you have a view. Name the mechanism you think explains it. Then try hard
+        to prove yourself wrong, and say so out loud when you manage it.
       </p>
       <div class="facts">
-        <p>Equity research associate. Previously a research assistant at Boston University's Department of Computer Science, working on systematic strategies and portfolio construction.</p>
-        <p>MS Applied Data Analytics, Boston University. BS Mathematics &amp; Computer Science, Chennai Mathematical Institute. CFA Level&nbsp;1.</p>
-        <p>Four peer-reviewed papers on trading strategies and statistical method, in <em>Stocks &amp; Commodities</em> and <em>MLAIJ</em> — and one, on the geometry of Greek vases, that exists mostly to prove the method travels.</p>
+        <p>Equity research associate. Before that, a research assistant in Boston University's Department of Computer Science, building systematic strategies and portfolio construction.</p>
+        <p>MS in Applied Data Analytics from Boston University; BS in Mathematics and Computer Science from Chennai Mathematical Institute; CFA Level&nbsp;1. Five years teaching physics and maths to olympiad students, which is still the fastest way I know to find out whether I actually understand something.</p>
+        <p>{papersWord} peer-reviewed papers. The most recent works out what actually drives volume in decentralised perpetual futures; an earlier one computes the volume of a Greek vase, and is here to show the method travels.</p>
         <p><a class="ln" href="/about">The longer version →</a></p>
       </div>
     </div>
@@ -66,9 +73,10 @@ const desc =
   <section class="slide rise">
     <div class="band"><h2 class="eyebrow">What I talk about</h2>
     <p class="lede">
-      Every word below is marked up inside the writing itself. Size is how often
-      I actually reach for an idea; colour and position are blended from the
-      areas it turns up in. Click one to read everything on it.
+      Not a list I sat down and wrote — every word here is marked up inside the
+      writing itself, so this is what I actually keep reaching for. Bigger means
+      more often. Colour and position show where an idea sits between the four
+      things I work on. Click any of them.
     </p>
     <WordMap themes={themes} />
   </div>
@@ -102,7 +110,7 @@ const desc =
     <div class="band"><h2 class="eyebrow">Get in touch</h2>
     <div class="two">
       <div>
-        <p class="big">Say hello.</p>
+        <p class="big">Tell me where I've got it wrong.</p>
         <p class="facts"><a class="ln" href={`mailto:${email}`}>{email}</a></p>
         <p class="facts">
           {presentation.socials.filter((s) => s.label !== "Email").map((s) => (
@@ -228,7 +236,7 @@ const desc =
   }
   .pm .tag{
     color:var(--peacock);border:1px solid color-mix(in srgb, var(--peacock) 42%, transparent);
-    border-radius:999px;padding:2px 9px;letter-spacing:.1em;
+    border-radius:var(--r-pill);padding:2px 9px;letter-spacing:.1em;
   }
   /* only notes step down — a series is a bigger entry than one article,
      and .tag alone was catching the series badge too */

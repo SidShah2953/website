@@ -125,7 +125,7 @@ const usedAreas = (Object.keys(AREAS) as AreaId[])
   .tools{ display:grid;gap:12px;margin-bottom:clamp(18px,2.6vw,28px); }
   .tools input{
     width:100%;background:var(--surface-1);border:1px solid var(--rule);
-    border-radius:999px;padding:12px 18px;color:var(--text);
+    border-radius:var(--r-pill);padding:12px 18px;color:var(--text);
     font-family:var(--sans);font-size:15px;transition:border-color .25s,background .25s;
   }
   .tools input::placeholder{ color:var(--text-3); }
@@ -133,7 +133,7 @@ const usedAreas = (Object.keys(AREAS) as AreaId[])
   .chips{ display:flex;flex-wrap:wrap;gap:7px; }
   .chips button{
     appearance:none;cursor:pointer;background:var(--surface-1);color:var(--text-2);
-    border:1px solid var(--rule);border-radius:999px;padding:7px 14px;
+    border:1px solid var(--rule);border-radius:var(--r-pill);padding:7px 14px;
     font-family:var(--sans);font-size:13px;transition:all .2s;
   }
   .chips button:hover{ color:var(--text);border-color:var(--rule-strong); }
@@ -187,7 +187,7 @@ const usedAreas = (Object.keys(AREAS) as AreaId[])
   .note{ padding:clamp(18px,2.4vw,26px) 0;display:grid;gap:8px; }
   .badge{
     color:var(--peacock);border:1px solid color-mix(in srgb, var(--peacock) 45%, transparent);
-    border-radius:999px;padding:2px 9px;letter-spacing:.1em;
+    border-radius:var(--r-pill);padding:2px 9px;letter-spacing:.1em;
   }
   .m a{ color:var(--text-3);text-decoration:none;border-bottom:1px solid transparent; }
   /* the permalink was unreachable: nothing linked to /notes/*, yet the pages
