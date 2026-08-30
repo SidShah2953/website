@@ -14,8 +14,8 @@
 export type AreaId = "fin" | "da" | "tech" | "craft";
 
 export const AREAS: Record<AreaId, { label: string; rgb: [number, number, number] }> = {
-  fin:   { label: "Finance",             rgb: [23, 145, 158] },
-  da:    { label: "Digital Assets",      rgb: [62, 212, 224] },
+  fin:   { label: "Finance",             rgb: [32, 142, 197] },
+  da:    { label: "Digital Assets",      rgb: [69, 181, 237] },
   tech:  { label: "Technology",          rgb: [47, 111, 232] },
   craft: { label: "Craft & Curiosities", rgb: [122, 100, 220] },
 };

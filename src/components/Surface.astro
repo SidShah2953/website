@@ -125,7 +125,7 @@ if (host && cv && gl) {
       vec3 film = filmColour(max(dot(n, v), 0.), thick);
 
       // pull the interference toward the peacock / azure / iris family
-      vec3 peacock = vec3(.090,.569,.620);
+      vec3 peacock = vec3(.125,.557,.773);
       vec3 azure   = vec3(.184,.435,.910);
       vec3 iris    = vec3(.478,.392,.855);
       vec3 tint = mix(peacock, azure, smoothstep(.25,.85, film.b));
