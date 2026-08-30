@@ -10,6 +10,7 @@ const projects = defineCollection({
     isPublish: z.boolean(),
     isOngoing: z.boolean().default(false),
     thesis: z.string().optional(),
+    tags: z.array(z.string()).default([]),
   }),
 });
 
