@@ -11,7 +11,7 @@
  * An unknown slug throws at build time — that's deliberate. It's the guard that
  * keeps the vocabulary from silently drifting as pieces get written.
  */
-import { THEMES, AREAS } from "@/data/themes";
+import { THEMES, AREAS, displayLabel } from "@/data/themes";
 
 interface Props { k: string }
 const { k } = Astro.props;
@@ -31,7 +31,7 @@ const rgb = AREAS[theme.area].rgb.join(",");
   class="theme-tag"
   style={`--tc: rgb(${rgb})`}
   data-theme={k}
-  title={`${theme.label} — ${AREAS[theme.area].label}`}
+  title={`${displayLabel(theme.label)} — ${AREAS[theme.area].label}`}
 ><slot /></a>
 
 <style>

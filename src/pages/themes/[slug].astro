@@ -1,7 +1,7 @@
 ---
 import Shell from "@/layouts/Shell.astro";
 import BreadcrumbSchema from "@/components/seo/BreadcrumbSchema.astro";
-import { THEMES, AREAS } from "@/data/themes";
+import { THEMES, AREAS, displayLabel } from "@/data/themes";
 import { allPieces } from "@/utils/allPieces";
 import { countThemes } from "@/utils/themeIndex";
 
@@ -27,11 +27,11 @@ const href = (p: any) =>
 <Shell title={`${theme.label} | Siddhant Shah`}
   description={`Everything I've written on ${theme.label}.`}
   canonical={`/themes/${slug}/`}>
-  <BreadcrumbSchema slot="head" items={[{ name: "Home", url: "/" }, { name: "Writing", url: "/blog/" }, { name: theme.label }]} />
+  <BreadcrumbSchema slot="head" items={[{ name: "Home", url: "/" }, { name: "Writing", url: "/blog/" }, { name: displayLabel(theme.label) }]} />
   <div class="page">
     <section class="wrap wrap--narrow">
     <p class="eyebrow" style={`color:rgb(${rgb})`}>{area.label}</p>
-    <h1 class="h1" style={`color:rgb(${rgb})`}>{theme.label}</h1>
+    <h1 class="h1" style={`color:rgb(${rgb})`}>{displayLabel(theme.label)}</h1>
     <p class="lede">
       {used.length === 0
         ? "Nothing tagged with this yet."

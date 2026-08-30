@@ -58,5 +58,14 @@ export const THEMES: Record<string, { area: AreaId; label: string }> = {
   "design":                { area: "craft", label: "design" },
 };
 
+/**
+ * Sentence case for UI chrome. Labels are stored lowercase because that is how
+ * they read inside a sentence, but a dropdown, a chip or a list item is not a
+ * sentence — it is a heading, and it should be capitalised like one. Labels that
+ * already carry their own capitals (DeFi, AI) are left exactly as written.
+ */
+export const displayLabel = (label: string): string =>
+  /[A-Z]/.test(label) ? label : label.charAt(0).toUpperCase() + label.slice(1);
+
 export const THEME_SLUGS = Object.keys(THEMES);
 export const isTheme = (s: string): s is keyof typeof THEMES => s in THEMES;

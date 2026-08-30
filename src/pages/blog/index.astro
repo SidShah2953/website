@@ -4,7 +4,7 @@ import BreadcrumbSchema from "@/components/seo/BreadcrumbSchema.astro";
 import { getFeed, fmtDate, readingMinutes } from "@/utils/feed";
 import { marked } from "marked";
 import Disclosure from "@/components/Disclosure.astro";
-import { AREAS, THEMES, type AreaId } from "@/data/themes";
+import { AREAS, THEMES, displayLabel, type AreaId } from "@/data/themes";
 import { countThemes } from "@/utils/themeIndex";
 
 const feed = await getFeed();
@@ -73,8 +73,6 @@ const usedThemes = [...new Set(feed.flatMap(themesOf))]
               style={`--ac: rgb(${AREAS[a].rgb.join(",")})`}>{AREAS[a].label}</button>
           ))}
           <button type="button" data-area="note" aria-pressed="false">Notes</button>
-        </div>
-        <div class="themes" id="themeRow">
           <label class="sr" for="theme">Filter by theme</label>
           <select id="theme">
             <option value="">All themes</option>
@@ -82,7 +80,7 @@ const usedThemes = [...new Set(feed.flatMap(themesOf))]
               usedThemes.some((t) => t.area === a) && (
                 <optgroup label={AREAS[a].label}>
                   {usedThemes.filter((t) => t.area === a).map((t) => (
-                    <option value={t.slug}>{t.label}</option>
+                    <option value={t.slug}>{displayLabel(t.label)}</option>
                   ))}
                 </optgroup>
               )
@@ -161,7 +159,7 @@ const usedThemes = [...new Set(feed.flatMap(themesOf))]
   }
   .tools input::placeholder{ color:var(--text-3); }
   .tools input:focus{ outline:none;border-color:var(--peacock);background:var(--surface-2); }
-  .chips{ display:flex;flex-wrap:wrap;gap:7px; }
+  .chips{ display:flex;flex-wrap:wrap;gap:7px;align-items:center; }
   .chips button{
     appearance:none;cursor:pointer;background:var(--surface-1);color:var(--text-2);
     border:1px solid var(--rule);border-radius:var(--r-pill);padding:7px 14px;
@@ -173,19 +171,19 @@ const usedThemes = [...new Set(feed.flatMap(themesOf))]
     background:var(--peacock-wash);
   }
   .chips button:focus-visible{ outline:2px solid var(--glow);outline-offset:2px; }
-  .themes select{
-    width:100%;max-width:340px;appearance:none;cursor:pointer;
+  .chips select{
+    appearance:none;cursor:pointer;margin-inline-start:auto;
     background:var(--surface-1);border:1px solid var(--rule);border-radius:var(--r-pill);
-    padding:9px 34px 9px 16px;color:var(--text-2);
-    font-family:var(--sans);font-size:13.5px;
+    padding:7px 32px 7px 14px;color:var(--text-2);
+    font-family:var(--sans);font-size:13px;line-height:1;
     background-image:linear-gradient(45deg,transparent 50%,var(--text-3) 50%),
                      linear-gradient(135deg,var(--text-3) 50%,transparent 50%);
     background-position:calc(100% - 18px) 50%, calc(100% - 13px) 50%;
     background-size:5px 5px, 5px 5px;background-repeat:no-repeat;
     transition:border-color .25s,color .25s;
   }
-  .themes select:hover{ color:var(--text);border-color:var(--rule-strong); }
-  .themes select:focus{ outline:none;border-color:var(--peacock);color:var(--text); }
+  .chips select:hover{ color:var(--text);border-color:var(--rule-strong); }
+  .chips select:focus{ outline:none;border-color:var(--peacock);color:var(--text); }
   .count{ font-family:var(--sans);font-size:12.5px;color:var(--text-3);margin:0; }
   .empty{
     font-family:var(--sans);font-size:15px;color:var(--text-2);

@@ -4,7 +4,7 @@ const { href, title } = Astro.props;
 ---
 <a class="deep" href={href}>
   <span class="ic" aria-hidden="true">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"
       stroke-linecap="round" stroke-linejoin="round">
       <path d="M6 3h8l4 4v14H6z" /><path d="M14 3v4h4" />
       <path d="M9 12h6" /><path d="M9 16h6" />
@@ -14,7 +14,12 @@ const { href, title } = Astro.props;
     <span class="lb">Deep dive</span>
     <span class="tt">{title}</span>
   </span>
-  <span class="ar" aria-hidden="true">→</span>
+  <span class="ar" aria-hidden="true">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M5 12h13" /><path d="m12 5 7 7-7 7" />
+    </svg>
+  </span>
 </a>
 
 <style>
@@ -30,17 +35,17 @@ const { href, title } = Astro.props;
     background:var(--peacock-wash);transform:translateY(-2px);
   }
   .ic{
-    flex:none;width:34px;height:34px;display:grid;place-items:center;border-radius:var(--r-sm);
+    flex:none;width:36px;height:36px;display:grid;place-items:center;border-radius:var(--r-sm);
     border:1px solid color-mix(in srgb, var(--peacock) 40%, transparent);
     color:var(--glow);background:var(--peacock-wash);
   }
-  .ic svg{ width:17px;height:17px; }
+  .ic svg{ width:20px;height:20px; }
   .tx{ display:grid;gap:3px;min-width:0; }
   .lb{
     font-family:var(--sans);font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;
     color:var(--text-3);
   }
   .tt{ font-family:var(--sans);font-size:clamp(14px,1.4vw,15px);color:var(--text);line-height:1.35; }
-  .ar{ margin-left:auto;color:var(--text-3);font-size:16px;transition:color .3s,translate .3s; }
+  .ar{ margin-left:auto;display:inline-flex;color:var(--text-3);transition:color .3s,translate .3s; }
   .deep:hover .ar{ color:var(--glow);translate:3px 0; }
 </style>
