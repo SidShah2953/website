@@ -5,7 +5,7 @@ import { getFeed, fmtDate, readingMinutes } from "@/utils/feed";
 import { marked } from "marked";
 import Disclosure from "@/components/Disclosure.astro";
 import { AREAS, THEMES, displayLabel, type AreaId } from "@/data/themes";
-import { countThemes } from "@/utils/themeIndex";
+import { countThemes, themesFor } from "@/utils/themeIndex";
 
 const feed = await getFeed();
 const posts = feed.reduce((n, f) => n + (f.kind === "post" ? 1 + (f.children?.length ?? 0) : 0), 0);
@@ -17,20 +17,18 @@ const inline = (md: string) => marked.parse(md.trim(), { async: false }) as stri
 // no request to make, and it still works if the JS never loads (every row is
 // rendered; the controls simply do nothing).
 const themesOf = (f: (typeof feed)[number]): string[] => {
-  const bodies = [f.body, ...(f.children ?? []).map((c) => c.body)];
   const set = new Set<string>();
-  for (const b of bodies) for (const [slug] of countThemes(b)) if (THEMES[slug]) set.add(slug);
+  for (const slug of f.themes ?? []) if (THEMES[slug]) set.add(slug);
+  for (const b of [f.body, ...(f.children ?? []).map((c) => c.body)])
+    for (const [slug] of countThemes(b)) if (THEMES[slug]) set.add(slug);
+  for (const c of f.children ?? [])
+    for (const slug of c.themes ?? []) if (THEMES[slug]) set.add(slug);
   return [...set];
 };
 
-const areasOf = (f: (typeof feed)[number]): AreaId[] => {
-  const bodies = [f.body, ...(f.children ?? []).map((c) => c.body)];
-  const set = new Set<AreaId>();
-  for (const b of bodies)
-    for (const [slug] of countThemes(b))
-      if (THEMES[slug]) set.add(THEMES[slug].area);
-  return [...set];
-};
+// derived from themesOf so a declared theme counts the same as an inline marker
+const areasOf = (f: (typeof feed)[number]): AreaId[] =>
+  [...new Set(themesOf(f).map((slug) => THEMES[slug].area))];
 // themes are part of the search text, so "stablecoins" finds the piece even when
 // the word is not in its title
 const haystack = (f: (typeof feed)[number]) =>

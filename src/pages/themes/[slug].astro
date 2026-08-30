@@ -3,15 +3,27 @@ import Shell from "@/layouts/Shell.astro";
 import BreadcrumbSchema from "@/components/seo/BreadcrumbSchema.astro";
 import { THEMES, AREAS, displayLabel } from "@/data/themes";
 import { allPieces } from "@/utils/allPieces";
-import { countThemes } from "@/utils/themeIndex";
+import { getCollection } from "astro:content";
+import { live } from "@/utils/archive";
+import { excerpt } from "@/utils/feed";
+import { themesFor } from "@/utils/themeIndex";
 
 export async function getStaticPaths() {
   const pieces = await allPieces();
+  // notes carry their themes in frontmatter, and belong on these pages too
+  const notes = live(await getCollection("notes"))
+    .filter((n) => !n.data.isHidden)
+    .map((entry) => ({
+      entry, kind: "notes" as const,
+      slug: entry.id.replace(/\.(md|mdx)$/, "").toLowerCase(),
+      areas: {},
+    }));
+  const all = [...pieces, ...notes];
   // A theme nothing is tagged with is an empty page. Emitting it gives Google a
   // page whose body reads "Nothing tagged with this yet."
   return Object.entries(THEMES).flatMap(([slug, t]) => {
-    const used = pieces
-      .map((p) => ({ ...p, n: countThemes(p.entry.body).get(slug) ?? 0 }))
+    const used = all
+      .map((p) => ({ ...p, n: themesFor(p.entry).get(slug) ?? 0 }))
       .filter((p) => p.n > 0)
       .sort((a, b) => +b.entry.data.publishedAt - +a.entry.data.publishedAt);
     if (used.length === 0) return [];
@@ -41,9 +53,13 @@ const href = (p: any) =>
       {used.map((p) => (
         <li>
           <a href={href(p)}>
-            <span class="pt">{p.entry.data.title}</span>
-            <span class="pd">{p.entry.data.description}</span>
-            <span class="pm">{p.kind} · mentioned {p.n}×</span>
+            {/* a note has no title by design, so show the note itself */}
+            <span class="pt">{p.entry.data.title ?? excerpt(p.entry.body, 110)}</span>
+            {p.entry.data.description && <span class="pd">{p.entry.data.description}</span>}
+            <span class="pm">
+              {p.kind === "notes" ? "note" : p.kind}
+              {p.n > 1 ? ` · mentioned ${p.n}×` : ""}
+            </span>
           </a>
         </li>
       ))}

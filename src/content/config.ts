@@ -11,6 +11,7 @@ const projects = defineCollection({
     isOngoing: z.boolean().default(false),
     thesis: z.string().optional(),
     tags: z.array(z.string()).default([]),
+    themes: z.array(z.string()).default([]),
   }),
 });
 
@@ -36,6 +37,9 @@ const blog = defineCollection({
     thesis: z.string().optional(),
     articleNumber: z.number().optional(), // sub-articles: sort order within series
     series: z.string().optional(),        // display name for the series card
+    // Themes that belong to a piece but never appear as words in its prose, so
+    // an inline marker has nothing to attach to.
+    themes: z.array(z.string()).default([]),
     // Marks a piece as an illustrative exercise rather than a view on a
     // security. Renders a notice above the piece, not just a footer line.
     demonstrative: z.boolean().default(false),
@@ -80,6 +84,10 @@ const notes = defineCollection({
     crosspost: z.string().url().optional(),
     // A link the note is about.
     via: z.string().url().optional(),
+    // Themes, by slug from src/data/themes.ts. A note is too short to carry
+    // inline <T> markers comfortably, so it declares its themes here instead.
+    // An unknown slug fails the build rather than silently vanishing.
+    themes: z.array(z.string()).default([]),
     isHidden: z.boolean().default(false),
   }),
 });

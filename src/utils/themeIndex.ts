@@ -8,13 +8,34 @@ import { isArchived } from "@/utils/archive";
 
 const TAG = /<T\s+k=["']([a-z0-9-]+)["'][^>]*>/g;
 
-export type Entry = { body: string; data: { tags?: string[] } };
+export type Entry = { body: string; data: { tags?: string[]; themes?: string[] } };
 
 /** Slug -> occurrence count, for one body. */
 export function countThemes(body: string): Map<string, number> {
   const out = new Map<string, number>();
   for (const m of body.matchAll(TAG)) {
     out.set(m[1], (out.get(m[1]) ?? 0) + 1);
+  }
+  return out;
+}
+
+/**
+ * Everything a piece is about: inline <T> markers plus themes declared in
+ * frontmatter. Notes are too short to mark up inline, and some longer pieces are
+ * about a theme whose word never appears in the prose, so a marker has nothing
+ * to attach to. A declared theme counts once; an inline marker counts per use.
+ */
+export function themesFor(entry: Entry): Map<string, number> {
+  const out = countThemes(entry.body);
+  for (const slug of entry.data.themes ?? []) {
+    if (!THEMES[slug]) {
+      throw new Error(
+        `Unknown theme "${slug}" in frontmatter. ` +
+        `Add it to src/data/themes.ts or fix the slug. ` +
+        `Known: ${Object.keys(THEMES).join(", ")}`,
+      );
+    }
+    if (!out.has(slug)) out.set(slug, 1);
   }
   return out;
 }
@@ -41,7 +62,7 @@ export function buildIndex<T extends Entry>(
 
   for (const { entry, areas } of entries) {
     if (isArchived(entry)) continue;                 // archived pieces leave the map
-    for (const [slug, n] of countThemes(entry.body)) {
+    for (const [slug, n] of themesFor(entry)) {
       if (!THEMES[slug]) continue;                   // T.astro already threw; belt and braces
       const cur = acc.get(slug) ?? { count: 0, pieces: 0, blend: { fin: 0, da: 0, tech: 0, side: 0 } };
       cur.count += n;
