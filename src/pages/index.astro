@@ -2,6 +2,7 @@
 import Shell from "@/layouts/Shell.astro";
 import PersonSchema from "@/components/seo/PersonSchema.astro";
 import WordMap from "@/components/WordMap.astro";
+import Surface from "@/components/Surface.astro";
 import Subscribe from "@/components/Subscribe.astro";
 import { allPieces } from "@/utils/allPieces";
 import { buildIndex } from "@/utils/themeIndex";
@@ -24,6 +25,10 @@ const desc =
 
   <!-- 1 · the opening -->
   <section class="hero">
+    <Surface />
+    <!-- scrim: guarantees copy contrast no matter where the surface flows -->
+    <div class="scrim" aria-hidden="true"></div>
+    <div class="hero-copy">
     <p class="kicker">Hi — I'm</p>
     <h1>Siddhant Shah</h1>
     <p class="line">
@@ -31,6 +36,7 @@ const desc =
       businesses are actually worth, and my evenings <em>explaining hard things</em>
       — mostly about money, occasionally about Greek vases.
     </p>
+    </div>
     <div class="scroll-cue" aria-hidden="true"><span></span></div>
   </section>
 
@@ -100,7 +106,18 @@ const desc =
 <style>
   .hero{
     min-height:100svh;display:flex;flex-direction:column;justify-content:center;
-    padding:0 clamp(18px,6vw,80px);max-width:1180px;margin:0 auto;position:relative;
+    padding:0 clamp(18px,6vw,80px);margin:0 auto;position:relative;isolation:isolate;
+  }
+  .hero-copy{position:relative;z-index:2;max-width:1180px;margin:0 auto;width:100%}
+  .scrim{
+    position:absolute;inset:0;z-index:1;pointer-events:none;
+    background:linear-gradient(103deg,
+      rgba(5,12,15,.90) 0%, rgba(5,12,15,.72) 26%,
+      rgba(5,12,15,.34) 48%, transparent 66%);
+  }
+  @media(max-width:760px){
+    .scrim{background:linear-gradient(180deg,
+      rgba(5,12,15,.88) 0%, rgba(5,12,15,.66) 46%, rgba(5,12,15,.22) 72%, transparent 100%)}
   }
   .kicker{
     font-family:var(--sans);font-size:12px;letter-spacing:.24em;text-transform:uppercase;
