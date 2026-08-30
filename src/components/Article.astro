@@ -108,6 +108,8 @@ const lift = ([r, g, b]: [number, number, number], k = 0.3): string =>
       <nav id="tocNav"></nav>
     </details>
 
+    {entry.data.demonstrative && <div class="col"><Disclosure variant="exercise" /></div>}
+
     <div class="prose col" id="prose">
       <Content components={{ T }} />
     </div>

@@ -7,7 +7,7 @@ import Subscribe from "@/components/Subscribe.astro";
 import Disclosure from "@/components/Disclosure.astro";
 import { allPieces } from "@/utils/allPieces";
 import { buildIndex } from "@/utils/themeIndex";
-import { getFeed } from "@/utils/feed";
+import { getFeed, fmtDate, excerpt } from "@/utils/feed";
 import presentation from "@/data/presentation";
 
 const pieces = await allPieces();
@@ -82,10 +82,14 @@ const desc =
       {latest.map((f) => (
         <li>
           <a href={f.href}>
-            <span class="pt">{f.title}</span>
-            {f.children?.length
-              ? <span class="pd">{f.children.length}-part series · {f.description}</span>
-              : f.description && <span class="pd">{f.description}</span>}
+            <span class="pm">
+              <span>{fmtDate(f.date)}</span>
+              {f.kind === "note" && <span class="tag">note</span>}
+              {f.children?.length ? <span class="tag">{f.children.length}-part series</span> : null}
+            </span>
+            {/* a note has no headline by design — show the thought itself */}
+            <span class="pt">{f.title ?? excerpt(f.body, 110)}</span>
+            {f.kind !== "note" && f.description && <span class="pd">{f.description}</span>}
           </a>
         </li>
       ))}
@@ -199,6 +203,16 @@ const desc =
   }
   .posts a:hover{padding-left:14px}
   .pt{font-size:clamp(19px,2.1vw,25px);color:var(--text);line-height:1.24}
+  .pm{
+    font-family:var(--sans);font-size:clamp(11.5px,1.1vw,12.5px);color:var(--text-3);
+    letter-spacing:.09em;text-transform:uppercase;
+    display:flex;flex-wrap:wrap;gap:6px 12px;align-items:center;
+  }
+  .pm .tag{
+    color:var(--peacock);border:1px solid color-mix(in srgb, var(--peacock) 42%, transparent);
+    border-radius:999px;padding:2px 9px;letter-spacing:.1em;
+  }
+  li:has(.tag) .pt{font-size:clamp(17px,1.8vw,21px);color:var(--text-2)}
   .pd{font-family:var(--sans);font-size:14px;color:var(--text-3);max-width:74ch;line-height:1.55}
   .posts a:hover .pt{color:var(--glow)}
 
