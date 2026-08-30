@@ -56,6 +56,10 @@ export async function getStaticPaths() {
 
 const { entry, seriesArticles, parentSeries, prevArticle, nextArticle, seriesName } = Astro.props;
 const stats = estimateReadingTime(entry.body);
+// A post marked isHidden is kept out of the feed and the RSS, but its page is
+// still emitted so existing links keep working. It must not be advertised:
+// without this it was submitted in the sitemap as index,follow.
+const hidden = entry.data.isHidden === true;
 const { Content } = await entry.render();
 
 // Build SEO props from frontmatter
@@ -64,6 +68,7 @@ const canonicalUrl = entry.data.canonical || `/blog/${entrySlug}/`;
 const ogImage = entry.data.ogImage || '/social-prev.png';
 ---
 <Shell
+  noindex={hidden}
   title={entry.data.title + ' | Siddhant Shah'}
   description={entry.data.description}
   canonical={canonicalUrl}

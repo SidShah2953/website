@@ -4,7 +4,7 @@
  * Position is barycentric across four fixed area anchors, colour is blended in
  * the same ratio — so hue and position always agree.
  */
-import { AREAS, type AreaId } from "@/data/themes";
+import { AREAS, displayLabel, type AreaId } from "@/data/themes";
 import type { ThemeStat } from "@/utils/themeIndex";
 interface Props { themes: ThemeStat[] }
 const { themes } = Astro.props;
@@ -132,9 +132,9 @@ const laid = placed.map((p, i) => ({
     <a class="term" href={`/themes/${t.slug}/`}
       data-ph={t.phase} data-amp={t.amp} data-rank={t.rank}
       style={`left:${t.left.toFixed(3)}%;top:${t.top.toFixed(3)}%;color:rgb(${t.rgb.join(",")});--s:${t.size.toFixed(1)};font-weight:${t.weight};text-shadow:0 0 ${Math.round(t.size * .6)}px rgba(${t.rgb.join(",")},.28)`}
-      data-label={t.label}
+      data-label={displayLabel(t.label)}
       data-meta={`${(Object.keys(AREAS) as AreaId[]).filter((a) => (t.blend[a] ?? 0) > .02).map((a) => `${AREAS[a].label} ${Math.round((t.blend[a] ?? 0) * 100)}%`).join("  ·  ")} — ${t.count} mention${t.count === 1 ? "" : "s"} across ${t.pieces} piece${t.pieces === 1 ? "" : "s"}`}
-    >{t.label}</a>
+    >{displayLabel(t.label)}</a>
   ))}
 </div>
 

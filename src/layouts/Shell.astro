@@ -293,7 +293,12 @@ const nav = [
       .prose table{ display:block;overflow-x:auto;max-width:100%;border-collapse:collapse;font-size:.92em; }
       .prose th,.prose td{ border-bottom:1px solid var(--rule);padding:.55em .8em;text-align:left;white-space:nowrap; }
       .prose .katex-display{ overflow-x:auto;overflow-y:hidden;padding-block:.4em;max-width:100%; }
-      .prose .katex{ max-width:100%; }
+      /* KaTeX's stylesheet sets .katex{font-size:1.21em}, which made every
+         formula 21% larger than the sentence around it (20.04px against 16.56px).
+         1.06 keeps maths optically level with the text without shrinking it. */
+      .prose .katex{ max-width:100%;font-size:1.06em; }
+      .prose .katex-display{ font-size:1.1em; }
+      .prose .katex-display > .katex{ font-size:1em; }
       /* inline maths can still be wider than a phone column — let it scroll */
       .prose :where(.katex-display) > .katex{ white-space:nowrap; }
       .prose mjx-container,.prose .katex-html{ max-width:100%;overflow-x:auto; }

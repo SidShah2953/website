@@ -2,6 +2,22 @@ import { defineConfig } from "astro/config";
 import sitemap from "@astrojs/sitemap";
 import robotsTxt from "astro-robots-txt";
 import { SITE_URL } from "./src/data/config";
+import { readdirSync, readFileSync } from "node:fs";
+
+// Posts flagged isHidden are deliberately unlisted; keep them out of the sitemap.
+const HIDDEN = (() => {
+  const out = [];
+  const walk = (dir) => {
+    for (const e of readdirSync(dir, { withFileTypes: true })) {
+      const p = `${dir}/${e.name}`;
+      if (e.isDirectory()) walk(p);
+      else if (/\.mdx?$/.test(e.name) && /^isHidden:\s*true/m.test(readFileSync(p, "utf8")))
+        out.push(e.name.replace(/\.mdx?$/, "").toLowerCase());
+    }
+  };
+  walk("./src/content/blog");
+  return out;
+})();
 
 import mdx from "@astrojs/mdx";
 // For Latex Integration
@@ -36,6 +52,7 @@ export default defineConfig({
       // submitting them just asks Google to crawl pages we tell it to ignore.
       filter: (page) =>
         !page.includes("/posts/") &&
+        !HIDDEN.some((slug) => page.includes(`/blog/${slug}/`)) &&
         !page.includes("/private/") &&
         !/\/(experience|education)\/?$/.test(new URL(page).pathname),
     }),

@@ -1,7 +1,7 @@
 ---
 import Shell from "@/layouts/Shell.astro";
 import BreadcrumbSchema from "@/components/seo/BreadcrumbSchema.astro";
-import { AREAS, THEMES, type AreaId } from "@/data/themes";
+import { AREAS, THEMES, displayLabel, type AreaId } from "@/data/themes";
 import { allPieces } from "@/utils/allPieces";
 import { buildIndex } from "@/utils/themeIndex";
 
@@ -34,7 +34,7 @@ const total = index.reduce((n, t) => n + t.pieces, 0);
             {g.themes.map((t) => (
               <li>
                 <a href={`/themes/${t.slug}/`} style={`--ac: rgb(${t.rgb.join(",")})`}>
-                  <span class="n">{t.label}</span>
+                  <span class="n">{displayLabel(t.label)}</span>
                   <span class="c">{t.pieces} {t.pieces === 1 ? "piece" : "pieces"}</span>
                 </a>
               </li>

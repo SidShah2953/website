@@ -12,7 +12,7 @@
 import type { CollectionEntry } from "astro:content";
 import { marked } from "marked";
 import T from "@/components/T.astro";
-import { THEMES, AREAS } from "@/data/themes";
+import { THEMES, AREAS, displayLabel } from "@/data/themes";
 import { countThemes } from "@/utils/themeIndex";
 import { fmtDate, readingMinutes } from "@/utils/feed";
 import Disclosure from "@/components/Disclosure.astro";
@@ -89,7 +89,7 @@ const lift = ([r, g, b]: [number, number, number], k = 0.3): string =>
         {themes.map(([s]) => (
           <a href={`/themes/${s}/`}
             style={`--tc: rgb(${AREAS[THEMES[s].area].rgb.join(",")}); --tct: ${lift(AREAS[THEMES[s].area].rgb)}`}>
-            {THEMES[s].label}
+            {displayLabel(THEMES[s].label)}
           </a>
         ))}
       </p>
