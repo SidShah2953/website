@@ -13,7 +13,7 @@ import type { CollectionEntry } from "astro:content";
 import { marked } from "marked";
 import T from "@/components/T.astro";
 import { THEMES, AREAS, displayLabel } from "@/data/themes";
-import { countThemes } from "@/utils/themeIndex";
+import { themesFor } from "@/utils/themeIndex";
 import { fmtDate, readingMinutes } from "@/utils/feed";
 import Disclosure from "@/components/Disclosure.astro";
 
@@ -51,7 +51,7 @@ const FINANCIAL = new Set(["accounting","valuation","unit-economics","market-str
   "tokenization","stablecoins","staking","onchain-infrastructure",
   "crypto-market-structure","composability","defi"]);
 
-const themes = [...countThemes(entry.body)]
+const themes = [...themesFor(entry)]
   .filter(([s]) => THEMES[s])
   .sort((a, b) => b[1] - a[1]);
 

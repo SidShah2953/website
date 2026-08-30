@@ -5,7 +5,7 @@ import Article from '@/components/Article.astro';
 import ArticleSchema from '@/components/seo/ArticleSchema.astro';
 import BreadcrumbSchema from '@/components/seo/BreadcrumbSchema.astro';
 import { estimateReadingTime } from '@/utils/estimateReadingTime';
-import { countThemes } from '@/utils/themeIndex';
+import { themesFor } from '@/utils/themeIndex';
 import { THEMES, displayLabel } from '@/data/themes';
 
 export async function getStaticPaths() {
@@ -62,7 +62,7 @@ const stats = estimateReadingTime(entry.body);
 // use. The legacy frontmatter tags said "Crypto, Finance" on a page whose chip
 // read "Derivatives" — two vocabularies describing one piece.
 const keywordsFromThemes = [
-  ...new Set([...countThemes(entry.body)].map(([s]) => THEMES[s]?.label).filter(Boolean)),
+  ...new Set([...themesFor(entry)].map(([s]) => THEMES[s]?.label).filter(Boolean)),
 ].map(displayLabel);
 // A post marked isHidden is kept out of the feed and the RSS, but its page is
 // still emitted so existing links keep working. It must not be advertised:
