@@ -1,0 +1,57 @@
+---
+/**
+ * Inline theme marker. Written directly in MDX body copy:
+ *
+ *   ...the whole idea rests on <T k="composability">composability</T>, which...
+ *
+ * `k` is the canonical slug from src/data/themes.ts; the children are whatever
+ * reads naturally in the sentence, so grammar is never bent to fit a tag.
+ * Renders as a quiet clickable link through to the filtered theme view.
+ *
+ * An unknown slug throws at build time — that's deliberate. It's the guard that
+ * keeps the vocabulary from silently drifting as pieces get written.
+ */
+import { THEMES, AREAS } from "@/data/themes";
+
+interface Props { k: string }
+const { k } = Astro.props;
+
+const theme = THEMES[k];
+if (!theme) {
+  throw new Error(
+    `<T k="${k}"> is not in the theme vocabulary. ` +
+    `Add it to src/data/themes.ts or fix the slug. ` +
+    `Known: ${Object.keys(THEMES).join(", ")}`
+  );
+}
+const rgb = AREAS[theme.area].rgb.join(",");
+---
+<a
+  href={`/themes/${k}/`}
+  class="theme-tag"
+  style={`--tc: rgb(${rgb})`}
+  data-theme={k}
+  title={`${theme.label} — ${AREAS[theme.area].label}`}
+><slot /></a>
+
+<style>
+  .theme-tag {
+    color: inherit;
+    text-decoration: none;
+    background-image: linear-gradient(var(--tc), var(--tc));
+    background-repeat: no-repeat;
+    background-position: 0 100%;
+    background-size: 100% 1px;
+    padding-bottom: 1px;
+    transition: background-size .28s cubic-bezier(.2,.7,.3,1), color .28s;
+  }
+  .theme-tag:hover,
+  .theme-tag:focus-visible {
+    color: var(--tc);
+    background-size: 100% 100%;
+    background-image: linear-gradient(color-mix(in srgb, var(--tc) 16%, transparent),
+                                      color-mix(in srgb, var(--tc) 16%, transparent));
+    outline: none;
+  }
+  .theme-tag:focus-visible { box-shadow: 0 0 0 2px var(--tc); border-radius: 3px; }
+</style>

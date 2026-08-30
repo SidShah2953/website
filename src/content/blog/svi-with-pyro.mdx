@@ -17,7 +17,7 @@ import img6 from '/src/assets/posts/svi-with-pyro/Image-6.png';
 
 We show that geography, through its impact on history, can have important effects on current economic development. The analysis focuses on the historic interaction between ruggedness and Africa's slave trades. Although rugged terrain hinders trade and most productive activities, negatively affecting income globally, within Africa rugged terrain afforded protection to those being raided during the slave trades. Since the slave trades retarded subsequent economic development, within Africa ruggedness has also had a historic indirect positive effect on income. Studying all countries worldwide, we estimate the differential effect of ruggedness on income for Africa. We show that:
 
-- the differential effect of ruggedness is statistically significant and economically meaningful,
+- the differential effect of ruggedness is <T k="statistics">statistically</T> significant and economically meaningful,
 - it is found in Africa only,
 - it cannot be explained by other factors like Africa's unique geographic environment, and
 - it is fully accounted for by the history of the slave trades.
@@ -105,7 +105,7 @@ This displays a somewhat superficial claim that there is indeed a possible relat
 
 ## Our Mathematical Model
 
-We will now be implementing a Bayesian Regression Model.
+We will now be implementing a <T k="bayesian-inference">Bayesian</T> Regression Model.
 
 Our initial hypothesis is that ruggedness has an effect on current income that is the same for all parts of the world. This relationship can be written
 
@@ -120,7 +120,7 @@ $$
 - $r_i$ is our measure of ruggedness,
 - $q_i$ is a measure of the efficiency or quality of the organisation of society,
 - $κ_1$, $\alpha $ and $β$ are constants ($\alpha  > 0$ and $β > 0$),
-- and $e_i$ is a classical error term (i.e., we assume that the $e_i$'s are independent and identically distributed, following a normal distribution with an expectation of zero).
+- and $e_i$ is a classical error term (i.e., we assume that the $e_i$'s are independent and identically distributed, following a normal <T k="statistics">distribution</T> with an expectation of zero).
 
 In equation $(1)$, we assume that the common impact of ruggedness on income is negative. This is not important for the exposition. It simply anticipates our empirical findings of a negative common effect of ruggedness.
 
@@ -190,7 +190,7 @@ Through out the mathematical references in this document, these notations will r
 - $\theta \in \mathbb R^n (n \geq 1)$ - The vector of learnable parameters.
   As the latent variables are represented by probability distributions, the learnable parameters are the parameters of these probability distributions.
 
-Now that we have specified a model, Bayes' rule tells us how to use it to perform inference, or draw conclusions about latent variables from data: compute the **posterior distribution** over $\textbf{z}$:
+Now that we have specified a model, Bayes' rule tells us how to use it to perform inference, or draw conclusions about latent variables from data: compute the **posterior <T k="statistics">distribution</T>** over $\textbf{z}$:
 
 $$
 p_\theta(\textbf{z} \mid \textbf{x}) = \frac{p_\theta(\textbf{x}, \textbf{z})}{\int d\textbf{z} \quad p_\theta(\textbf{x}, \textbf{z})}
@@ -222,7 +222,7 @@ $$
 
 Each of these computations (the posterior distribution, the marginal likelihood and the posterior predictive distribution) requires performing integrals that are often impossible or computationally intractable.
 
-While Pyro includes support for many different exact and approximate inference algorithms, the best-supported is variational inference, which offers a unified scheme for finding $\theta_{max}$ and computing a tractable approximation $q_\phi(\textbf{z})$ to the true, unknown posterior $p_{\theta_{max}}(\textbf{z} \mid \textbf{x})$ by converting the intractable integrals into optimization of a functional of $p$ and $q$.
+While Pyro includes support for many different exact and approximate inference algorithms, the best-supported is <T k="bayesian-inference">variational inference</T>, which offers a unified scheme for finding $\theta_{max}$ and computing a tractable approximation $q_\phi(\textbf{z})$ to the true, unknown posterior $p_{\theta_{max}}(\textbf{z} \mid \textbf{x})$ by converting the intractable integrals into optimization of a functional of $p$ and $q$.
 
 This distribution $q_\phi$ is called the variational distribution in much of the literature, and in the context of Pyro it's called the **_guide._**
 
@@ -263,7 +263,7 @@ pyro.render_model(auto_guide,
 
 ### ELBO Minimisation
 
-Variational inference approximates the true posterior by searching the space of variational distributions to find one that is most similar to the true posterior according to some measure of distance or divergence (Kullback-Leibler divergence $KL(q_\phi(\textbf{z})|| p_{\theta_{max}}(\textbf z \mid \textbf x))$), but computing this directly requires knowing the true posterior ahead of time, which would defeat the purpose.
+<T k="bayesian-inference">Variational inference</T> approximates the true posterior by searching the space of variational distributions to find one that is most similar to the true posterior according to some measure of distance or divergence (Kullback-Leibler divergence $KL(q_\phi(\textbf{z})|| p_{\theta_{max}}(\textbf z \mid \textbf x))$), but computing this directly requires knowing the true posterior ahead of time, which would defeat the purpose.
 
 We are interested in optimising this divergence, which might sound even harder, but in fact it is possible to use Bayes' theorem to rewrite the definition of $KL(q_\phi(\textbf{z})|| p_{\theta_{max}}(\textbf z \mid \textbf x))$ as the difference between an intractable constant that does not depend on $q_\phi$ and a tractable term called the **evidence lower bound (ELBO)**, defined below. Maximising this tractable term will therefore produce the same solution as minimising the original $KL$-divergence.
 

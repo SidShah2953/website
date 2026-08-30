@@ -1,0 +1,119 @@
+---
+/**
+ * The word map. Terms come from inline <T k="..."> markers in the writing.
+ * Position is barycentric across four fixed area anchors, colour is blended in
+ * the same ratio — so hue and position always agree.
+ */
+import { AREAS, type AreaId } from "@/data/themes";
+import type { ThemeStat } from "@/utils/themeIndex";
+interface Props { themes: ThemeStat[] }
+const { themes } = Astro.props;
+
+const ANCHOR: Record<AreaId, { x: number; y: number }> = {
+  fin: { x: .19, y: .23 }, da: { x: .81, y: .23 },
+  tech: { x: .81, y: .80 }, craft: { x: .19, y: .80 },
+};
+const counts = themes.map((t) => t.count);
+const lo = Math.min(...counts, 1), hi = Math.max(...counts, 1);
+
+const placed = themes.map((t, i) => {
+  let x = 0, y = 0, tot = 0;
+  for (const a of Object.keys(ANCHOR) as AreaId[]) {
+    const w = t.blend[a] ?? 0; if (!w) continue;
+    x += ANCHOR[a].x * w; y += ANCHOR[a].y * w; tot += w;
+  }
+  x /= tot || 1; y /= tot || 1;
+  const k = Math.pow((t.count - lo) / (hi - lo || 1), .45);
+  const ang = i * 2.39996, rad = .022 + (i % 6) * .012;
+  return {
+    ...t,
+    x: Math.min(.93, Math.max(.07, x + Math.cos(ang) * rad * 1.6)),
+    y: Math.min(.90, Math.max(.10, y + Math.sin(ang) * rad)),
+    size: 15 + k * 27,
+    weight: k > .66 ? 400 : k > .34 ? 300 : 200,
+    phase: i * 0.73,
+    amp: 2.2 + (i % 5) * 0.8,
+  };
+});
+---
+<div class="wm" id="wm">
+  {(Object.keys(AREAS) as AreaId[]).map((a) => (
+    <span class="anchor" data-area={a}
+      style={`left:${ANCHOR[a].x * 100}%;top:${ANCHOR[a].y * 100}%;color:rgb(${AREAS[a].rgb.join(",")})`}>
+      <i style={`background:rgb(${AREAS[a].rgb.join(",")});box-shadow:0 0 24px rgb(${AREAS[a].rgb.join(",")})`}></i>
+      {AREAS[a].label}
+    </span>
+  ))}
+  {placed.map((t) => (
+    <a class="term" href={`/themes/${t.slug}/`}
+      data-ph={t.phase} data-amp={t.amp}
+      style={`left:${t.x * 100}%;top:${t.y * 100}%;color:rgb(${t.rgb.join(",")});font-size:${t.size.toFixed(1)}px;font-weight:${t.weight};text-shadow:0 0 ${Math.round(t.size * .8)}px rgba(${t.rgb.join(",")},.28)`}
+      data-label={t.label}
+      data-meta={`${(Object.keys(AREAS) as AreaId[]).filter((a) => (t.blend[a] ?? 0) > .02).map((a) => `${AREAS[a].label} ${Math.round((t.blend[a] ?? 0) * 100)}%`).join("  ·  ")} — ${t.count} mention${t.count === 1 ? "" : "s"} across ${t.pieces} piece${t.pieces === 1 ? "" : "s"}`}
+    >{t.label}</a>
+  ))}
+  <div class="readout" id="wmr" role="status" aria-live="polite"></div>
+</div>
+
+<style>
+  .wm{
+    position:relative;width:100%;aspect-ratio:16/10;min-height:420px;
+    border-radius:26px;overflow:hidden;
+    background:radial-gradient(88% 78% at 50% 46%,rgba(23,145,158,.09),transparent 72%);
+  }
+  .anchor{
+    position:absolute;translate:-50% -50%;text-align:center;pointer-events:none;
+    font-family:var(--sans);font-size:10.5px;font-weight:500;letter-spacing:.2em;
+    text-transform:uppercase;opacity:.48;transition:opacity .4s;
+  }
+  .anchor i{display:block;width:6px;height:6px;border-radius:50%;margin:0 auto 8px}
+  .term{
+    position:absolute;translate:-50% -50%;white-space:nowrap;text-decoration:none;
+    font-family:var(--serif);letter-spacing:-.01em;
+    transition:filter .3s,opacity .45s;will-change:transform;
+  }
+  .term:hover,.term:focus-visible{
+    filter:brightness(1.5) drop-shadow(0 0 20px currentColor);z-index:9;outline:none;
+  }
+  .readout{
+    position:absolute;left:50%;bottom:16px;translate:-50% 0;text-align:center;
+    pointer-events:none;opacity:0;transition:opacity .25s;max-width:88%;
+  }
+  .readout.on{opacity:1}
+  .readout b{display:block;font-size:19px;font-weight:400;color:var(--text)}
+  .readout span{font-family:var(--sans);font-size:11.5px;color:var(--text-3);letter-spacing:.03em}
+  @media (prefers-reduced-motion:reduce){.term{transition:opacity .2s}}
+</style>
+
+<script>
+  const wm = document.getElementById('wm');
+  const out = document.getElementById('wmr');
+  if (wm && out) {
+    const terms = [...wm.querySelectorAll<HTMLElement>('.term')];
+    for (const t of terms) {
+      const show = () => {
+        out.innerHTML = `<b>${t.dataset.label}</b><span>${t.dataset.meta}</span>`;
+        out.classList.add('on');
+      };
+      const hide = () => out.classList.remove('on');
+      t.addEventListener('pointerenter', show);
+      t.addEventListener('pointerleave', hide);
+      t.addEventListener('focus', show);
+      t.addEventListener('blur', hide);
+    }
+    if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      const t0 = performance.now();
+      const drift = (now: number) => {
+        const s = (now - t0) / 1000;
+        for (const t of terms) {
+          const ph = +(t.dataset.ph || 0), amp = +(t.dataset.amp || 2);
+          const dx = Math.sin(s * .17 + ph) * amp;
+          const dy = Math.cos(s * .14 + ph * 1.3) * amp * .8;
+          t.style.transform = `translate(${dx.toFixed(2)}px,${dy.toFixed(2)}px)`;
+        }
+        requestAnimationFrame(drift);
+      };
+      requestAnimationFrame(drift);
+    }
+  }
+</script>
