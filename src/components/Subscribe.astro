@@ -34,22 +34,22 @@ const ready = Boolean(action);
   .note{font-family:var(--sans);font-size:13.5px;color:var(--text-3);margin:0}
   .row{display:flex;gap:9px;flex-wrap:wrap;margin-top:6px}
   input{
-    flex:1 1 220px;background:rgba(255,255,255,.04);border:1px solid var(--rule);
+    flex:1 1 220px;background:var(--surface-2);border:1px solid var(--rule);
     border-radius:999px;padding:13px 20px;color:var(--text);
     font-family:var(--sans);font-size:14.5px;transition:border-color .3s,background .3s;
   }
   input::placeholder{color:var(--text-3)}
-  input:focus{outline:none;border-color:var(--peacock);background:rgba(255,255,255,.06)}
+  input:focus{outline:none;border-color:var(--peacock);background:var(--surface-3)}
   input:disabled{opacity:.5}
   button{
     border:0;border-radius:999px;padding:13px 26px;cursor:pointer;
-    font-family:var(--sans);font-size:14.5px;font-weight:500;color:#04171B;
+    font-family:var(--sans);font-size:14.5px;font-weight:500;color:var(--on-accent);
     background:linear-gradient(102deg,var(--glow),var(--peacock) 55%,var(--azure));
     background-size:200% 100%;transition:background-position .5s,opacity .3s;
   }
   button:hover:not(:disabled){background-position:100% 0}
   button:disabled{opacity:.4;cursor:not-allowed}
-  .warn{font-family:var(--sans);font-size:12.5px;color:#E0A88F;margin:2px 0 0}
-  code{font-family:ui-monospace,monospace;font-size:12px;background:rgba(255,255,255,.07);padding:2px 6px;border-radius:4px}
+  .warn{font-family:var(--sans);font-size:12.5px;color:var(--warn);margin:2px 0 0}
+  code{font-family:ui-monospace,monospace;font-size:12px;background:var(--surface-3);padding:2px 6px;border-radius:4px}
   .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 </style>

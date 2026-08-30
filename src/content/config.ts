@@ -57,6 +57,7 @@ const research = defineCollection({
     tags: z.array(z.string()).default([]),
     isPublished: z.boolean().default(true),
     thesis: z.string().optional(),
+    themes: z.array(z.string()).default([]),
   }),
 });
 
