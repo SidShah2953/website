@@ -21,7 +21,7 @@ const { href, title } = Astro.props;
   .deep{
     display:flex;align-items:center;gap:clamp(12px,1.6vw,16px);
     margin:clamp(22px,3vw,32px) 0;padding:clamp(13px,1.6vw,16px) clamp(15px,1.8vw,18px);
-    border:1px solid var(--rule);border-radius:14px;text-decoration:none;
+    border:1px solid var(--rule);border-radius:var(--r-md);text-decoration:none;
     background:var(--surface-1);
     transition:border-color .3s, background .3s, transform .3s cubic-bezier(.2,.7,.3,1);
   }
@@ -30,7 +30,7 @@ const { href, title } = Astro.props;
     background:var(--peacock-wash);transform:translateY(-2px);
   }
   .ic{
-    flex:none;width:34px;height:34px;display:grid;place-items:center;border-radius:10px;
+    flex:none;width:34px;height:34px;display:grid;place-items:center;border-radius:var(--r-sm);
     border:1px solid color-mix(in srgb, var(--peacock) 40%, transparent);
     color:var(--glow);background:var(--peacock-wash);
   }

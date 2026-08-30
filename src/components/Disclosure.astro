@@ -65,7 +65,7 @@ const year = new Date().getFullYear();
   }
   .disclosure{
     margin-top:clamp(40px,6vw,72px);padding:clamp(18px,2.4vw,26px);
-    border:1px solid var(--rule);border-radius:16px;
+    border:1px solid var(--rule);border-radius:var(--r-md);
     border-left:2px solid var(--peacock);
     background:var(--surface-1);
     scroll-margin-top:calc(var(--hdr-h) + 20px);
@@ -90,7 +90,7 @@ const year = new Date().getFullYear();
   .exercise{
     margin:0 0 clamp(24px,3.4vw,36px);padding:clamp(16px,2.2vw,22px);
     border:1px solid color-mix(in srgb, var(--peacock) 40%, transparent);
-    border-left:2px solid var(--peacock);border-radius:14px;
+    border-left:2px solid var(--peacock);border-radius:var(--r-md);
     background:var(--peacock-wash);
   }
   .exercise .h{

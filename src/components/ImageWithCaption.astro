@@ -12,7 +12,7 @@ const { src, alt, caption, class: className, ...rest } = Astro.props;
 <style>
   .fig{ margin:clamp(28px,4vw,44px) 0;display:grid;gap:12px; }
   .fig :global(img){
-    width:100%;height:auto;display:block;border-radius:14px;
+    width:100%;height:auto;display:block;border-radius:var(--r-md);
     border:1px solid var(--rule);
   }
   figcaption{
