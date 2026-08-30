@@ -41,6 +41,10 @@ jobs:
         uses: withastro/action@v3
         with:
           node-version: 24
+        env:
+          # Repository variable, not a secret — it ends up in the built HTML
+          # anyway as the form's action URL.
+          PUBLIC_NEWSLETTER_ACTION: ${{ vars.PUBLIC_NEWSLETTER_ACTION }}
 
   deploy:
     needs: build
