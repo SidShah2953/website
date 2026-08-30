@@ -5,8 +5,56 @@ import type { HeadTags } from "@/utils/types/HeadTags";
 // Self-hosted variable fonts — no third-party request, one file per family.
 import "@fontsource-variable/newsreader";
 import "@fontsource-variable/schibsted-grotesk";
-export type Props = HeadTags & { transparentHeader?: boolean; snap?: boolean };
-const { transparentHeader = false, snap = false, ...headTags } = Astro.props;
+export type Props = HeadTags & {
+  transparentHeader?: boolean;
+  snap?: boolean;
+  /**
+   * "surface" — the raymarched hero graphic. Homepage only.
+   * "lines"   — flow lines: the same field the surface is built from, drawn as
+   *             still contours instead of lit geometry. Same mathematics, far
+   *             quieter, so the text stays the subject. This is the default.
+   */
+  atmosphere?: "surface" | "lines" | "none";
+};
+const { transparentHeader = false, snap = false, atmosphere = "lines", ...headTags } = Astro.props;
+
+/* ---------------------------------------------------------------------------
+   Flow lines, generated once at build time. These trace the same value-noise
+   field the hero shader displaces, so the interior pages read as a contour map
+   of the landing page rather than a different idea. Deterministic, no runtime
+   JS, and it ships as a few hundred bytes of path data.
+--------------------------------------------------------------------------- */
+const LW = 1200, LH = 900, ROWS = 15, STEP = 24;
+
+const h2 = (x: number, y: number) => {
+  const n = Math.sin(x * 127.1 + y * 311.7) * 43758.5453;
+  return n - Math.floor(n);
+};
+const smooth = (t: number) => t * t * (3 - 2 * t);
+const vnoise = (x: number, y: number) => {
+  const xi = Math.floor(x), yi = Math.floor(y);
+  const xf = smooth(x - xi), yf = smooth(y - yi);
+  const a = h2(xi, yi), b = h2(xi + 1, yi), c = h2(xi, yi + 1), d = h2(xi + 1, yi + 1);
+  return (a * (1 - xf) + b * xf) * (1 - yf) + (c * (1 - xf) + d * xf) * yf;
+};
+const fbm2 = (x: number, y: number) => {
+  let v = 0, amp = 0.5, fx = x, fy = y;
+  for (let i = 0; i < 3; i++) { v += amp * vnoise(fx, fy); fx *= 1.97; fy *= 1.97; amp *= 0.5; }
+  return v;
+};
+
+const lines = Array.from({ length: ROWS }, (_, r) => {
+  const base = (LH / (ROWS - 1)) * r;
+  // amplitude swells in the middle of the page, like a wave passing through
+  const swell = 1 - Math.abs(r / (ROWS - 1) - 0.5) * 1.4;
+  const amp = 26 + 54 * Math.max(swell, 0);
+  let d = "";
+  for (let x = 0; x <= LW; x += STEP) {
+    const y = base + (fbm2(x / 320, r * 0.62) - 0.5) * 2 * amp;
+    d += `${x === 0 ? "M" : "L"}${x} ${y.toFixed(1)} `;
+  }
+  return { d: d.trim(), o: (0.13 + 0.11 * Math.max(swell, 0)).toFixed(3) };
+});
 const path = Astro.url.pathname.replace(/\/$/, "") || "/";
 const nav = [
   { href: "/", label: "Home" },
@@ -19,8 +67,27 @@ const nav = [
   <SEOTags {...headTags} />
   <slot name="head" />
   <body>
-    <!-- fluid ground: slow-drifting light, never a flat panel -->
-    <div class="sky" aria-hidden="true"><i class="s1"></i><i class="s2"></i><i class="s3"></i></div>
+    {atmosphere === "surface" && (
+      <div class="sky" aria-hidden="true"><i class="s1"></i><i class="s2"></i><i class="s3"></i></div>
+    )}
+
+    {atmosphere === "lines" && (
+      <div class="lines" aria-hidden="true">
+        <svg viewBox={`0 0 ${LW} ${LH}`} preserveAspectRatio="xMidYMid slice" focusable="false">
+          <defs>
+            <linearGradient id="lg" x1="0" y1="0" x2="1" y2="0.35">
+              <stop offset="0%" stop-color="#17919E" />
+              <stop offset="52%" stop-color="#2F6FE8" />
+              <stop offset="100%" stop-color="#6A5AD8" />
+            </linearGradient>
+          </defs>
+          {lines.map((l) => (
+            <path d={l.d} fill="none" stroke="url(#lg)" stroke-width="1.15"
+              stroke-opacity={l.o} vector-effect="non-scaling-stroke" />
+          ))}
+        </svg>
+      </div>
+    )}
 
     <header id="hdr" class={transparentHeader ? "hdr" : "hdr solid"}>
       <a class="mark" href="/"><span id="markName">Siddhant Shah</span></a>
@@ -66,6 +133,18 @@ const nav = [
       h1,h2,h3,h4{margin:0;font-weight:300;text-wrap:balance;letter-spacing:-.022em}
       a{color:inherit}
       .sky{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+
+      /* Flow lines: still, low-contrast, and behind everything. No animation —
+         interior pages are for reading, so the atmosphere holds position. */
+      .lines{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+      .lines svg{width:100%;height:100%;display:block}
+      .lines::after{
+        content:"";position:absolute;inset:0;
+        background:
+          radial-gradient(120% 78% at 50% -8%, rgba(23,145,158,.14), transparent 62%),
+          linear-gradient(180deg, rgba(5,12,15,.30) 0%, transparent 26%,
+                                  transparent 72%, rgba(5,12,15,.55) 100%);
+      }
       .sky i{position:absolute;display:block;border-radius:50%;filter:blur(80px);opacity:.55}
       .s1{width:64vw;height:64vw;left:-16vw;top:-20vw;background:radial-gradient(circle,#0E5560,transparent 68%);animation:f1 34s ease-in-out infinite}
       .s2{width:54vw;height:54vw;right:-14vw;top:12vh;background:radial-gradient(circle,#173F86,transparent 68%);animation:f2 43s ease-in-out infinite}
@@ -128,7 +207,10 @@ const nav = [
       .lede{ color:var(--text-2);font-size:clamp(16px,1.9vw,20px);max-width:62ch;margin:0 0 clamp(22px,3.4vw,40px); }
 
       /* long-form reading column */
-      .prose{ max-width:68ch;font-size:clamp(16.5px,1.15vw,18.5px);line-height:1.72; }
+      /* Never put .prose on the same element as .wrap: both set a max-width and
+         .wrap centres with auto margins, so the narrower prose box gets centred
+         inside the wider one and the body copy sits indented from its heading. */
+      .prose{ max-width:68ch;margin-inline:0;font-size:clamp(16.5px,1.15vw,18.5px);line-height:1.72; }
       .prose > * + *{ margin-top:1.15em; }
       .prose h2{ font-size:clamp(22px,3vw,30px);line-height:1.2;margin-top:2.1em; }
       .prose h3{ font-size:clamp(18.5px,2.2vw,23px);line-height:1.25;margin-top:1.8em; }

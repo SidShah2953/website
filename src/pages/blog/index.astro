@@ -4,7 +4,7 @@ import { getFeed, fmtDate, readingMinutes } from "@/utils/feed";
 import { marked } from "marked";
 
 const feed = await getFeed();
-const posts = feed.filter((f) => f.kind === "post").length;
+const posts = feed.reduce((n, f) => n + (f.kind === "post" ? 1 + (f.children?.length ?? 0) : 0), 0);
 const notes = feed.filter((f) => f.kind === "note").length;
 // notes render inline in the feed — they're too short to deserve their own click
 const inline = (md: string) => marked.parse(md.trim(), { async: false }) as string;
@@ -27,7 +27,33 @@ const inline = (md: string) => marked.parse(md.trim(), { async: false }) as stri
       <ul class="feed">
         {feed.map((f) => (
           <li>
-            {f.kind === "post" ? (
+            {f.kind === "post" && f.children?.length ? (
+              <div class="series">
+                <a class="row" href={f.href}>
+                  <span class="m">
+                    <span>{fmtDate(f.date)}</span>
+                    <span class="badge">{f.children.length}-part series</span>
+                  </span>
+                  <span class="t">{f.title}</span>
+                  {f.description && <span class="d">{f.description}</span>}
+                </a>
+                <details class="parts">
+                  <summary>
+                    <span class="open">All {f.children.length} parts</span>
+                    <span class="shut">Hide parts</span>
+                  </summary>
+                  <ol>
+                    {f.children.map((c) => (
+                      <li>
+                        <a href={c.href}>
+                          <span class="n">{c.articleNumber ?? "·"}</span>{c.title}
+                        </a>
+                      </li>
+                    ))}
+                  </ol>
+                </details>
+              </div>
+            ) : f.kind === "post" ? (
               <a class="row" href={f.href}>
                 <span class="m">
                   <span>{fmtDate(f.date)}</span>
@@ -56,6 +82,38 @@ const inline = (md: string) => marked.parse(md.trim(), { async: false }) as stri
 </Shell>
 
 <style>
+  .series .row{ padding-bottom:10px; }
+  .parts{ padding:0 0 clamp(14px,2vw,20px); }
+  .parts summary{
+    list-style:none;cursor:pointer;display:inline-flex;align-items:center;gap:7px;
+    font-family:var(--sans);font-size:13px;color:var(--peacock);
+    padding:5px 0;transition:color .25s;
+  }
+  .parts summary::-webkit-details-marker{ display:none; }
+  .parts summary::after{
+    content:"";width:6px;height:6px;border-right:1.4px solid currentColor;
+    border-bottom:1.4px solid currentColor;rotate:45deg;translate:0 -2px;
+    transition:rotate .3s cubic-bezier(.2,.7,.3,1);
+  }
+  .parts[open] summary::after{ rotate:225deg;translate:0 1px; }
+  .parts summary:hover{ color:var(--glow); }
+  .parts .shut,.parts[open] .open{ display:none; }
+  .parts[open] .shut{ display:inline; }
+  .parts ol{
+    list-style:none;margin:10px 0 0;padding:0 0 0 clamp(12px,2vw,18px);
+    border-left:1px solid var(--rule);display:grid;gap:2px;
+  }
+  .parts ol a{
+    display:grid;grid-template-columns:auto 1fr;gap:12px;align-items:baseline;
+    padding:8px 0;text-decoration:none;color:var(--text-2);
+    font-size:clamp(15px,1.5vw,16.5px);line-height:1.35;
+    transition:color .22s, padding-inline-start .3s cubic-bezier(.2,.7,.3,1);
+  }
+  .parts ol a:hover{ color:var(--glow);padding-inline-start:6px; }
+  .parts .n{
+    font-family:var(--sans);font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;
+    color:var(--text-3);min-width:4.5ch;
+  }
   .note{ padding:clamp(18px,2.4vw,26px) 0;display:grid;gap:8px; }
   .badge{
     color:var(--peacock);border:1px solid color-mix(in srgb, var(--peacock) 45%, transparent);
