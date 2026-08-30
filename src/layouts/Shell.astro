@@ -5,8 +5,8 @@ import type { HeadTags } from "@/utils/types/HeadTags";
 // Self-hosted variable fonts — no third-party request, one file per family.
 import "@fontsource-variable/newsreader";
 import "@fontsource-variable/schibsted-grotesk";
-export type Props = HeadTags & { transparentHeader?: boolean };
-const { transparentHeader = false, ...headTags } = Astro.props;
+export type Props = HeadTags & { transparentHeader?: boolean; snap?: boolean };
+const { transparentHeader = false, snap = false, ...headTags } = Astro.props;
 const path = Astro.url.pathname.replace(/\/$/, "") || "/";
 const nav = [
   { href: "/", label: "Home" },
@@ -15,7 +15,7 @@ const nav = [
 ];
 ---
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class={snap ? "snap" : undefined}>
   <SEOTags {...headTags} />
   <slot name="head" />
   <body>
@@ -109,6 +109,15 @@ const nav = [
       .disc{max-width:52ch}
       ::selection{background:rgba(62,212,224,.24)}
       :focus-visible{outline:2px solid var(--glow);outline-offset:3px}
+
+      /* Scroll snapping, homepage only. Sections are full-height slides, so a
+         reader always lands on one rather than halfway between two. Disabled on
+         short viewports and under reduced motion, where forcing a snap point
+         traps people inside content taller than their screen. */
+      html.snap{ scroll-padding-top:0; }
+      @media (min-height:640px) and (prefers-reduced-motion:no-preference){
+        html.snap{ scroll-snap-type:y mandatory; }
+      }
 
       /* scroll choreography: sections rise in, and settle out downward */
       .rise{opacity:0;transform:translateY(34px);
