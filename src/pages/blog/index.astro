@@ -1,174 +1,73 @@
 ---
-import { getCollection } from 'astro:content';
-import ContentListLayout from '@/layouts/ContentListLayout.astro';
-import ContentCard from '@/components/ContentCard.astro';
-import { estimateReadingTime } from '@/utils/estimateReadingTime';
+import Shell from "@/layouts/Shell.astro";
+import { getFeed, fmtDate, readingMinutes } from "@/utils/feed";
+import { marked } from "marked";
 
-const allBlogPosts = await getCollection('blog');
-
-// Count sub-articles per series (slug prefix = parent slug)
-const seriesArticleCounts: Record<string, number> = {};
-allBlogPosts
-  .filter(p => p.slug.includes('/'))
-  .forEach(p => {
-    const parentSlug = p.slug.split('/')[0];
-    seriesArticleCounts[parentSlug] = (seriesArticleCounts[parentSlug] ?? 0) + 1;
-  });
-
-// Derive which top-level posts are series homes
-const seriesHomeSlugs = new Set(Object.keys(seriesArticleCounts));
-
-// Blog index: top-level posts only (no sub-articles), not hidden
-const blogPosts = allBlogPosts
-  .filter(p => !p.data.isHidden && !p.slug.includes('/'))
-  .sort((a, b) => b.data.publishedAt.getTime() - a.data.publishedAt.getTime());
-
-// Inject reading time (if not stored yet)
-const enriched = blogPosts.map(p => {
-  if (!p.data.readingTimeMinutes) {
-    const stats = estimateReadingTime(p.body);
-    return { ...p, data: { ...p.data, readingTimeMinutes: stats.minutes } };
-  }
-  return p;
-});
-
-// Collect all unique tags
-const allTags = [...new Set(enriched.flatMap(p => p.data.tags))].sort();
-
-// Pass all posts to client-side for filtering
-const postsData = enriched.map(p => ({
-  slug: p.slug,
-  title: p.data.title,
-  description: p.data.description,
-  publishedAt: p.data.publishedAt.toISOString(),
-  tags: p.data.tags,
-  isSeries: seriesHomeSlugs.has(p.slug),
-  articleCount: seriesArticleCounts[p.slug] ?? 0,
-}));
+const feed = await getFeed();
+const posts = feed.filter((f) => f.kind === "post").length;
+const notes = feed.filter((f) => f.kind === "note").length;
+// notes render inline in the feed — they're too short to deserve their own click
+const inline = (md: string) => marked.parse(md.trim(), { async: false }) as string;
 ---
+<Shell title="Writing | Siddhant Shah"
+  description="Essays on finance, digital assets and technology, plus shorter notes."
+  canonical="/blog/">
+  <div class="page">
+    <div class="wrap wrap--narrow">
+      <p class="eyebrow">Writing</p>
+      <h1 class="h1">Everything, newest first.</h1>
+      <p class="lede">
+        {posts} longer {posts === 1 ? "piece" : "pieces"} and {notes} shorter
+        {notes === 1 ? "note" : "notes"}. The long ones are worth your time; the
+        short ones are me thinking out loud.
+      </p>
+    </div>
 
-<ContentListLayout
-  title="Blog"
-  pageTitle="Blog | Siddhant Shah"
-  description="Long-form posts, experiments & deeper dives into finance, tech, and quantitative analysis."
-  allTags={allTags}
-  enableTagFilter={true}
-  contentType="blog"
->
-  {enriched.map(post => (
-    <ContentCard
-      type="blog"
-      slug={post.slug}
-      title={post.data.title}
-      description={post.data.description}
-      publishedAt={post.data.publishedAt}
-      tags={post.data.tags}
-      isSeries={seriesHomeSlugs.has(post.slug)}
-      articleCount={seriesArticleCounts[post.slug]}
-    />
-  ))}
-</ContentListLayout>
+    <div class="wrap wrap--narrow">
+      <ul class="feed">
+        {feed.map((f) => (
+          <li>
+            {f.kind === "post" ? (
+              <a class="row" href={f.href}>
+                <span class="m">
+                  <span>{fmtDate(f.date)}</span>
+                  <span>{readingMinutes(f.words)} min</span>
+                </span>
+                <span class="t">{f.title}</span>
+                {f.description && <span class="d">{f.description}</span>}
+              </a>
+            ) : (
+              <article class="note">
+                <p class="m">
+                  <span>{fmtDate(f.date)}</span>
+                  <span class="badge">note</span>
+                  {f.crosspost && <a href={f.crosspost} rel="noopener">also on X ↗</a>}
+                </p>
+                {f.title && <h2 class="nt">{f.title}</h2>}
+                <div class="nb" set:html={inline(f.body)} />
+                {f.via && <p class="m"><a href={f.via} rel="noopener">source ↗</a></p>}
+              </article>
+            )}
+          </li>
+        ))}
+      </ul>
+    </div>
+  </div>
+</Shell>
 
-<script is:inline define:vars={{ postsData }}>
-  const posts = postsData;
-  const container = document.getElementById('content-container');
-  const tagMessage = document.getElementById('tag-message');
-  const noPostsMessage = document.getElementById('no-posts-message');
-  const tagFilters = document.querySelectorAll('.tag-filter');
-
-  function renderPosts(filtered, selectedTag) {
-    if (filtered.length === 0) {
-      container.classList.add('hidden');
-      noPostsMessage.classList.remove('hidden');
-      return;
-    }
-
-    container.classList.remove('hidden');
-    noPostsMessage.classList.add('hidden');
-
-    container.innerHTML = filtered.map(post => {
-      const date = new Date(post.publishedAt).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' }).replace(/\//g, '/');
-      const seriesBadge = post.isSeries
-        ? `<div class="flex items-center gap-2 mb-2">
-            <span class="inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-md bg-finance-purple/20 text-finance-purple border border-finance-purple/40 uppercase tracking-wide">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                <line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/>
-                <line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/>
-              </svg>
-              Series${post.articleCount ? ` · ${post.articleCount} parts` : ''}
-            </span>
-          </div>`
-        : '';
-      return `
-        <a class="content-card content-card--blog group glass-card-hover p-6 flex flex-col gap-3 relative overflow-hidden" href="/blog/${post.slug}" data-tags="${post.tags.join(',')}">
-          <div class="absolute inset-0 bg-gradient-to-br from-finance-cyan/0 to-finance-blue/0 group-hover:from-finance-cyan/5 group-hover:to-finance-blue/5 transition-all duration-300 rounded-2xl"></div>
-          <div class="relative z-10">
-            <div class="flex w-full items-start justify-between gap-4 flex-wrap">
-              <div class="flex-1">
-                ${seriesBadge}
-                <h2 class="font-semibold text-white group-hover:text-finance-cyan transition-colors leading-tight text-xl">${post.title}</h2>
-              </div>
-              <div class="flex flex-row items-center gap-3 text-sm text-neutral-400 shrink-0">
-                <time datetime="${post.publishedAt}">${date}</time>
-                <svg width="20" height="20" viewBox="0 0 18 18" fill="none" class="transition-all duration-300 group-hover:translate-x-1 group-hover:translate-y-[-2px] opacity-60 group-hover:opacity-100">
-                  <path d="M5.25 12.75L12.75 5.25" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
-                  <path d="M5.25 5.25H12.75V12.75" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
-                </svg>
-              </div>
-            </div>
-            <p class="text-neutral-300 leading-relaxed line-clamp-2 mt-2">${post.description}</p>
-          </div>
-        </a>
-      `;
-    }).join('');
-
-    if (selectedTag) {
-      tagMessage.innerHTML = `Showing posts tagged with <strong class="text-neutral-200">${selectedTag}</strong>`;
-      tagMessage.classList.remove('hidden');
-    } else {
-      tagMessage.classList.add('hidden');
-    }
+<style>
+  .note{ padding:clamp(18px,2.4vw,26px) 0;display:grid;gap:8px; }
+  .badge{
+    color:var(--peacock);border:1px solid color-mix(in srgb, var(--peacock) 45%, transparent);
+    border-radius:999px;padding:2px 9px;letter-spacing:.1em;
   }
-
-  function filterByTag(tag) {
-    const filtered = tag ? posts.filter(p => p.tags.includes(tag)) : posts;
-
-    // Update URL without reload
-    const url = new URL(window.location);
-    if (tag) {
-      url.searchParams.set('tag', tag);
-    } else {
-      url.searchParams.delete('tag');
-    }
-    window.history.pushState({}, '', url);
-
-    // Update button states
-    tagFilters.forEach(btn => {
-      const btnTag = btn.dataset.tag;
-      if (btnTag === tag) {
-        btn.classList.remove('bg-neutral-800', 'text-neutral-400');
-        btn.classList.add('bg-neutral-700', 'text-neutral-100');
-      } else {
-        btn.classList.remove('bg-neutral-700', 'text-neutral-100');
-        btn.classList.add('bg-neutral-800', 'text-neutral-400', 'hover:bg-neutral-700');
-      }
-    });
-
-    renderPosts(filtered, tag);
-  }
-
-  // Set up click handlers
-  tagFilters.forEach(btn => {
-    btn.addEventListener('click', () => {
-      const tag = btn.dataset.tag;
-      filterByTag(tag);
-    });
-  });
-
-  // Check URL on load
-  const urlParams = new URLSearchParams(window.location.search);
-  const initialTag = urlParams.get('tag');
-  if (initialTag) {
-    filterByTag(initialTag);
-  }
-</script>
+  .m a{ color:var(--text-3);text-decoration:none;border-bottom:1px solid transparent; }
+  .m a:hover{ color:var(--glow);border-bottom-color:currentColor; }
+  .nt{ font-size:clamp(17px,2vw,21px);line-height:1.25;margin:0; }
+  .nb{ font-size:clamp(16px,1.15vw,17.5px);line-height:1.68;color:var(--text-2);max-width:64ch; }
+  .nb :global(p){ margin:0 0 .7em; }
+  .nb :global(p:last-child){ margin-bottom:0; }
+  .nb :global(a){ color:var(--glow);text-decoration:none;border-bottom:1px solid rgba(62,212,224,.35); }
+  .nb :global(em){ font-style:italic;color:var(--text); }
+  .nb :global(strong){ color:var(--text);font-weight:500; }
+</style>

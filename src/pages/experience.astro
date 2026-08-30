@@ -1,15 +1,14 @@
 ---
-import ContentListLayout from "@/layouts/ContentListLayout.astro";
-import TimelineCard from "@/components/TimelineCard.astro";
+import Shell from "@/layouts/Shell.astro";
+import Entry from "@/components/Entry.astro";
 ---
-
-<ContentListLayout
-  title="Experience"
-  pageTitle="Experience"
-  contentType="experience"
->
-  <TimelineCard
-    type="experience"
+<Shell title="Experience | Siddhant Shah" description="Where I have worked, and what I actually did there." canonical="/experience/">
+  <div class="page">
+    <div class="wrap wrap--narrow">
+      <p class="eyebrow">Experience</p>
+      <h1 class="h1">Experience.</h1>
+      <p class="lede">Where I have worked, and what I actually did there.</p>
+      <ul class="entries"><Entry
     organization="Boston University, Department of Computer Science"
     organizationUrl="https://www.bu.edu"
     dateRange="Oct 2024 - Present"
@@ -24,8 +23,7 @@ import TimelineCard from "@/components/TimelineCard.astro";
     skills="Python, scikit-learn, Pandas, NumPy, PyTorch, TensorFlow, R, SQL, Git, Back-testing, Research"
   />
 
-  <TimelineCard
-    type="experience"
+  <Entry
     organization="Raising A Mathematician Foundation"
     organizationUrl="https://www.mathscircle.org"
     dateRange="Jul 2024 - Aug 2024"
@@ -38,8 +36,7 @@ import TimelineCard from "@/components/TimelineCard.astro";
     skills="Python, Microsoft Office (Excel, Word, PowerPoint), Jira, Confluence, Leadership"
   />
 
-  <TimelineCard
-    type="experience"
+  <Entry
     organization="Fino Payments Bank"
     organizationUrl="https://www.finobank.com"
     dateRange="May 2023 - Jul 2023"
@@ -51,8 +48,7 @@ import TimelineCard from "@/components/TimelineCard.astro";
     skills="Python (PySpark), R, SQL, Microsoft Office (Advanced Excel & VBA, Word, PowerPoint), Stakeholder Communication"
   />
 
-  <TimelineCard
-    type="experience"
+  <Entry
     organization="Greater Mumbai Science Teachers' Association"
     organizationUrl="https://www.mathscircle.org"
     dateRange="May 2023 - Jul 2023"
@@ -63,4 +59,14 @@ import TimelineCard from "@/components/TimelineCard.astro";
     ]}
     skills="Quantitative Reasoning, Data Interpretation, Scientific Communication, Leadership and Mentorship"
   />
-</ContentListLayout>
+      </ul>
+      <p class="back"><a href="/about/">← About me</a></p>
+    </div>
+  </div>
+</Shell>
+
+<style>
+  .entries{ list-style:none;margin:0;padding:0;border-top:1px solid var(--rule); }
+  .back{ margin-top:clamp(28px,4vw,48px);font-family:var(--sans);font-size:14px; }
+  .back a{ color:var(--glow);text-decoration:none; }
+</style>

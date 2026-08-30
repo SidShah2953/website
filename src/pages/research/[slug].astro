@@ -1,7 +1,7 @@
 ---
 import { getCollection, type CollectionEntry } from "astro:content";
-import Layout from "@/layouts/Layout.astro";
-import ContentPage from "@/components/ContentPage.astro";
+import Shell from "@/layouts/Shell.astro";
+import Article from "@/components/Article.astro";
 import ScholarlyArticleSchema from "@/components/seo/ScholarlyArticleSchema.astro";
 import BreadcrumbSchema from "@/components/seo/BreadcrumbSchema.astro";
 
@@ -20,7 +20,7 @@ const { entry } = Astro.props;
 const { Content } = await entry.render();
 ---
 
-<Layout
+<Shell
   title={`${entry.data.title} | Research`}
   description={entry.data.description}
   canonical={`/research/${entry.slug}/`}
@@ -54,5 +54,5 @@ const { Content } = await entry.render();
     ]}
   />
 
-  <ContentPage type="research" entry={entry} Content={Content} />
-</Layout>
+  <Article type="research" entry={entry} Content={Content} />
+</Shell>

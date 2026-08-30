@@ -1,0 +1,41 @@
+---
+import Shell from "@/layouts/Shell.astro";
+import { getCollection } from "astro:content";
+import { fmtDate } from "@/utils/feed";
+import T from "@/components/T.astro";
+
+export async function getStaticPaths() {
+  const notes = await getCollection("notes");
+  return notes.filter((n) => !n.data.isHidden).map((entry) => ({
+    params: { slug: entry.id.replace(/\.(md|mdx)$/, "").toLowerCase() },
+    props: { entry },
+  }));
+}
+const { entry } = Astro.props;
+const { Content } = await entry.render();
+---
+<Shell title={`${entry.data.title ?? "Note"} | Siddhant Shah`}
+  description={entry.body.trim().slice(0, 180)}
+  canonical={`/notes/${entry.id.replace(/\.(md|mdx)$/, "").toLowerCase()}/`}>
+  <article class="page">
+    <div class="wrap wrap--narrow">
+      <p class="eyebrow">
+        Note · {fmtDate(entry.data.publishedAt)}
+        {entry.data.crosspost && <> · <a href={entry.data.crosspost} rel="noopener">also on X ↗</a></>}
+      </p>
+      {entry.data.title && <h1 class="h2">{entry.data.title}</h1>}
+      <div class="prose"><Content components={{ T }} /></div>
+      {entry.data.via && <p class="via"><a href={entry.data.via} rel="noopener">source ↗</a></p>}
+      <p class="back"><a href="/blog/">← All writing</a></p>
+    </div>
+  </article>
+</Shell>
+
+<style>
+  .page{ padding-block: calc(var(--hdr-h) + clamp(36px,7vw,86px)) clamp(48px,9vw,110px); }
+  .eyebrow a{ color:var(--peacock);text-decoration:none; }
+  .eyebrow a:hover{ color:var(--glow); }
+  .prose{ margin-top:clamp(10px,2vw,18px); }
+  .via,.back{ font-family:var(--sans);font-size:14px;margin-top:clamp(24px,4vw,40px); }
+  .via a,.back a{ color:var(--glow);text-decoration:none; }
+</style>

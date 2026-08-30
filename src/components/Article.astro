@@ -1,0 +1,207 @@
+---
+/**
+ * The reading page for every long piece — blog, research and projects.
+ * Replaces ContentPage's glass-card layout. Keeps everything that mattered:
+ * table of contents, series navigation, the thesis block, KaTeX, Shiki, and the
+ * inline <T> theme markers injected into MDX.
+ *
+ * Every width is relative. The reading column is capped in ch so the measure
+ * stays right at any viewport, and the TOC collapses into a <details> below the
+ * two-column breakpoint rather than being hidden or overflowing.
+ */
+import type { CollectionEntry } from "astro:content";
+import { marked } from "marked";
+import T from "@/components/T.astro";
+import { THEMES, AREAS } from "@/data/themes";
+import { countThemes } from "@/utils/themeIndex";
+import { fmtDate, readingMinutes } from "@/utils/feed";
+
+type Blog = CollectionEntry<"blog">;
+interface Props {
+  type: "blog" | "project" | "research";
+  entry: any;
+  Content: any;
+  seriesArticles?: Blog[];
+  parentSeries?: Blog;
+  prevArticle?: Blog;
+  nextArticle?: Blog;
+}
+const { type, entry, Content, seriesArticles, parentSeries, prevArticle, nextArticle } = Astro.props;
+
+const slug = (id: string) => id.replace(/\.(md|mdx)$/, "").toLowerCase();
+const base = type === "blog" ? "blog" : type === "research" ? "research" : "projects";
+const thesisHtml = entry.data.thesis ? await marked.parse(entry.data.thesis) : null;
+const words = entry.body.split(/\s+/).length;
+
+// themes this piece actually invokes, ordered by how often
+const themes = [...countThemes(entry.body)]
+  .filter(([s]) => THEMES[s])
+  .sort((a, b) => b[1] - a[1]);
+---
+<article class="page">
+  <header class="wrap wrap--narrow">
+    {parentSeries && (
+      <p class="eyebrow series">
+        <a href={`/blog/${slug(parentSeries.id)}/`}>← {parentSeries.data.title}</a>
+        {entry.data.articleNumber != null && seriesArticles?.length
+          ? <span>Part {entry.data.articleNumber} of {seriesArticles.length}</span> : null}
+      </p>
+    )}
+    <h1 class="h1 title">{entry.data.title}</h1>
+    {entry.data.description && <p class="lede">{entry.data.description}</p>}
+    <p class="meta">
+      <span>{fmtDate(entry.data.publishedAt)}</span>
+      <span>{readingMinutes(words)} min</span>
+      {entry.data.publication && <span>{entry.data.publication}</span>}
+      {entry.data.authors?.length ? <span>{entry.data.authors.join(", ")}</span> : null}
+    </p>
+    {themes.length > 0 && (
+      <p class="themes">
+        {themes.map(([s]) => (
+          <a href={`/themes/${s}/`} style={`--tc: rgb(${AREAS[THEMES[s].area].rgb.join(",")})`}>
+            {THEMES[s].label}
+          </a>
+        ))}
+      </p>
+    )}
+  </header>
+
+  {thesisHtml && (
+    <aside class="wrap wrap--narrow thesis">
+      <p class="eyebrow">The short version</p>
+      <div set:html={thesisHtml} />
+    </aside>
+  )}
+
+  <div class="wrap body">
+    <details class="toc" id="toc">
+      <summary>Contents</summary>
+      <nav id="tocNav"></nav>
+    </details>
+
+    <div class="prose" id="prose">
+      <Content components={{ T }} />
+    </div>
+  </div>
+
+  {(prevArticle || nextArticle) && (
+    <nav class="wrap wrap--narrow pager">
+      {prevArticle
+        ? <a class="p prev" href={`/blog/${slug(prevArticle.id)}/`}><span>Previous</span>{prevArticle.data.title}</a>
+        : <span />}
+      {nextArticle
+        ? <a class="p next" href={`/blog/${slug(nextArticle.id)}/`}><span>Next</span>{nextArticle.data.title}</a>
+        : <span />}
+    </nav>
+  )}
+
+  {seriesArticles && seriesArticles.length > 0 && !parentSeries && (
+    <section class="wrap wrap--narrow series-list">
+      <p class="eyebrow">In this series</p>
+      <ul class="feed">
+        {seriesArticles.map((a) => (
+          <li>
+            <a class="row" href={`/blog/${slug(a.id)}/`}>
+              <span class="m"><span>Part {a.data.articleNumber ?? "—"}</span></span>
+              <span class="t">{a.data.title}</span>
+              {a.data.description && <span class="d">{a.data.description}</span>}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </section>
+  )}
+
+  <p class="wrap wrap--narrow back"><a href={`/${base}/`}>← All {base === "blog" ? "writing" : base}</a></p>
+</article>
+
+<style>
+  .page{ padding-block: calc(var(--hdr-h) + clamp(28px,6vw,72px)) clamp(48px,9vw,120px); }
+  .title{ text-wrap:balance; }
+  .series{ display:flex;flex-wrap:wrap;gap:6px 16px;align-items:baseline; }
+  .series a{ color:var(--peacock);text-decoration:none; }
+  .series a:hover{ color:var(--glow); }
+  .meta{
+    font-family:var(--sans);font-size:clamp(11.5px,1.2vw,13px);color:var(--text-3);
+    display:flex;flex-wrap:wrap;gap:6px clamp(12px,2vw,20px);margin:0 0 clamp(14px,2vw,20px);
+  }
+  .themes{ display:flex;flex-wrap:wrap;gap:8px;margin:0; }
+  .themes a{
+    font-family:var(--sans);font-size:12px;text-decoration:none;color:var(--tc);
+    border:1px solid color-mix(in srgb, var(--tc) 38%, transparent);
+    border-radius:999px;padding:5px 12px;transition:background .25s;
+  }
+  .themes a:hover{ background:color-mix(in srgb, var(--tc) 16%, transparent); }
+
+  .thesis{
+    margin-top:clamp(28px,4vw,44px);padding:clamp(18px,2.6vw,28px);
+    border:1px solid var(--rule);border-radius:16px;background:rgba(255,255,255,.028);
+  }
+  .thesis :global(p){ margin:0 0 .7em;color:var(--text-2);font-size:clamp(16px,1.15vw,17.5px);line-height:1.66; }
+  .thesis :global(p:last-child){ margin-bottom:0; }
+
+  /* two columns only when there is genuinely room; otherwise the TOC collapses */
+  .body{ margin-top:clamp(30px,5vw,54px);display:grid;gap:clamp(24px,4vw,52px); }
+  @media (min-width:1080px){
+    .body{ grid-template-columns:minmax(190px,240px) minmax(0,1fr);align-items:start; }
+    .toc{ position:sticky;top:calc(var(--hdr-h) + 24px);max-height:calc(100svh - var(--hdr-h) - 48px);overflow:auto; }
+    .toc summary{ display:none; }
+    .toc[open], .toc:not([open]){ }
+    .toc nav{ display:block !important; }
+  }
+  .toc{ border:1px solid var(--rule);border-radius:14px;padding:clamp(12px,1.6vw,16px);min-width:0; }
+  @media (min-width:1080px){ .toc{ border:0;padding:0;border-inline-start:1px solid var(--rule);
+    padding-inline-start:clamp(12px,1.4vw,18px);border-radius:0; } }
+  .toc summary{ font-family:var(--sans);font-size:13px;color:var(--text-2);cursor:pointer;letter-spacing:.04em; }
+  .toc nav{ display:flex;flex-direction:column;gap:7px;margin-top:12px; }
+  .toc :global(a){
+    font-family:var(--sans);font-size:13px;line-height:1.4;color:var(--text-3);
+    text-decoration:none;transition:color .2s;
+  }
+  .toc :global(a:hover),.toc :global(a.on){ color:var(--glow); }
+  .toc :global(a.lvl3){ padding-inline-start:12px;font-size:12.3px; }
+  .prose{ min-width:0; }
+
+  .pager{
+    margin-top:clamp(40px,6vw,72px);display:grid;gap:14px;
+    grid-template-columns:1fr;border-top:1px solid var(--rule);padding-top:clamp(18px,2.6vw,28px);
+  }
+  @media (min-width:720px){ .pager{ grid-template-columns:1fr 1fr; } .pager .next{ text-align:right; } }
+  .pager .p{ text-decoration:none;display:grid;gap:4px;font-size:clamp(15px,1.7vw,18px);line-height:1.3; }
+  .pager .p span{ font-family:var(--sans);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--text-3); }
+  .pager .p:hover{ color:var(--glow); }
+  .series-list{ margin-top:clamp(40px,6vw,72px); }
+  .back{ margin-top:clamp(34px,5vw,60px);font-family:var(--sans);font-size:14px; }
+  .back a{ color:var(--glow);text-decoration:none; }
+</style>
+
+<script>
+  // Build the table of contents from the rendered headings.
+  const prose = document.getElementById('prose');
+  const nav = document.getElementById('tocNav');
+  const toc = document.getElementById('toc') as HTMLDetailsElement | null;
+  if (prose && nav && toc) {
+    const hs = [...prose.querySelectorAll('h2, h3')] as HTMLElement[];
+    if (hs.length < 2) { toc.style.display = 'none'; }
+    else {
+      hs.forEach((h, i) => {
+        if (!h.id) h.id = (h.textContent || '').trim().toLowerCase()
+          .replace(/[^\w\s-]/g, '').replace(/\s+/g, '-').slice(0, 60) || `h-${i}`;
+        const a = document.createElement('a');
+        a.href = `#${h.id}`;
+        a.textContent = h.textContent;
+        if (h.tagName === 'H3') a.className = 'lvl3';
+        nav.append(a);
+      });
+      const links = [...nav.querySelectorAll('a')];
+      const io = new IntersectionObserver((es) => {
+        for (const e of es) {
+          if (!e.isIntersecting) continue;
+          links.forEach((l) => l.classList.toggle('on', l.getAttribute('href') === `#${e.target.id}`));
+        }
+      }, { rootMargin: '-15% 0px -70% 0px' });
+      hs.forEach((h) => io.observe(h));
+      if (matchMedia('(min-width:1080px)').matches) toc.open = true;
+    }
+  }
+</script>

@@ -1,32 +1,35 @@
 ---
+import Shell from "@/layouts/Shell.astro";
 import { getCollection } from "astro:content";
-import ContentListLayout from "@/layouts/ContentListLayout.astro";
-import ContentCard from "@/components/ContentCard.astro";
+import { live } from "@/utils/archive";
+import { fmtDate } from "@/utils/feed";
 
-const research = (await getCollection("research"))
-  .filter(r => r.data.isPublished)
-  .sort((a, b) => b.data.publishedAt.getTime() - a.data.publishedAt.getTime());
+const research = live(await getCollection("research"))
+  .filter((r) => r.data.isPublished)
+  .sort((a, b) => +b.data.publishedAt - +a.data.publishedAt);
 ---
-
-<ContentListLayout
-  title="Research"
-  pageTitle="Research | Siddhant Shah"
-  description="Published papers, preprints, and academic contributions."
-  contentType="research"
->
-  {research.length === 0 && <p class="text-neutral-400">No publications yet. Stay tuned!</p>}
-  {research.map(paper => (
-    <ContentCard
-      type="research"
-      slug={paper.slug}
-      title={paper.data.title}
-      description={paper.data.description}
-      publishedAt={paper.data.publishedAt}
-      authors={paper.data.authors}
-      publication={paper.data.publication}
-      doi={paper.data.doi}
-      arxiv={paper.data.arxiv}
-      tags={paper.data.tags}
-    />
-  ))}
-</ContentListLayout>
+<Shell title="Research | Siddhant Shah"
+  description="Peer-reviewed research on trading strategies, statistical methods and mathematical modelling."
+  canonical="/research/">
+  <div class="page">
+    <div class="wrap wrap--narrow">
+      <p class="eyebrow">Research</p>
+      <h1 class="h1">Published work.</h1>
+      <p class="lede">Peer-reviewed papers, from momentum in crude oil to the volume of Greek vases.</p>
+      <ul class="feed">
+        {research.map((r) => (
+          <li>
+            <a class="row" href={`/research/${r.id.replace(/\.(md|mdx)$/, "").toLowerCase()}/`}>
+              <span class="m">
+                <span>{fmtDate(r.data.publishedAt)}</span>
+                {r.data.publication && <span>{r.data.publication}</span>}
+              </span>
+              <span class="t">{r.data.title}</span>
+              <span class="d">{r.data.description}</span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </div>
+</Shell>

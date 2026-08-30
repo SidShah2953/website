@@ -148,7 +148,7 @@ const laid = placed.map((p, i) => ({
   }
   .anchor{
     position:absolute;translate:-50% -50%;text-align:center;pointer-events:none;
-    font-family:var(--sans);font-size:10.5px;font-weight:500;letter-spacing:.2em;
+    font-family:var(--sans);font-size:clamp(11.5px,1.05vw,12.5px);font-weight:500;letter-spacing:.18em;
     text-transform:uppercase;opacity:.48;transition:opacity .4s;
   }
   .anchor i{display:block;width:6px;height:6px;border-radius:50%;margin:0 auto 8px}
@@ -185,7 +185,7 @@ const laid = placed.map((p, i) => ({
     .term[data-rank="6"],.term[data-rank="7"],
     .term[data-rank="8"],.term[data-rank="9"],
     .term[data-rank="10"],.term[data-rank="11"]{display:none}
-    .anchor{font-size:9px;letter-spacing:.14em}
+    .anchor{font-size:11.5px;letter-spacing:.1em}
   }
   @media (prefers-reduced-motion:reduce){.term{transition:opacity .2s}}
 </style>

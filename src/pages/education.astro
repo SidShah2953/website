@@ -1,17 +1,16 @@
 ---
-import ContentListLayout from "@/layouts/ContentListLayout.astro";
-import TimelineCard from "@/components/TimelineCard.astro";
+import Shell from "@/layouts/Shell.astro";
+import Entry from "@/components/Entry.astro";
 import formatDateFromJSON from "@/utils/formatDateFromJSON";
 import courses from "@/content/education/courses.json";
 ---
-
-<ContentListLayout
-  title="Education"
-  pageTitle="Education"
-  contentType="education"
->
-  <TimelineCard
-    type="education"
+<Shell title="Education | Siddhant Shah" description="Degrees, and the courses I took because I wanted to." canonical="/education/">
+  <div class="page">
+    <div class="wrap wrap--narrow">
+      <p class="eyebrow">Education</p>
+      <h1 class="h1">Education.</h1>
+      <p class="lede">Degrees, and the courses I took because I wanted to.</p>
+      <ul class="entries"><Entry
     title="Master of Science - Applied Data Analytics"
     organization="Boston University"
     organizationUrl="https://www.bu.edu"
@@ -24,8 +23,7 @@ import courses from "@/content/education/courses.json";
     ]}
   />
 
-  <TimelineCard
-    type="education"
+  <Entry
     title="Bachelor of Science (Honors) - Mathematics and Computer Science"
     organization="Chennai Mathematical Institute"
     organizationUrl="https://www.cmi.ac.in"
@@ -42,8 +40,7 @@ import courses from "@/content/education/courses.json";
     ]}
   />
 
-  <TimelineCard
-    type="education"
+  <Entry
     title="Grade 12 (Maharashtra HSC) - Science"
     organization="PACE Junior Science College"
     dateRange="Mumbai | September 2021"
@@ -60,9 +57,9 @@ import courses from "@/content/education/courses.json";
       </header>
       <section class="content-list content-list--course flex flex-col flex-wrap gap-2 md:flex-row md:flex-wrap">
         {courses.map((course) => (
-          <TimelineCard
+          <Entry
             type="course"
-            title={course.title}
+    title={course.title}
             completedOn={formatDateFromJSON(course.completedOn)}
             offeredBy={course.offeredBy}
           />
@@ -70,4 +67,14 @@ import courses from "@/content/education/courses.json";
       </section>
     </article>
   </Fragment>
-</ContentListLayout>
+      </ul>
+      <p class="back"><a href="/about/">← About me</a></p>
+    </div>
+  </div>
+</Shell>
+
+<style>
+  .entries{ list-style:none;margin:0;padding:0;border-top:1px solid var(--rule); }
+  .back{ margin-top:clamp(28px,4vw,48px);font-family:var(--sans);font-size:14px; }
+  .back a{ color:var(--glow);text-decoration:none; }
+</style>
