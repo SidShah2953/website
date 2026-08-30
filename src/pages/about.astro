@@ -104,14 +104,16 @@ const experienceCount = ROLES.length;
       </p>
 
       <h2>Elsewhere</h2>
-      <Disclosure />
-
       <p class="links">
         <a href={`mailto:${presentation.mail}`}>{presentation.mail}</a>
         {socials.map((s) => <a href={s.link} rel="me">{s.label}</a>)}
         <a href="/Resume.pdf">Résumé</a>
       </p>
     </div>
+
+    {/* Outside .prose on purpose: the disclosure is a panel, not body copy, so
+        it takes the page's content width rather than the 68ch reading measure. */}
+    <Disclosure />
     </div>
   </div>
 </Shell>
@@ -129,12 +131,12 @@ const experienceCount = ROLES.length;
   .cards a{
     display:grid;gap:7px;height:100%;text-decoration:none;
     padding:clamp(18px,2.4vw,24px);border:1px solid var(--rule);border-radius:16px;
-    background:rgba(255,255,255,.026);
+    background:var(--surface-1);
     transition:border-color .3s, background .3s, transform .3s cubic-bezier(.2,.7,.3,1);
   }
   .cards a:hover{
     border-color:color-mix(in srgb, var(--peacock) 55%, transparent);
-    background:rgba(255,255,255,.05);transform:translateY(-3px);
+    background:var(--surface-2);transform:translateY(-3px);
   }
   .ct{ font-size:clamp(18px,2vw,21px);line-height:1.2;color:var(--text); }
   .cards a:hover .ct{ color:var(--glow); }

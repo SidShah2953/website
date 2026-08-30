@@ -70,6 +70,9 @@ const year = new Date().getFullYear();
     background:var(--surface-1);
     scroll-margin-top:calc(var(--hdr-h) + 20px);
   }
+  @media (max-height: 780px){
+    .disclosure{ padding:clamp(13px,1.8vw,18px);margin-top:clamp(20px,3vw,32px) }
+  }
   .disclosure p{
     margin:0 0 .8em;font-family:var(--sans);
     font-size:clamp(12.5px,1.2vw,13.5px);line-height:1.65;color:var(--text-3);

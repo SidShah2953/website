@@ -28,9 +28,10 @@ const href = (p: any) =>
   description={`Everything I've written on ${theme.label}.`}
   canonical={`/themes/${slug}/`}>
   <BreadcrumbSchema slot="head" items={[{ name: "Home", url: "/" }, { name: "Writing", url: "/blog/" }, { name: theme.label }]} />
-  <section class="band">
+  <div class="page">
+    <section class="wrap wrap--narrow">
     <p class="eyebrow" style={`color:rgb(${rgb})`}>{area.label}</p>
-    <h1 style={`color:rgb(${rgb})`}>{theme.label}</h1>
+    <h1 class="h1" style={`color:rgb(${rgb})`}>{theme.label}</h1>
     <p class="lede">
       {used.length === 0
         ? "Nothing tagged with this yet."
@@ -48,14 +49,15 @@ const href = (p: any) =>
       ))}
     </ul>
     <p><a class="ln" href="/#what">← All themes</a></p>
-  </section>
+    </section>
+  </div>
 </Shell>
 
 <style>
-  .band{max-width:1060px;margin:0 auto;padding:calc(var(--hdr-h) + clamp(50px,8vw,100px)) clamp(18px,6vw,80px) 0}
-  .eyebrow{font-family:var(--sans);font-size:11.5px;letter-spacing:.22em;text-transform:uppercase;margin:0 0 14px;font-weight:500}
-  h1{font-size:clamp(38px,7vw,72px);line-height:1;margin:0 0 18px}
-  .lede{color:var(--text-2);margin:0 0 40px}
+  /* This page used to carry its own 1060px column and its own gutter, so it
+     sat at a different left edge from every other listing. It now uses the
+     shared .page/.wrap kit, like /blog, /research and /projects. */
+  .lede{margin-bottom:clamp(24px,3.4vw,40px)}
   .posts{list-style:none;margin:0 0 34px;padding:0;border-top:1px solid var(--rule)}
   .posts li{border-bottom:1px solid var(--rule)}
   .posts a{display:grid;gap:5px;padding:24px 0;text-decoration:none;transition:padding-left .4s cubic-bezier(.2,.7,.3,1)}
@@ -63,5 +65,5 @@ const href = (p: any) =>
   .pt{font-size:clamp(19px,2.1vw,25px);color:var(--text);line-height:1.24}
   .pd{font-family:var(--sans);font-size:14px;color:var(--text-3);max-width:74ch;line-height:1.55}
   .pm{font-family:var(--sans);font-size:11.5px;color:var(--text-3);letter-spacing:.06em;text-transform:uppercase}
-  .ln{font-family:var(--sans);font-size:14.5px;text-decoration:none;color:var(--glow);border-bottom:1px solid rgba(62,212,224,.28)}
+  .ln{font-family:var(--sans);font-size:14.5px;text-decoration:none;color:var(--glow);border-bottom:1px solid var(--glow-line)}
 </style>
