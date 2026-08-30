@@ -40,12 +40,17 @@ export async function getStaticPaths() {
 
     return {
       params: { slug },
-      props: { entry: p, seriesArticles, parentSeries, prevArticle, nextArticle },
+      props: {
+        entry: p, seriesArticles, parentSeries, prevArticle, nextArticle,
+        // there is no series-home post, so the series identity comes from the
+        // `series` field the parts share
+        seriesName: p.data.series,
+      },
     };
   });
 }
 
-const { entry, seriesArticles, parentSeries, prevArticle, nextArticle } = Astro.props;
+const { entry, seriesArticles, parentSeries, prevArticle, nextArticle, seriesName } = Astro.props;
 const stats = estimateReadingTime(entry.body);
 const { Content } = await entry.render();
 
@@ -105,6 +110,7 @@ const ogImage = entry.data.ogImage || '/social-prev.png';
     entry={entry}
     Content={Content}
     seriesArticles={seriesArticles}
+  seriesName={seriesName}
     parentSeries={parentSeries}
     prevArticle={prevArticle}
     nextArticle={nextArticle}
