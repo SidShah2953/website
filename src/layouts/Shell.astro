@@ -321,8 +321,12 @@ const nav = [
          short viewports and under reduced motion, where forcing a snap point
          traps people inside content taller than their screen. */
       html.snap{ scroll-padding-top:0; }
-      @media (min-height:640px) and (prefers-reduced-motion:no-preference){
-        html.snap{ scroll-snap-type:y mandatory; }
+      /* Snapping is only applied once script has confirmed every slide actually
+         fits. Mandatory snap over a slide taller than the viewport traps the
+         reader — they physically cannot scroll to its bottom. A viewport-height
+         media query cannot express this because the cause is content height. */
+      @media (prefers-reduced-motion:no-preference){
+        html.snap.snap-ok{ scroll-snap-type:y mandatory; }
       }
 
       /* scroll choreography: sections rise in, and settle out downward */
@@ -345,6 +349,17 @@ const nav = [
         onScroll();
         addEventListener('scroll', onScroll, { passive: true });
       }
+      // enable snapping only while every slide fits the viewport
+      const root = document.documentElement;
+      if (root.classList.contains('snap')) {
+        const slides = [...document.querySelectorAll<HTMLElement>('.slide')];
+        const fits = () => slides.every((s) => s.getBoundingClientRect().height <= innerHeight + 1);
+        const sync = () => root.classList.toggle('snap-ok', slides.length > 0 && fits());
+        sync();
+        addEventListener('resize', sync, { passive: true });
+        if ((document as any).fonts?.ready) (document as any).fonts.ready.then(sync);
+      }
+
       const io = new IntersectionObserver(
         (es) => es.forEach((e) => e.isIntersecting && e.target.classList.add('in')),
         { threshold: 0.1, rootMargin: '0px 0px -8% 0px' },

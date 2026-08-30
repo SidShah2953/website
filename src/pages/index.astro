@@ -41,7 +41,6 @@ const desc =
     </p>
     </div>
     <div class="scroll-cue" aria-hidden="true"><span></span></div>
-  </div>
   </section>
 
   <!-- 2 · who I am -->
@@ -84,7 +83,7 @@ const desc =
           <a href={f.href}>
             <span class="pm">
               <span>{fmtDate(f.date)}</span>
-              {f.kind === "note" && <span class="tag">note</span>}
+              {f.kind === "note" && <span class="tag tag--note">note</span>}
               {f.children?.length ? <span class="tag">{f.children.length}-part series</span> : null}
             </span>
             {/* a note has no headline by design — show the thought itself */}
@@ -113,8 +112,11 @@ const desc =
       </div>
       <Subscribe />
     </div>
+    </div>
 
-    <!-- the footer lives here: past the last snap point it is unreachable -->
+    <!-- the footer lives here: past the last snap point it is unreachable.
+         A sibling of the band above, not a child of it: nesting one .band in
+         another applied the gutter twice and pinched the disclosure inwards. -->
     <div class="band"><Disclosure /></div>
   </section>
 </Shell>
@@ -128,18 +130,22 @@ const desc =
   }
   .hero{padding:0 clamp(18px,6vw,80px);isolation:isolate}
   .hero-copy{position:relative;z-index:2;max-width:1180px;margin:0 auto;width:100%}
+  /* Scrim stops come from the shared --scrim-* set. The two densities that set
+     has no stop for are mixed from --ground, so no literal colour is written
+     here and the shade still tracks the palette. */
   .veil{
     position:fixed;inset:0;z-index:0;pointer-events:none;
     background:
-      linear-gradient(103deg, rgba(5,12,15,.86) 0%, rgba(5,12,15,.62) 30%,
-                              rgba(5,12,15,.22) 56%, transparent 74%),
-      linear-gradient(180deg, rgba(5,12,15,.34) 0%, transparent 22%,
-                              transparent 78%, rgba(5,12,15,.42) 100%);
+      linear-gradient(103deg, var(--scrim-0) 0%, var(--scrim-1) 30%,
+                              var(--scrim-3) 56%, transparent 74%),
+      linear-gradient(180deg, var(--scrim-2) 0%, transparent 22%,
+                              transparent 78%,
+                              color-mix(in srgb, var(--ground) 42%, transparent) 100%);
   }
   @media(max-width:860px){
     .veil{background:linear-gradient(180deg,
-      rgba(5,12,15,.80) 0%, rgba(5,12,15,.62) 38%,
-      rgba(5,12,15,.62) 70%, rgba(5,12,15,.80) 100%)}
+      color-mix(in srgb, var(--ground) 80%, transparent) 0%, var(--scrim-1) 38%,
+      var(--scrim-1) 70%, color-mix(in srgb, var(--ground) 80%, transparent) 100%)}
   }
   /* content rides above the fixed surface + veil */
   .slide{ z-index:1; }
@@ -174,6 +180,18 @@ const desc =
     padding:clamp(40px,7vw,90px) clamp(18px,6vw,80px);
   }
   @media (max-height: 820px){ .band{padding-block:clamp(24px,3.5vw,48px)} }
+  /* the contact slide carries both the form and the full-width disclosure, so on
+     short viewports it is the one that tips over the snap-fit threshold */
+  @media (max-height: 780px){
+    #contact .band{ padding-block:clamp(16px,2.4vw,30px) }
+    #contact .eyebrow{ margin-bottom:clamp(10px,1.6vw,16px) }
+  }
+  /* the contact slide carries the form and the disclosure, so it is the one most
+     likely to exceed a small phone */
+  @media (max-width: 640px){
+    #contact .two{ gap:clamp(18px,4vw,28px) }
+    #contact .big{ font-size:clamp(19px,5vw,24px) }
+  }
   .lede{margin-bottom:clamp(16px,2.4vw,34px)}
   .eyebrow{
     font-family:var(--sans);font-size:11.5px;letter-spacing:.22em;text-transform:uppercase;
@@ -189,7 +207,7 @@ const desc =
 
   .ln{
     font-family:var(--sans);font-size:14.5px;text-decoration:none;color:var(--glow);
-    border-bottom:1px solid rgba(62,212,224,.28);padding-bottom:1px;transition:border-color .3s;
+    border-bottom:1px solid var(--glow-line);padding-bottom:1px;transition:border-color .3s;
   }
   .ln:hover{border-bottom-color:var(--glow)}
   .ln.sm{margin-right:20px}
@@ -212,7 +230,9 @@ const desc =
     color:var(--peacock);border:1px solid color-mix(in srgb, var(--peacock) 42%, transparent);
     border-radius:999px;padding:2px 9px;letter-spacing:.1em;
   }
-  li:has(.tag) .pt{font-size:clamp(17px,1.8vw,21px);color:var(--text-2)}
+  /* only notes step down — a series is a bigger entry than one article,
+     and .tag alone was catching the series badge too */
+  li:has(.tag--note) .pt{font-size:clamp(17px,1.8vw,21px);color:var(--text-2)}
   .pd{font-family:var(--sans);font-size:14px;color:var(--text-3);max-width:74ch;line-height:1.55}
   .posts a:hover .pt{color:var(--glow)}
 

@@ -132,7 +132,7 @@ const inline = (md: string) => marked.parse(md.trim(), { async: false }) as stri
   .nb{ font-size:clamp(16px,1.15vw,17.5px);line-height:1.68;color:var(--text-2);max-width:64ch; }
   .nb :global(p){ margin:0 0 .7em; }
   .nb :global(p:last-child){ margin-bottom:0; }
-  .nb :global(a){ color:var(--glow);text-decoration:none;border-bottom:1px solid rgba(62,212,224,.35); }
+  .nb :global(a){ color:var(--glow);text-decoration:none;border-bottom:1px solid var(--glow-line); }
   .nb :global(em){ font-style:italic;color:var(--text); }
   .nb :global(strong){ color:var(--text);font-weight:500; }
 </style>
