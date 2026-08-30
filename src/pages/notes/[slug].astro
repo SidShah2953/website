@@ -30,7 +30,9 @@ const desc = excerpt(entry.body);
         Note · {fmtDate(entry.data.publishedAt)}
         {entry.data.crosspost && <> · <a href={entry.data.crosspost} rel="noopener">also on X ↗</a></>}
       </p>
-      <h1 class="h2">{heading}</h1>
+      {/* only show a headline when the note actually has one — a derived title
+          just repeats the sentence immediately below it */}
+      {entry.data.title && <h1 class="h2">{entry.data.title}</h1>}
       <div class="prose"><Content components={{ T }} /></div>
       {entry.data.via && <p class="via"><a href={entry.data.via} rel="noopener">source ↗</a></p>}
       <p class="back"><a href="/blog/">← All writing</a></p>
