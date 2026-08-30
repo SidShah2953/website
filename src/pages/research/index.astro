@@ -1,5 +1,6 @@
 ---
 import Shell from "@/layouts/Shell.astro";
+import BreadcrumbSchema from "@/components/seo/BreadcrumbSchema.astro";
 import { getCollection } from "astro:content";
 import { live } from "@/utils/archive";
 import { fmtDate } from "@/utils/feed";
@@ -11,6 +12,7 @@ const research = live(await getCollection("research"))
 <Shell title="Research | Siddhant Shah"
   description="Peer-reviewed research on trading strategies, statistical methods and mathematical modelling."
   canonical="/research/">
+  <BreadcrumbSchema slot="head" items={[{ name: "Home", url: "/" }, { name: "Research" }]} />
   <div class="page">
     <div class="wrap wrap--narrow">
       <p class="eyebrow">Research</p>

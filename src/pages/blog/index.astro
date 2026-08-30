@@ -1,5 +1,6 @@
 ---
 import Shell from "@/layouts/Shell.astro";
+import BreadcrumbSchema from "@/components/seo/BreadcrumbSchema.astro";
 import { getFeed, fmtDate, readingMinutes } from "@/utils/feed";
 import { marked } from "marked";
 
@@ -12,6 +13,7 @@ const inline = (md: string) => marked.parse(md.trim(), { async: false }) as stri
 <Shell title="Writing | Siddhant Shah"
   description="Essays on finance, digital assets and technology, plus shorter notes."
   canonical="/blog/">
+  <BreadcrumbSchema slot="head" items={[{ name: "Home", url: "/" }, { name: "Writing" }]} />
   <div class="page">
     <div class="wrap wrap--narrow">
       <p class="eyebrow">Writing</p>
@@ -65,7 +67,7 @@ const inline = (md: string) => marked.parse(md.trim(), { async: false }) as stri
             ) : (
               <article class="note">
                 <p class="m">
-                  <span>{fmtDate(f.date)}</span>
+                  <a class="perma" href={f.href}>{fmtDate(f.date)}</a>
                   <span class="badge">note</span>
                   {f.crosspost && <a href={f.crosspost} rel="noopener">also on X ↗</a>}
                 </p>
@@ -120,6 +122,9 @@ const inline = (md: string) => marked.parse(md.trim(), { async: false }) as stri
     border-radius:999px;padding:2px 9px;letter-spacing:.1em;
   }
   .m a{ color:var(--text-3);text-decoration:none;border-bottom:1px solid transparent; }
+  /* the permalink was unreachable: nothing linked to /notes/*, yet the pages
+     were indexed and duplicated the feed body */
+  .perma{ border-bottom-color:var(--rule) !important; }
   .m a:hover{ color:var(--glow);border-bottom-color:currentColor; }
   .nt{ font-size:clamp(17px,2vw,21px);line-height:1.25;margin:0; }
   .nb{ font-size:clamp(16px,1.15vw,17.5px);line-height:1.68;color:var(--text-2);max-width:64ch; }

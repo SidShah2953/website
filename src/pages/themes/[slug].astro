@@ -1,17 +1,21 @@
 ---
 import Shell from "@/layouts/Shell.astro";
+import BreadcrumbSchema from "@/components/seo/BreadcrumbSchema.astro";
 import { THEMES, AREAS } from "@/data/themes";
 import { allPieces } from "@/utils/allPieces";
 import { countThemes } from "@/utils/themeIndex";
 
 export async function getStaticPaths() {
   const pieces = await allPieces();
-  return Object.entries(THEMES).map(([slug, t]) => {
+  // A theme nothing is tagged with is an empty page. Emitting it gives Google a
+  // page whose body reads "Nothing tagged with this yet."
+  return Object.entries(THEMES).flatMap(([slug, t]) => {
     const used = pieces
       .map((p) => ({ ...p, n: countThemes(p.entry.body).get(slug) ?? 0 }))
       .filter((p) => p.n > 0)
       .sort((a, b) => +b.entry.data.publishedAt - +a.entry.data.publishedAt);
-    return { params: { slug }, props: { slug, theme: t, used } };
+    if (used.length === 0) return [];
+    return [{ params: { slug }, props: { slug, theme: t, used } }];
   });
 }
 const { slug, theme, used } = Astro.props;
@@ -23,6 +27,7 @@ const href = (p: any) =>
 <Shell title={`${theme.label} | Siddhant Shah`}
   description={`Everything I've written on ${theme.label}.`}
   canonical={`/themes/${slug}/`}>
+  <BreadcrumbSchema slot="head" items={[{ name: "Home", url: "/" }, { name: "Writing", url: "/blog/" }, { name: theme.label }]} />
   <section class="band">
     <p class="eyebrow" style={`color:rgb(${rgb})`}>{area.label}</p>
     <h1 style={`color:rgb(${rgb})`}>{theme.label}</h1>
