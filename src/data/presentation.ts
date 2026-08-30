@@ -17,7 +17,7 @@ const presentation: Presentation = {
   title: "Hi, I'm Siddhant",
   // profile: "/profile.webp",
   description:
-    'I am an equity research associate. I take the same rigorous framework — build the dataset, name the mechanism, test it, and be honest about what the numbers cannot carry — and point it at whatever is interesting. Usually that is *tokenization, digital assets and AI*; sometimes it is Formula 1 telemetry or a fertility register. This site is where I think out loud about that, in a personal capacity.',
+    'I am an equity research associate. I write about how companies actually make money and what they are worth — accounting rules, unit economics, valuation, derivatives — and what changes when those questions move onchain. The method came from statistics and machine learning before it came from markets, and it still travels: occasionally it gets pointed at Formula 1 telemetry or a fertility register instead. Written in a personal capacity.',
   socials: [
     {
       label: "Email",
