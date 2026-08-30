@@ -35,6 +35,7 @@ const blog = defineCollection({
     ogImage: z.string().optional(),
     thesis: z.string().optional(),
     articleNumber: z.number().optional(), // sub-articles: sort order within series
+    series: z.string().optional(),        // display name for the series card
   }),
 });
 
