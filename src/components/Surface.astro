@@ -24,14 +24,13 @@
 
 <style>
   .surface{
-    position:absolute;inset:0;z-index:0;overflow:hidden;
+    position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none;
     /* fallback that shows if WebGL never initialises */
     background:
       radial-gradient(60% 50% at 22% 28%, rgba(23,145,158,.30), transparent 70%),
       radial-gradient(55% 45% at 78% 32%, rgba(47,111,232,.24), transparent 70%),
       radial-gradient(70% 55% at 50% 92%, rgba(106,90,216,.20), transparent 72%);
-    -webkit-mask-image:linear-gradient(180deg,transparent 8%,#000 46%,#000 88%,transparent 100%);
-    mask-image:linear-gradient(180deg,transparent 8%,#000 46%,#000 88%,transparent 100%);
+    /* no mask: the surface is the page's atmosphere now, not a hero band */
   }
   canvas{display:block;width:100%;height:100%;opacity:0;transition:opacity 1.2s ease}
   canvas.on{opacity:1}
@@ -89,10 +88,12 @@ if (host && cv && gl) {
     vec2 uv = (gl_FragCoord.xy - .5*uRes) / uRes.y;
 
     // camera drifts with the pointer and sinks as the page scrolls
-    vec3 ro = vec3(uMouse.x*.42, 0.46 + uScroll*0.9, 3.2 + uMouse.y*.22);
+    // camera sinks toward the surface and levels off as the page scrolls
+    float s = uScroll;
+    vec3 ro = vec3(uMouse.x*.42 + s*0.7, 0.52 + s*1.45, 3.2 + uMouse.y*.22 - s*0.9);
     vec3 rd = normalize(vec3(uv, -1.15));
-    rd.y -= 0.30;                      // look down: horizon into the lower third
-    rd.y += uScroll*.20 + uMouse.y*.05;
+    rd.y -= 0.30 - s*0.16;             // horizon rises as you descend
+    rd.y += uMouse.y*.05;
     rd = normalize(rd);
 
     // march down onto the heightfield
@@ -119,7 +120,8 @@ if (host && cv && gl) {
       float fres = pow(1. - max(dot(n, v), 0.), 3.4);
 
       // film thickness varies over the surface, so hue travels across it
-      float thick = 340. + 210.*fbm(pos.xz*.85 + uTime*.03) + 130.*n.y;
+      // film thickness drifts with depth, so the hue travels down the page
+      float thick = 300. + 240.*fbm(pos.xz*.85 + uTime*.03) + 130.*n.y + s*190.;
       vec3 film = filmColour(max(dot(n, v), 0.), thick);
 
       // pull the interference toward the peacock / azure / iris family
@@ -211,16 +213,17 @@ if (host && cv && gl) {
 
     let scroll = 0;
     const onScroll = () => {
-      scroll = Math.min(1, Math.max(0, scrollY / Math.max(1, innerHeight)));
+      // progress through the entire page, not just the hero — the surface
+      // travels with the reader rather than scrolling away behind them
+      const max = Math.max(1, document.documentElement.scrollHeight - innerHeight);
+      scroll = Math.min(1, Math.max(0, scrollY / max));
     };
     onScroll();
     addEventListener('scroll', onScroll, { passive:true });
 
     let visible = true, raf = 0;
-    new IntersectionObserver(
-      (es) => { visible = es[0].isIntersecting; if (visible) start(); },
-      { threshold: 0 },
-    ).observe(host);
+    // it is fixed and always on screen; only a hidden tab should stop the loop
+    visible = true;
     document.addEventListener('visibilitychange', () => { if (!document.hidden) start(); });
 
     const t0 = performance.now();

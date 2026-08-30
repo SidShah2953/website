@@ -51,14 +51,17 @@ const nav = [
       *{box-sizing:border-box}
       /* Grid and flex children default to min-width:auto, so one long unbreakable
          string (an email address, a URL) can force a track wider than the
-         viewport. This is the single most common cause of horizontal overflow. */
+         viewport. This is the single most common cause of horizontal overflow.
+         Fixing it at the source matters: an overflow-x:hidden safety net on body
+         makes body its own scroll container, which silently kills scroll-snap
+         set on html. */
       *,*::before,*::after{ min-width:0; }
-      html{scroll-behavior:smooth;-webkit-font-smoothing:antialiased;overflow-x:clip}
+      html{scroll-behavior:smooth;-webkit-font-smoothing:antialiased}
       body{
         margin:0;background:var(--ground);color:var(--text);
         overflow-wrap:break-word;
         font-family:var(--serif);font-weight:300;line-height:1.62;
-        font-size:17px;overflow-x:hidden;
+        font-size:17px;
       }
       h1,h2,h3,h4{margin:0;font-weight:300;text-wrap:balance;letter-spacing:-.022em}
       a{color:inherit}

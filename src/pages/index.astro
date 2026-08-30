@@ -24,10 +24,12 @@ const desc =
   <PersonSchema slot="head" />
 
   <!-- 1 · the opening -->
+  <Surface />
+  <!-- fixed scrim over the surface: guarantees copy contrast on every section,
+       not just the hero, since the graphic now travels the whole page -->
+  <div class="veil" aria-hidden="true"></div>
+
   <section class="slide hero">
-    <Surface />
-    <!-- scrim: guarantees copy contrast no matter where the surface flows -->
-    <div class="scrim" aria-hidden="true"></div>
     <div class="hero-copy">
     <p class="kicker">Hi — I'm</p>
     <h1>Siddhant Shah</h1>
@@ -116,16 +118,21 @@ const desc =
   }
   .hero{padding:0 clamp(18px,6vw,80px);isolation:isolate}
   .hero-copy{position:relative;z-index:2;max-width:1180px;margin:0 auto;width:100%}
-  .scrim{
-    position:absolute;inset:0;z-index:1;pointer-events:none;
-    background:linear-gradient(103deg,
-      rgba(5,12,15,.90) 0%, rgba(5,12,15,.72) 26%,
-      rgba(5,12,15,.34) 48%, transparent 66%);
+  .veil{
+    position:fixed;inset:0;z-index:0;pointer-events:none;
+    background:
+      linear-gradient(103deg, rgba(5,12,15,.86) 0%, rgba(5,12,15,.62) 30%,
+                              rgba(5,12,15,.22) 56%, transparent 74%),
+      linear-gradient(180deg, rgba(5,12,15,.34) 0%, transparent 22%,
+                              transparent 78%, rgba(5,12,15,.42) 100%);
   }
-  @media(max-width:760px){
-    .scrim{background:linear-gradient(180deg,
-      rgba(5,12,15,.88) 0%, rgba(5,12,15,.66) 46%, rgba(5,12,15,.22) 72%, transparent 100%)}
+  @media(max-width:860px){
+    .veil{background:linear-gradient(180deg,
+      rgba(5,12,15,.80) 0%, rgba(5,12,15,.62) 38%,
+      rgba(5,12,15,.62) 70%, rgba(5,12,15,.80) 100%)}
   }
+  /* content rides above the fixed surface + veil */
+  .slide{ z-index:1; }
   .kicker{
     font-family:var(--sans);font-size:12px;letter-spacing:.24em;text-transform:uppercase;
     color:var(--text-3);margin:0 0 18px;
