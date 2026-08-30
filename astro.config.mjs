@@ -1,8 +1,6 @@
-import { defineConfig, passthroughImageService } from "astro/config";
-import tailwindcss from "@tailwindcss/vite";
+import { defineConfig } from "astro/config";
 import sitemap from "@astrojs/sitemap";
 import robotsTxt from "astro-robots-txt";
-import react from "@astrojs/react";
 import { SITE_URL } from "./src/data/config";
 
 import mdx from "@astrojs/mdx";
@@ -10,7 +8,6 @@ import mdx from "@astrojs/mdx";
 import rehypeKatex from 'rehype-katex';
 import remarkMath from 'remark-math';
 
-const isDev = process.env.NODE_ENV === 'development';
 
 // https://astro.build/config
 export default defineConfig({
@@ -20,10 +17,12 @@ export default defineConfig({
   redirects: {
     '/experience': '/about/experience/',
     '/education': '/about/education/',
+    // The COIN series home was renamed 202602 -> 202603, which 404'd two URLs
+    // that are live and indexed. The eight parts still live under 202602/.
+    '/blog/coin-research-202602': '/blog/coin-research-202603/',
+    '/posts/coin-research-202602': '/blog/coin-research-202603/',
   },
-  ...(isDev ? { image: { service: passthroughImageService() } } : {}),
   vite: {
-    plugins: [tailwindcss()],
     server: {
       watch: {
         ignored: ['**/node_modules/**', '**/.git/**'],
@@ -31,9 +30,16 @@ export default defineConfig({
     },
   },
   integrations: [
-    sitemap(),
+    sitemap({
+      // Keep redirect stubs, the hidden page and the legacy /posts/ tree out of
+      // the sitemap. They are all meta-refresh stubs marked noindex, so
+      // submitting them just asks Google to crawl pages we tell it to ignore.
+      filter: (page) =>
+        !page.includes("/posts/") &&
+        !page.includes("/private/") &&
+        !/\/(experience|education)\/?$/.test(new URL(page).pathname),
+    }),
     robotsTxt(),
-    react(),
     mdx({
 			remarkPlugins: [
         remarkMath,

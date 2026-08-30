@@ -1,11 +1,13 @@
 ---
 import Shell from "@/layouts/Shell.astro";
+import BreadcrumbSchema from "@/components/seo/BreadcrumbSchema.astro";
 import Entry from "@/components/Entry.astro";
 import { ROLES } from "@/data/experience";
 ---
 <Shell title="Experience | Siddhant Shah"
   description="Where I have worked, and what I actually did there."
   canonical="/about/experience/">
+  <BreadcrumbSchema slot="head" items={[{ name: "Home", url: "/" }, { name: "About", url: "/about/" }, { name: "Experience" }]} />
   <div class="page">
     <div class="wrap wrap--narrow">
       <p class="eyebrow crumb"><a href="/about/">About</a> <span>/</span> Experience</p>

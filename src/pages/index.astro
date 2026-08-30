@@ -6,15 +6,15 @@ import Surface from "@/components/Surface.astro";
 import Subscribe from "@/components/Subscribe.astro";
 import { allPieces } from "@/utils/allPieces";
 import { buildIndex } from "@/utils/themeIndex";
+import { getFeed } from "@/utils/feed";
 import presentation from "@/data/presentation";
 
 const pieces = await allPieces();
 const themes = buildIndex(pieces.map((p) => ({ entry: p.entry, areas: p.areas })));
 
-const latest = pieces
-  .filter((p) => p.kind === "blog")
-  .sort((a, b) => +b.entry.data.publishedAt - +a.entry.data.publishedAt)
-  .slice(0, 3);
+// getFeed() collapses a series into its home post, so the eight COIN parts are
+// nested rather than filling this list
+const latest = (await getFeed()).slice(0, 3);
 
 const email = presentation.mail;
 const desc =
@@ -78,11 +78,13 @@ const desc =
   <section class="slide rise">
     <div class="band"><h2 class="eyebrow">Recently</h2>
     <ul class="posts">
-      {latest.map((p) => (
+      {latest.map((f) => (
         <li>
-          <a href={`/blog/${p.entry.id.replace(/\.(md|mdx)$/, "").toLowerCase()}/`}>
-            <span class="pt">{p.entry.data.title}</span>
-            <span class="pd">{p.entry.data.description}</span>
+          <a href={f.href}>
+            <span class="pt">{f.title}</span>
+            {f.children?.length
+              ? <span class="pd">{f.children.length}-part series · {f.description}</span>
+              : f.description && <span class="pd">{f.description}</span>}
           </a>
         </li>
       ))}
@@ -205,9 +207,14 @@ const desc =
   .colophon{
     margin-top:auto;padding-top:clamp(26px,4vw,44px);
     border-top:1px solid var(--rule);
-    display:flex;flex-wrap:wrap;gap:6px clamp(18px,3vw,30px);justify-content:space-between;
+    display:flex;flex-wrap:wrap;gap:8px clamp(18px,3vw,30px);
+    justify-content:space-between;align-items:baseline;
     font-family:var(--sans);font-size:13.5px;color:var(--text-3);
   }
   .colophon p{margin:0}
-  .colophon .disc{max-width:52ch}
+  .colophon p:first-child{ margin-inline-end:auto;text-align:left; }
+  .colophon .disc{ max-width:52ch;text-align:right; }
+  @media (max-width:640px){
+    .colophon .disc{ text-align:left; }
+  }
 </style>

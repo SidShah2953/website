@@ -1,23 +1,33 @@
-import { getCollection } from 'astro:content';
-import rss from '@astrojs/rss';
-import { SITE_URL } from '@/data/config';
+import rss from "@astrojs/rss";
+import { SITE_URL } from "@/data/config";
+import { getFeed, excerpt } from "@/utils/feed";
 
 export async function GET() {
-  const posts = (await getCollection('blog'))
-    .filter(p => !p.data.isHidden && !p.slug.includes('/'))
-    .sort((a, b) => b.data.publishedAt.getTime() - a.data.publishedAt.getTime());
+  // The feed now carries both halves: long pieces and short notes. Notes are
+  // the half a reader most wants pushed to them, and excluding them meant the
+  // feed went quiet for months at a time between essays.
+  //
+  // getFeed() already drops archived and hidden entries and collapses series
+  // sub-articles under a synthesised card, so the feed shows the series once
+  // rather than eight times.
+  const items = (await getFeed()).flatMap((f) => {
+    // a series card is not itself a page worth syndicating; syndicate its parts
+    const rows = f.children?.length ? f.children : [f];
+    return rows.map((r) => ({
+      title: r.title ?? excerpt(r.body, 70),
+      description: r.description ?? excerpt(r.body),
+      link: r.href,
+      pubDate: r.date,
+      categories: r.tags,
+    }));
+  });
 
   return rss({
-    title: 'Siddhant Shah - Blog',
-    description: 'Latest blog posts on quantitative finance, machine learning, and data analytics by Siddhant Shah',
+    title: "Siddhant Shah",
+    description:
+      "Essays and notes on finance, digital assets and technology — plus whatever else I end up measuring.",
     site: SITE_URL,
-    items: posts.map(p => ({
-      title: p.data.title,
-      description: p.data.description,
-      link: `/blog/${p.slug}/`,
-      pubDate: p.data.publishedAt,
-      categories: p.data.tags,
-    })),
-    customData: `<language>en-us</language>`,
+    items,
+    customData: "<language>en-us</language>",
   });
 }

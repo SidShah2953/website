@@ -10,42 +10,46 @@ export async function getStaticPaths() {
   const toSlug = (id: string) => id.replace(/\.(md|mdx)$/, '').toLowerCase();
   const allPosts = await getCollection('blog');
 
-  return allPosts.map(p => {
-    const slug = toSlug(p.id);
-    const isSubArticle = slug.includes('/');
-    const isSeriesHome = !isSubArticle && allPosts.some(a => toSlug(a.id).startsWith(slug + '/'));
+  // Series membership comes from the shared `series` frontmatter field, not from
+  // the slug prefix. The prefix approach broke silently when the home post was
+  // renamed 202602 -> 202603 while its parts stayed in the 202602/ folder: the
+  // home stopped being recognised as a home and every part lost its parent.
+  const partsOf = new Map<string, typeof allPosts>();
+  for (const a of allPosts) {
+    const name = a.data.series;
+    if (!name || a.data.articleNumber == null) continue;
+    if (!partsOf.has(name)) partsOf.set(name, []);
+    partsOf.get(name)!.push(a);
+  }
+  for (const list of partsOf.values()) {
+    list.sort((x, y) => (x.data.articleNumber ?? 0) - (y.data.articleNumber ?? 0));
+  }
+  // the home is the piece that names the series but is not itself numbered
+  const homeOf = new Map<string, (typeof allPosts)[number]>();
+  for (const a of allPosts) {
+    if (a.data.series && a.data.articleNumber == null) homeOf.set(a.data.series, a);
+  }
 
-    let seriesArticles = undefined;
-    let parentSeries = undefined;
+  return allPosts.map(p => {
+    const seriesName = p.data.series;
+    const siblings = seriesName ? partsOf.get(seriesName) : undefined;
+    const home = seriesName ? homeOf.get(seriesName) : undefined;
+    const isPart = Boolean(seriesName && p.data.articleNumber != null);
+
+    const seriesArticles = siblings && siblings.length > 0 ? siblings : undefined;
+    const parentSeries = isPart && home && home.id !== p.id ? home : undefined;
+
     let prevArticle = undefined;
     let nextArticle = undefined;
-
-    if (isSeriesHome) {
-      seriesArticles = allPosts
-        .filter(a => toSlug(a.id).startsWith(slug + '/'))
-        .sort((a, b) => (a.data.articleNumber ?? 0) - (b.data.articleNumber ?? 0));
-    }
-
-    if (isSubArticle) {
-      const parentSlug = slug.split('/')[0];
-      const siblings = allPosts
-        .filter(a => toSlug(a.id).startsWith(parentSlug + '/'))
-        .sort((a, b) => (a.data.articleNumber ?? 0) - (b.data.articleNumber ?? 0));
-      parentSeries = allPosts.find(a => toSlug(a.id) === parentSlug);
+    if (isPart && siblings) {
       const idx = siblings.findIndex(a => a.id === p.id);
       prevArticle = idx > 0 ? siblings[idx - 1] : undefined;
-      nextArticle = idx < siblings.length - 1 ? siblings[idx + 1] : undefined;
-      seriesArticles = siblings;
+      nextArticle = idx >= 0 && idx < siblings.length - 1 ? siblings[idx + 1] : undefined;
     }
 
     return {
-      params: { slug },
-      props: {
-        entry: p, seriesArticles, parentSeries, prevArticle, nextArticle,
-        // there is no series-home post, so the series identity comes from the
-        // `series` field the parts share
-        seriesName: p.data.series,
-      },
+      params: { slug: toSlug(p.id) },
+      props: { entry: p, seriesArticles, parentSeries, prevArticle, nextArticle, seriesName },
     };
   });
 }

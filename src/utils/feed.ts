@@ -48,37 +48,43 @@ export async function getFeed(): Promise<FeedItem[]> {
       seriesName: e.data.series,
     }));
 
-  // A sub-article's slug is "folder/child". Collapse each folder into a single
-  // series card so a nine-part run occupies one row instead of nine.
-  //
-  // There is no "series home" post to hang them on — the folder has no parent
-  // file — so the card is synthesised from the folder itself and titled by the
-  // `series` field the parts share.
+  // Collapse a series into a single row. Parts are identified by the shared
+  // `series` field rather than the folder, because the folder and the home post
+  // can disagree — here the home is COIN-Research-202603.mdx while its parts sit
+  // in COIN-Research-202602/. Folder-based grouping produced two rows for one
+  // series: a synthesised card plus the home post listed on its own.
   const p: FeedItem[] = [];
-  const groups = new Map<string, FeedItem>();
+  const partsOf = new Map<string, FeedItem[]>();
   for (const item of all) {
-    const cut = item.slug.indexOf("/");
-    if (cut < 0) { p.push(item); continue; }
-    const key = item.slug.slice(0, cut);
-    let g = groups.get(key);
-    if (!g) {
-      g = {
-        kind: "post", slug: key, href: "", body: "", words: 0, tags: [],
-        date: item.date, children: [],
-        title: item.seriesName ?? key.replace(/-/g, " "),
-      };
-      groups.set(key, g);
-      p.push(g);
+    if (item.seriesName && item.articleNumber != null) {
+      (partsOf.get(item.seriesName) ?? partsOf.set(item.seriesName, []).get(item.seriesName)!).push(item);
     }
-    g.children!.push(item);
-    if (item.seriesName) g.title = item.seriesName;
   }
-  for (const g of groups.values()) {
-    g.children!.sort((a, b) => (a.articleNumber ?? 0) - (b.articleNumber ?? 0));
-    g.date = new Date(Math.max(...g.children!.map((c) => +c.date)));   // as recent as its newest part
-    g.href = g.children![0].href;                                      // the card opens part one
-    g.words = g.children!.reduce((n, c) => n + c.words, 0);
-    g.description = `${g.children!.length} parts · ${g.children!.reduce((n, c) => n + c.words, 0).toLocaleString()} words`;
+
+  const claimed = new Set<string>();
+  for (const item of all) {
+    if (item.seriesName && item.articleNumber != null) continue;   // a part, never top level
+    const parts = item.seriesName ? partsOf.get(item.seriesName) : undefined;
+    if (parts?.length) {
+      // this is the series home: hang the parts off it
+      item.children = [...parts].sort((a, b) => (a.articleNumber ?? 0) - (b.articleNumber ?? 0));
+      item.date = new Date(Math.max(+item.date, ...parts.map((c) => +c.date)));
+      claimed.add(item.seriesName);
+    }
+    p.push(item);
+  }
+
+  // a series with parts but no home post still gets one synthesised card
+  for (const [name, parts] of partsOf) {
+    if (claimed.has(name)) continue;
+    const sorted = [...parts].sort((a, b) => (a.articleNumber ?? 0) - (b.articleNumber ?? 0));
+    p.push({
+      kind: "post", slug: name.toLowerCase().replace(/\W+/g, "-"),
+      href: sorted[0].href, body: "", tags: [], title: name,
+      words: sorted.reduce((n, c) => n + c.words, 0),
+      date: new Date(Math.max(...sorted.map((c) => +c.date))),
+      children: sorted,
+    });
   }
 
   const n: FeedItem[] = live(notes)
@@ -103,3 +109,31 @@ export const fmtDate = (d: Date) =>
   d.toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });
 
 export const readingMinutes = (words: number) => Math.max(1, Math.round(words / 220));
+
+/**
+ * A clean meta description from raw MDX body text. Slicing the body directly
+ * leaks newlines, markdown syntax and mid-word truncation into <meta> and
+ * og:description, which is what the notes route was doing.
+ */
+export function excerpt(md: string, max = 155): string {
+  const flat = md
+    .replace(/^---[\s\S]*?---/, "")          // frontmatter
+    .replace(/```[\s\S]*?```/g, " ")          // fenced code
+    .replace(/!\[[^\]]*\]\([^)]*\)/g, " ")    // images
+    .replace(/\[([^\]]*)\]\([^)]*\)/g, "$1")  // links -> text
+    .replace(/<[^>]+>/g, " ")                  // html / jsx
+    .replace(/[*_`#>]/g, "")                   // markdown marks
+    .replace(/\s+/g, " ")
+    .trim();
+  if (flat.length <= max) return flat;
+  const cut = flat.slice(0, max);
+  return cut.slice(0, cut.lastIndexOf(" ")).replace(/[,;:.]$/, "") + "…";
+}
+
+/** First sentence, for notes with no title of their own. */
+export const firstSentence = (md: string, max = 70): string => {
+  const e = excerpt(md, 300);
+  const stop = e.search(/[.!?](\s|$)/);
+  const s = stop > 0 ? e.slice(0, stop + 1) : e;
+  return s.length <= max ? s : s.slice(0, max).replace(/\s\S*$/, "") + "…";
+};

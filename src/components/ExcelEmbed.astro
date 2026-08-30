@@ -1,12 +1,143 @@
 ---
-import ExcelViewer from './ExcelViewer.tsx';
+/**
+ * Renders a spreadsheet as static HTML, parsed at BUILD time.
+ *
+ * This replaced a React island that fetched the .xlsx in the browser and parsed
+ * it with SheetJS. Three reasons it had to go:
+ *
+ *  1. Security. `xlsx` carries an unfixable high-severity advisory (prototype
+ *     pollution + ReDoS, GHSA-4r6h-8v6p-xvw6); the npm package is abandoned at
+ *     0.18.5. It was the only dependency whose code ran in visitors' browsers.
+ *     Parsing here instead means it never reaches them, and the only input is a
+ *     file committed to this repo rather than anything untrusted.
+ *  2. It was invisible anyway. The old component was styled entirely in
+ *     Tailwind classes, and Tailwind stopped being compiled — it emitted zero
+ *     bytes — so the viewer rendered unstyled on both pages that use it.
+ *  3. Weight. Those two pages shipped ~198 KB gzipped of React + SheetJS for
+ *     one table. Now they ship none.
+ *
+ * Tab switching is a few lines of vanilla JS; without JS every sheet is still
+ * present and readable, just stacked.
+ */
+import * as XLSX from "xlsx";
+import { readFileSync } from "node:fs";
+import { fileURLToPath } from "node:url";
 
-interface Props {
-  src: string;
-  filename?: string;
-}
+interface Props { src: string; filename?: string }
+const { src, filename = "model.xlsx" } = Astro.props;
 
-const { src, filename } = Astro.props;
+const abs = fileURLToPath(new URL(`../../public${src}`, import.meta.url));
+const wb = XLSX.read(readFileSync(abs), { type: "buffer" });
+
+const sheets = wb.SheetNames.map((name) => {
+  const rows = (XLSX.utils.sheet_to_json(wb.Sheets[name], {
+    header: 1, blankrows: false, defval: "",
+  }) as unknown[][]).filter((r) => r.some((c) => String(c).trim() !== ""));
+  const width = Math.max(0, ...rows.map((r) => r.length));
+  return {
+    name,
+    id: name.toLowerCase().replace(/\W+/g, "-"),
+    head: rows[0] ?? [],
+    body: rows.slice(1),
+    width,
+  };
+}).filter((s) => s.body.length > 0);
+
+const fmt = (v: unknown) =>
+  typeof v === "number" ? new Intl.NumberFormat("en-US", { maximumFractionDigits: 2 }).format(v)
+  : String(v ?? "");
+const isNum = (v: unknown) => typeof v === "number";
 ---
+<figure class="sheet" data-sheet>
+  <div class="tabs" role="tablist" aria-label={filename}>
+    {sheets.map((s, i) => (
+      <button role="tab" type="button" data-tab={s.id}
+        aria-selected={i === 0 ? "true" : "false"}
+        aria-controls={`panel-${s.id}`}>{s.name}</button>
+    ))}
+  </div>
 
-<ExcelViewer src={src} filename={filename} client:load />
+  {sheets.map((s, i) => (
+    <div class="panel" id={`panel-${s.id}`} data-panel={s.id} role="tabpanel"
+      aria-label={s.name} hidden={i !== 0}>
+      <div class="scroll">
+        <table>
+          <thead>
+            <tr>{Array.from({ length: s.width }, (_, c) => (
+              <th scope="col">{fmt(s.head[c])}</th>
+            ))}</tr>
+          </thead>
+          <tbody>
+            {s.body.map((row) => (
+              <tr>{Array.from({ length: s.width }, (_, c) => (
+                <td class={isNum(row[c]) ? "n" : undefined}>{fmt(row[c])}</td>
+              ))}</tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  ))}
+
+  <figcaption>
+    <span>{filename}</span>
+    <a href={src} download={filename}>Download the workbook ↓</a>
+  </figcaption>
+</figure>
+
+<style>
+  .sheet{
+    margin:clamp(26px,3.6vw,40px) 0;border:1px solid var(--rule);border-radius:16px;
+    overflow:hidden;background:rgba(255,255,255,.026);
+  }
+  .tabs{ display:flex;overflow-x:auto;border-bottom:1px solid var(--rule);scrollbar-width:none; }
+  .tabs::-webkit-scrollbar{ display:none; }
+  .tabs button{
+    appearance:none;background:none;border:0;cursor:pointer;white-space:nowrap;
+    font-family:var(--sans);font-size:12.5px;color:var(--text-3);
+    padding:12px clamp(12px,1.6vw,17px);border-bottom:2px solid transparent;
+    transition:color .25s,border-color .25s;
+  }
+  .tabs button:hover{ color:var(--text); }
+  .tabs button[aria-selected="true"]{ color:var(--glow);border-bottom-color:var(--peacock); }
+  .tabs button:focus-visible{ outline:2px solid var(--glow);outline-offset:-2px; }
+  .scroll{ overflow:auto;max-height:min(60svh,520px); }
+  table{ border-collapse:collapse;width:100%;font-family:var(--sans);font-size:12.5px; }
+  th,td{
+    padding:7px 12px;text-align:left;white-space:nowrap;
+    border-bottom:1px solid var(--rule);color:var(--text-2);
+  }
+  th{
+    position:sticky;top:0;background:#0C1519;color:var(--text);
+    font-weight:500;font-size:11.5px;letter-spacing:.04em;
+  }
+  td.n{ text-align:right;font-variant-numeric:tabular-nums;color:var(--text); }
+  tbody tr:hover td{ background:rgba(255,255,255,.03); }
+  figcaption{
+    display:flex;flex-wrap:wrap;gap:8px 18px;justify-content:space-between;align-items:baseline;
+    padding:11px clamp(12px,1.6vw,17px);border-top:1px solid var(--rule);
+    font-family:var(--sans);font-size:12.5px;color:var(--text-3);
+  }
+  figcaption a{ color:var(--glow);text-decoration:none;border-bottom:1px solid rgba(62,212,224,.35); }
+</style>
+
+<script>
+  for (const fig of document.querySelectorAll<HTMLElement>('[data-sheet]')) {
+    const tabs = [...fig.querySelectorAll<HTMLButtonElement>('[data-tab]')];
+    const panels = [...fig.querySelectorAll<HTMLElement>('[data-panel]')];
+    const show = (id: string) => {
+      for (const t of tabs) t.setAttribute('aria-selected', String(t.dataset.tab === id));
+      for (const p of panels) p.hidden = p.dataset.panel !== id;
+    };
+    tabs.forEach((t, i) => {
+      t.addEventListener('click', () => show(t.dataset.tab!));
+      t.addEventListener('keydown', (e) => {
+        const d = e.key === 'ArrowRight' ? 1 : e.key === 'ArrowLeft' ? -1 : 0;
+        if (!d) return;
+        e.preventDefault();
+        const next = tabs[(i + d + tabs.length) % tabs.length];
+        next.focus(); show(next.dataset.tab!);
+      });
+    });
+  }
+</script>

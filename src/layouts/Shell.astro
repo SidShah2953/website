@@ -266,8 +266,12 @@ const nav = [
         position:relative;z-index:1;border-top:1px solid var(--rule);
         margin-top:clamp(60px,10vw,120px);padding:38px clamp(18px,4vw,42px) 54px;
         font-family:var(--sans);font-size:13px;color:var(--text-3);
-        display:flex;flex-wrap:wrap;gap:6px 26px;justify-content:space-between;
+        display:flex;flex-wrap:wrap;gap:8px 26px;
+        justify-content:space-between;align-items:baseline;
       }
+      footer p:first-child{ margin-inline-end:auto;text-align:left; }
+      footer .disc{ text-align:right; }
+      @media (max-width:640px){ footer .disc{ text-align:left; } }
       footer p{margin:0}
       .disc{max-width:52ch}
       ::selection{background:rgba(62,212,224,.24)}
