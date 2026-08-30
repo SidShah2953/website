@@ -18,18 +18,18 @@ W = {
  'usdc-stablecoin':       {'fin':.30,'da':.70},
  'cryptos-transparency-paradox':{'da':1.0},
  'momentum-crude-oil-trading':{'fin':1.0},
- 'stems-2024-talk':       {'fin':.85,'craft':.15},
+ 'stems-2024-talk':       {'fin':.85,'side':.15},
  'svi-with-pyro':         {'tech':1.0},
  'bagged-ensemble-accuracy':{'tech':1.0},
  'ai-model-demo':         {'tech':1.0},
- 'f1-lap-time-prediction':{'tech':.60,'craft':.40},
- 'pyspark-vs-kdb':        {'tech':.50,'craft':.50},
- 'greek-vase-volume-analysis':{'craft':1.0},
- 'hfea-data':             {'craft':1.0},
- 'macos-apps':            {'craft':1.0},
- 'finlatics-baep':        {'craft':1.0},
+ 'f1-lap-time-prediction':{'tech':.60,'side':.40},
+ 'pyspark-vs-kdb':        {'tech':.50,'side':.50},
+ 'greek-vase-volume-analysis':{'side':1.0},
+ 'hfea-data':             {'side':1.0},
+ 'macos-apps':            {'side':1.0},
+ 'finlatics-baep':        {'side':1.0},
 }
-THEMES=['fin','da','tech','craft']
+THEMES=['fin','da','tech','side']
 
 STOP=set("""a about above after again against all am an and any are aren as at be because been before
 being below between both but by can cannot could couldn did didn do does doesn doing don down during

@@ -24,18 +24,18 @@ export const PIECE_AREAS: Record<string, Partial<Record<AreaId, number>>> = {
   "usdc-stablecoin":             { fin: .30, da: .70 },
   "cryptos-transparency-paradox":{ da: 1 },
   "momentum-crude-oil-trading":  { fin: 1 },
-  "stems-2024-talk":             { fin: .85, craft: .15 },
+  "stems-2024-talk":             { fin: .85, side: .15 },
   "svi-with-pyro":               { tech: 1 },
   "bagged-ensemble-accuracy":    { tech: 1 },
   "ai-model-demo":               { tech: 1 },
-  "f1-lap-time-prediction":      { tech: .60, craft: .40 },
-  "pyspark-vs-kdb":              { tech: .50, craft: .50 },
-  "greek-vase-volume-analysis":  { craft: 1 },
-  "hfea-data":                   { craft: 1 },
-  "macos-apps":                  { craft: 1 },
-  "finlatics-baep":              { craft: 1 },
+  "f1-lap-time-prediction":      { tech: .60, side: .40 },
+  "pyspark-vs-kdb":              { tech: .50, side: .50 },
+  "greek-vase-volume-analysis":  { side: 1 },
+  "hfea-data":                   { side: 1 },
+  "macos-apps":                  { side: 1 },
+  "finlatics-baep":              { side: 1 },
 };
 
 /** Falls back to an even split so an untracked piece never breaks the build. */
 export const areasFor = (slug: string): Partial<Record<AreaId, number>> =>
-  PIECE_AREAS[slug.toLowerCase()] ?? { fin: .25, da: .25, tech: .25, craft: .25 };
+  PIECE_AREAS[slug.toLowerCase()] ?? { fin: .25, da: .25, tech: .25, side: .25 };

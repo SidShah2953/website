@@ -11,13 +11,13 @@
  * that isn't listed here fails the build, which is the point — no drift.
  */
 
-export type AreaId = "fin" | "da" | "tech" | "craft";
+export type AreaId = "fin" | "da" | "tech" | "side";
 
 export const AREAS: Record<AreaId, { label: string; rgb: [number, number, number] }> = {
   fin:   { label: "Finance",             rgb: [32, 142, 197] },
   da:    { label: "Digital Assets",      rgb: [69, 181, 237] },
   tech:  { label: "Technology",          rgb: [47, 111, 232] },
-  craft: { label: "Side Quests",         rgb: [122, 100, 220] },
+  side: { label: "Side Quests",         rgb: [122, 100, 220] },
 };
 
 export const THEMES: Record<string, { area: AreaId; label: string }> = {
@@ -48,14 +48,14 @@ export const THEMES: Record<string, { area: AreaId; label: string }> = {
 
   // Side Quests — everything that is not the day job. Deliberately broad: this
   // is where non-work writing lands, not an appendix to the work.
-  "tools":                 { area: "craft", label: "tools" },
-  "workflow":              { area: "craft", label: "workflow" },
-  "books":                 { area: "craft", label: "books" },
-  "teaching":              { area: "craft", label: "teaching" },
-  "odd-measurements":      { area: "craft", label: "odd measurements" },
-  "mathematical-modelling":{ area: "craft", label: "mathematical modelling" },
-  "motorsport":            { area: "craft", label: "motorsport" },
-  "design":                { area: "craft", label: "design" },
+  "tools":                 { area: "side", label: "tools" },
+  "workflow":              { area: "side", label: "workflow" },
+  "books":                 { area: "side", label: "books" },
+  "teaching":              { area: "side", label: "teaching" },
+  "odd-measurements":      { area: "side", label: "odd measurements" },
+  "mathematical-modelling":{ area: "side", label: "mathematical modelling" },
+  "motorsport":            { area: "side", label: "motorsport" },
+  "design":                { area: "side", label: "design" },
 };
 
 /**
