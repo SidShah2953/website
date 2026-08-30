@@ -16,3 +16,14 @@ Two traps this had to work around, both of which produced false results first:
   outside the box as fallback.
 - **Gradient-filled text has no flat colour to sample.** Anything using
   `background-clip: text` is flagged for eye-checking rather than scored.
+
+## Run these against the BUILT site, not `astro dev`
+
+    npm run build && npx serve dist -l 4399      # note: no -s, that is SPA fallback
+    node scripts/checks/responsive.mjs http://localhost:4399
+    node scripts/checks/contrast.mjs   http://localhost:4399
+
+The dev server does **not** load scoped styles for components imported inside
+MDX (`CallOutForMDX`, `ImageWithCaption`, `ModelDownload`, `ArticleLink`). They
+render unstyled in dev and correctly in the build, so auditing against `astro
+dev` gives a false picture of every article page.
