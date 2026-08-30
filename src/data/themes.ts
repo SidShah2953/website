@@ -1,0 +1,59 @@
+/**
+ * The controlled vocabulary for the word map.
+ *
+ * Pieces declare `themes: [...]` in their frontmatter using these slugs only.
+ * Each theme belongs to one of four areas. A theme's colour and position on the
+ * word map are NOT taken from its own area alone — they're blended from the
+ * areas of every piece that carries it. So "composability" leans Digital Assets
+ * but drifts toward Finance because the pieces using it are partly financial.
+ *
+ * Adding a theme: add it here, then tag the pieces. Anything in frontmatter
+ * that isn't listed here fails the build, which is the point — no drift.
+ */
+
+export type AreaId = "fin" | "da" | "tech" | "craft";
+
+export const AREAS: Record<AreaId, { label: string; rgb: [number, number, number] }> = {
+  fin:   { label: "Finance",             rgb: [23, 145, 158] },
+  da:    { label: "Digital Assets",      rgb: [62, 212, 224] },
+  tech:  { label: "Technology",          rgb: [47, 111, 232] },
+  craft: { label: "Craft & Curiosities", rgb: [122, 100, 220] },
+};
+
+export const THEMES: Record<string, { area: AreaId; label: string }> = {
+  // Finance
+  "accounting":            { area: "fin",   label: "accounting" },
+  "valuation":             { area: "fin",   label: "valuation" },
+  "unit-economics":        { area: "fin",   label: "unit economics" },
+  "market-structure":      { area: "fin",   label: "market structure" },
+  "derivatives":           { area: "fin",   label: "derivatives" },
+  "systematic-trading":    { area: "fin",   label: "systematic trading" },
+  "equity-research":       { area: "fin",   label: "equity research" },
+  "financial-modelling":   { area: "fin",   label: "financial modelling" },
+
+  // Digital Assets
+  "tokenization":          { area: "da",    label: "tokenization" },
+  "stablecoins":           { area: "da",    label: "stablecoins" },
+  "staking":               { area: "da",    label: "staking" },
+  "onchain-infrastructure":{ area: "da",    label: "onchain infrastructure" },
+  "crypto-market-structure":{ area: "da",   label: "crypto market structure" },
+  "composability":         { area: "da",    label: "composability" },
+  "defi":                  { area: "da",    label: "DeFi" },
+
+  // Technology
+  "machine-learning":      { area: "tech",  label: "machine learning" },
+  "bayesian-inference":    { area: "tech",  label: "bayesian inference" },
+  "statistics":            { area: "tech",  label: "statistics" },
+  "data-engineering":      { area: "tech",  label: "data engineering" },
+
+  // Craft & Curiosities
+  "tools":                 { area: "craft", label: "tools" },
+  "workflow":              { area: "craft", label: "workflow" },
+  "books":                 { area: "craft", label: "books" },
+  "teaching":              { area: "craft", label: "teaching" },
+  "odd-measurements":      { area: "craft", label: "odd measurements" },
+  "mathematical-modelling":{ area: "craft", label: "mathematical modelling" },
+};
+
+export const THEME_SLUGS = Object.keys(THEMES);
+export const isTheme = (s: string): s is keyof typeof THEMES => s in THEMES;

@@ -23,3 +23,6 @@ pnpm-debug.log*
 
 # macOS-specific files
 .DS_Store
+
+# iCloud sync conflict duplicates ("file 2.ts", "file 3.md")
+*[[:space:]][0-9].*
