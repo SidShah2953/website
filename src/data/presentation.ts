@@ -17,7 +17,7 @@ const presentation: Presentation = {
   title: "Hi, I'm Siddhant",
   // profile: "/profile.webp",
   description:
-    'I develop systematic approaches to investment challenges—designing momentum strategies, optimizing sector portfolios, and building institutional AI platforms that integrate research, risk, and portfolio governance in real time. My work spans quantitative research, financial modeling, emerging markets, and AI/ML in capital markets, bridging precision analytics with business insight. Skilled in *Python, SQL, Bloomberg*, and advanced portfolio modeling, I craft data-driven solutions that accelerate smarter investment decisions.',
+    'I am an equity research associate. I take the same rigorous framework — build the dataset, name the mechanism, test it, and be honest about what the numbers cannot carry — and point it at whatever is interesting. Usually that is *tokenization, digital assets and AI*; sometimes it is Formula 1 telemetry or a fertility register. This site is where I think out loud about that, in a personal capacity.',
   socials: [
     {
       label: "Email",
