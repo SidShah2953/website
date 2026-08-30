@@ -4,6 +4,7 @@ import PersonSchema from "@/components/seo/PersonSchema.astro";
 import WordMap from "@/components/WordMap.astro";
 import Surface from "@/components/Surface.astro";
 import Subscribe from "@/components/Subscribe.astro";
+import Disclosure from "@/components/Disclosure.astro";
 import { allPieces } from "@/utils/allPieces";
 import { buildIndex } from "@/utils/themeIndex";
 import { getFeed } from "@/utils/feed";
@@ -110,10 +111,7 @@ const desc =
     </div>
 
     <!-- the footer lives here: past the last snap point it is unreachable -->
-    <div class="band colophon">
-      <p>© {new Date().getFullYear()} Siddhant Shah</p>
-      <p class="disc">Written in a personal capacity. Nothing here is investment advice.</p>
-    </div>
+    <div class="band"><Disclosure /></div>
   </section>
 </Shell>
 

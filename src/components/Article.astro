@@ -15,6 +15,7 @@ import T from "@/components/T.astro";
 import { THEMES, AREAS } from "@/data/themes";
 import { countThemes } from "@/utils/themeIndex";
 import { fmtDate, readingMinutes } from "@/utils/feed";
+import Disclosure from "@/components/Disclosure.astro";
 
 type Blog = CollectionEntry<"blog">;
 interface Props {
@@ -43,9 +44,18 @@ const thesisHtml = entry.data.thesis ? await marked.parse(entry.data.thesis) : n
 const words = entry.body.split(/\s+/).length;
 
 // themes this piece actually invokes, ordered by how often
+// Anything touching a named issuer or a tradeable asset gets the asterisk at
+// the headline, not just a footer line.
+const FINANCIAL = new Set(["accounting","valuation","unit-economics","market-structure",
+  "derivatives","systematic-trading","equity-research","financial-modelling",
+  "tokenization","stablecoins","staking","onchain-infrastructure",
+  "crypto-market-structure","composability","defi"]);
+
 const themes = [...countThemes(entry.body)]
   .filter(([s]) => THEMES[s])
   .sort((a, b) => b[1] - a[1]);
+
+const needsDisclosure = themes.some(([slug]) => FINANCIAL.has(slug));
 
 /* The raw area colours are tuned for graphics and are too dark for 12px text —
    Technology (#2F6FE8) only reaches 4.28:1. Lift each toward white here, in the
@@ -66,7 +76,7 @@ const lift = ([r, g, b]: [number, number, number], k = 0.3): string =>
         {partNo != null && partCount ? <span>Part {partNo} of {partCount}</span> : null}
       </p>
     )}
-    <h1 class="h1 title">{entry.data.title}</h1>
+    <h1 class="h1 title">{entry.data.title}{needsDisclosure && <Disclosure variant="mark" />}</h1>
     {entry.data.description && <p class="lede">{entry.data.description}</p>}
     <p class="meta">
       <span>{fmtDate(entry.data.publishedAt)}</span>
@@ -129,6 +139,8 @@ const lift = ([r, g, b]: [number, number, number], k = 0.3): string =>
       </ul>
     </section>
   )}
+
+    {needsDisclosure && <div class="col"><Disclosure /></div>}
 
     <p class="col back"><a href={`/${base}/`}>← All {base === "blog" ? "writing" : base}</a></p>
   </div>
