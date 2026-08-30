@@ -8,6 +8,12 @@ const pieces = await allPieces();
 const research = pieces.filter((p) => p.kind === "research")
   .sort((a, b) => +b.entry.data.publishedAt - +a.entry.data.publishedAt);
 const socials = presentation.socials.filter((s) => s.label !== "Email");
+
+// counts shown on the cards, derived from the real sources so they cannot drift
+const courses = (await import("@/content/education/courses.json")).default as unknown[];
+const { ROLES } = await import("@/data/experience");
+const courseCount = courses.length;
+const experienceCount = ROLES.length;
 ---
 <Shell title="About | Siddhant Shah"
   description="Siddhant Shah — equity research associate. Background, published research, and how to get in touch."
@@ -46,25 +52,39 @@ const socials = presentation.socials.filter((s) => s.label !== "Email");
         do with markets, which I'd argue is the point rather than a distraction.
       </p>
 
-      <h2>Education</h2>
-      <ul>
-        <li><strong>MS, Applied Data Analytics</strong> — Boston University</li>
-        <li><strong>BS, Mathematics &amp; Computer Science</strong> — Chennai Mathematical Institute</li>
-        <li><strong>CFA</strong> — Level&nbsp;1 cleared</li>
-      </ul>
+      <h2>The detail</h2>
+      <p class="sub">
+        The full version of each, rather than a wall of bullets here.
+      </p>
+    </div>
 
-      <h2>Published research</h2>
-      <ul class="pubs">
-        {research.map((p) => (
-          <li>
-            <a href={`/research/${p.entry.id.replace(/\.(md|mdx)$/, "").toLowerCase()}/`}>
-              {p.entry.data.title}
-            </a>
-            {p.entry.data.publication && <span class="ven"> — {p.entry.data.publication}</span>}
-          </li>
-        ))}
+    <div class="wrap wrap--narrow">
+      <ul class="cards">
+        <li>
+          <a href="/about/experience/">
+            <span class="ct">Experience</span>
+            <span class="cd">Equity research, and before that systematic strategy work at Boston University.</span>
+            <span class="cm">{experienceCount} roles →</span>
+          </a>
+        </li>
+        <li>
+          <a href="/about/education/">
+            <span class="ct">Education</span>
+            <span class="cd">Boston University, Chennai Mathematical Institute, CFA Level&nbsp;1, and the courses I took for fun.</span>
+            <span class="cm">{courseCount} courses →</span>
+          </a>
+        </li>
+        <li>
+          <a href="/research/">
+            <span class="ct">Research</span>
+            <span class="cd">Peer-reviewed papers, from momentum in crude oil to the volume of Greek vases.</span>
+            <span class="cm">{research.length} papers →</span>
+          </a>
+        </li>
       </ul>
+    </div>
 
+    <div class="wrap wrap--narrow prose about">
       <h2>Teaching</h2>
       <p>
         I coach students for the International Junior Science Olympiad and have
@@ -90,6 +110,23 @@ const socials = presentation.socials.filter((s) => s.label !== "Email");
     letter-spacing:.14em;color:var(--text-3);margin-top:2.6em; }
   .about ul{ padding-left:1.1em; }
   .about li{ margin-top:.5em; }
-  .pubs .ven{ color:var(--text-3);font-size:.92em; }
+  .sub{ color:var(--text-2);margin:0; }
+  .cards{ list-style:none;margin:clamp(18px,2.6vw,28px) 0 0;padding:0;display:grid;gap:12px; }
+  @media (min-width:820px){ .cards{ grid-template-columns:repeat(3,minmax(0,1fr)); } }
+  .cards a{
+    display:grid;gap:7px;height:100%;text-decoration:none;
+    padding:clamp(18px,2.4vw,24px);border:1px solid var(--rule);border-radius:16px;
+    background:rgba(255,255,255,.026);
+    transition:border-color .3s, background .3s, transform .3s cubic-bezier(.2,.7,.3,1);
+  }
+  .cards a:hover{
+    border-color:color-mix(in srgb, var(--peacock) 55%, transparent);
+    background:rgba(255,255,255,.05);transform:translateY(-3px);
+  }
+  .ct{ font-size:clamp(18px,2vw,21px);line-height:1.2;color:var(--text); }
+  .cards a:hover .ct{ color:var(--glow); }
+  .cd{ font-family:var(--sans);font-size:clamp(13.5px,1.3vw,14.5px);color:var(--text-3);line-height:1.55; }
+  .cm{ font-family:var(--sans);font-size:12px;letter-spacing:.09em;text-transform:uppercase;
+       color:var(--peacock);margin-top:auto;padding-top:4px; }
   .links{ display:flex;flex-wrap:wrap;gap:10px clamp(16px,3vw,28px);font-family:var(--sans);font-size:15px; }
 </style>
