@@ -17,7 +17,7 @@ export const AREAS: Record<AreaId, { label: string; rgb: [number, number, number
   fin:   { label: "Finance",             rgb: [32, 142, 197] },
   da:    { label: "Digital Assets",      rgb: [69, 181, 237] },
   tech:  { label: "Technology",          rgb: [47, 111, 232] },
-  craft: { label: "Craft & Curiosities", rgb: [122, 100, 220] },
+  craft: { label: "Side Quests",         rgb: [122, 100, 220] },
 };
 
 export const THEMES: Record<string, { area: AreaId; label: string }> = {
@@ -46,13 +46,16 @@ export const THEMES: Record<string, { area: AreaId; label: string }> = {
   "statistics":            { area: "tech",  label: "statistics" },
   "data-engineering":      { area: "tech",  label: "data engineering" },
 
-  // Craft & Curiosities
+  // Side Quests — everything that is not the day job. Deliberately broad: this
+  // is where non-work writing lands, not an appendix to the work.
   "tools":                 { area: "craft", label: "tools" },
   "workflow":              { area: "craft", label: "workflow" },
   "books":                 { area: "craft", label: "books" },
   "teaching":              { area: "craft", label: "teaching" },
   "odd-measurements":      { area: "craft", label: "odd measurements" },
   "mathematical-modelling":{ area: "craft", label: "mathematical modelling" },
+  "motorsport":            { area: "craft", label: "motorsport" },
+  "design":                { area: "craft", label: "design" },
 };
 
 export const THEME_SLUGS = Object.keys(THEMES);
