@@ -67,12 +67,13 @@ export async function getFeed(): Promise<FeedItem[]> {
   const claimed = new Set<string>();
   for (const item of all) {
     if (item.seriesName && item.articleNumber != null) continue;   // a part, never top level
-    const parts = item.seriesName ? partsOf.get(item.seriesName) : undefined;
-    if (parts?.length) {
+    const name = item.seriesName;
+    const parts = name ? partsOf.get(name) : undefined;
+    if (name && parts?.length) {
       // this is the series home: hang the parts off it
       item.children = [...parts].sort((a, b) => (a.articleNumber ?? 0) - (b.articleNumber ?? 0));
       item.date = new Date(Math.max(+item.date, ...parts.map((c) => +c.date)));
-      claimed.add(item.seriesName);
+      claimed.add(name);
     }
     p.push(item);
   }

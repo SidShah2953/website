@@ -16,7 +16,22 @@ permissions:
   id-token: write
 
 jobs:
+  # Gate the deploy on type checking. astro check is clean as of this commit, so
+  # a new type error fails here rather than shipping. Delete this job (and the
+  # `needs: check` below) if it ever gets in the way.
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: npm run check
+
   build:
+    needs: check
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
