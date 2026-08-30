@@ -3,6 +3,7 @@ import Shell from "@/layouts/Shell.astro";
 import BreadcrumbSchema from "@/components/seo/BreadcrumbSchema.astro";
 import { getFeed, fmtDate, readingMinutes } from "@/utils/feed";
 import { marked } from "marked";
+import Disclosure from "@/components/Disclosure.astro";
 
 const feed = await getFeed();
 const posts = feed.reduce((n, f) => n + (f.kind === "post" ? 1 + (f.children?.length ?? 0) : 0), 0);
@@ -79,6 +80,7 @@ const inline = (md: string) => marked.parse(md.trim(), { async: false }) as stri
           </li>
         ))}
       </ul>
+      <Disclosure />
     </div>
   </div>
 </Shell>

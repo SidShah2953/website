@@ -1,6 +1,7 @@
 ---
 import Shell from "@/layouts/Shell.astro";
 import BreadcrumbSchema from "@/components/seo/BreadcrumbSchema.astro";
+import Disclosure from "@/components/Disclosure.astro";
 import PersonSchema from "@/components/seo/PersonSchema.astro";
 import presentation from "@/data/presentation";
 import { allPieces } from "@/utils/allPieces";
@@ -40,7 +41,7 @@ const experienceCount = ROLES.length;
         model, and being honest about which assumptions are carrying the answer.
       </p>
       <p>
-        This site is where I think out loud about that. It is <strong>not</strong>
+        This site is where I think out loud about that.<Disclosure variant="mark" /> It is <strong>not</strong>
         investment advice, and it isn't my firm's research — that work belongs to
         them and stays there. What's here is the part I'd explain to a curious
         friend over coffee: why an accounting rule made a profitable company post a
@@ -97,6 +98,8 @@ const experienceCount = ROLES.length;
       </p>
 
       <h2>Elsewhere</h2>
+      <Disclosure />
+
       <p class="links">
         <a href={`mailto:${presentation.mail}`}>{presentation.mail}</a>
         {socials.map((s) => <a href={s.link} rel="me">{s.label}</a>)}
