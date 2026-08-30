@@ -37,6 +37,13 @@ const words = entry.body.split(/\s+/).length;
 const themes = [...countThemes(entry.body)]
   .filter(([s]) => THEMES[s])
   .sort((a, b) => b[1] - a[1]);
+
+/* The raw area colours are tuned for graphics and are too dark for 12px text —
+   Technology (#2F6FE8) only reaches 4.28:1. Lift each toward white here, in the
+   build, rather than with color-mix(): color-mix() against an *unregistered*
+   custom property computes to black in Chromium, which made the chips invisible. */
+const lift = ([r, g, b]: [number, number, number], k = 0.3): string =>
+  `rgb(${Math.round(r + (234 - r) * k)},${Math.round(g + (243 - g) * k)},${Math.round(b + (245 - b) * k)})`;
 ---
 <article class="page">
   <header class="wrap wrap--narrow">
@@ -58,7 +65,8 @@ const themes = [...countThemes(entry.body)]
     {themes.length > 0 && (
       <p class="themes">
         {themes.map(([s]) => (
-          <a href={`/themes/${s}/`} style={`--tc: rgb(${AREAS[THEMES[s].area].rgb.join(",")})`}>
+          <a href={`/themes/${s}/`}
+            style={`--tc: rgb(${AREAS[THEMES[s].area].rgb.join(",")}); --tct: ${lift(AREAS[THEMES[s].area].rgb)}`}>
             {THEMES[s].label}
           </a>
         ))}
@@ -127,7 +135,9 @@ const themes = [...countThemes(entry.body)]
   }
   .themes{ display:flex;flex-wrap:wrap;gap:8px;margin:0; }
   .themes a{
-    font-family:var(--sans);font-size:12px;text-decoration:none;color:var(--tc);
+    /* the raw area colour is tuned for graphics; Technology (#2F6FE8) only
+       reaches 4.28:1 at this size, so lift it toward white for text use */
+    font-family:var(--sans);font-size:12.5px;text-decoration:none;color:var(--tct);
     border:1px solid color-mix(in srgb, var(--tc) 38%, transparent);
     border-radius:999px;padding:5px 12px;transition:background .25s;
   }

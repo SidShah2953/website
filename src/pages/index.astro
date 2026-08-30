@@ -20,7 +20,7 @@ const email = presentation.mail;
 const desc =
   "Siddhant Shah — equity research associate. I write about finance, digital assets, technology, and whatever else I end up measuring.";
 ---
-<Shell title="Siddhant Shah" description={desc} canonical="/" transparentHeader snap atmosphere="surface">
+<Shell title="Siddhant Shah" description={desc} canonical="/" transparentHeader snap atmosphere="surface" footer={false}>
   <PersonSchema slot="head" />
 
   <!-- 1 · the opening -->
@@ -105,6 +105,12 @@ const desc =
         </p>
       </div>
       <Subscribe />
+    </div>
+
+    <!-- the footer lives here: past the last snap point it is unreachable -->
+    <div class="band colophon">
+      <p>© {new Date().getFullYear()} Siddhant Shah</p>
+      <p class="disc">Written in a personal capacity. Nothing here is investment advice.</p>
     </div>
   </section>
 </Shell>
@@ -195,4 +201,13 @@ const desc =
   .pt{font-size:clamp(19px,2.1vw,25px);color:var(--text);line-height:1.24}
   .pd{font-family:var(--sans);font-size:14px;color:var(--text-3);max-width:74ch;line-height:1.55}
   .posts a:hover .pt{color:var(--glow)}
+
+  .colophon{
+    margin-top:auto;padding-top:clamp(26px,4vw,44px);
+    border-top:1px solid var(--rule);
+    display:flex;flex-wrap:wrap;gap:6px clamp(18px,3vw,30px);justify-content:space-between;
+    font-family:var(--sans);font-size:13.5px;color:var(--text-3);
+  }
+  .colophon p{margin:0}
+  .colophon .disc{max-width:52ch}
 </style>

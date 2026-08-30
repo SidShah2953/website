@@ -15,8 +15,15 @@ export type Props = HeadTags & {
    *             quieter, so the text stays the subject. This is the default.
    */
   atmosphere?: "surface" | "lines" | "none";
+  /**
+   * Set false where the page owns its own ending. On the snapping homepage the
+   * last slide fills the viewport, so a trailing footer sits past the final
+   * snap point and cannot be scrolled to — it moves into the contact section
+   * instead.
+   */
+  footer?: boolean;
 };
-const { transparentHeader = false, snap = false, atmosphere = "lines", ...headTags } = Astro.props;
+const { transparentHeader = false, snap = false, atmosphere = "lines", footer = true, ...headTags } = Astro.props;
 
 /* ---------------------------------------------------------------------------
    Flow lines, generated once at build time. These trace the same value-noise
@@ -100,16 +107,22 @@ const nav = [
 
     <main><slot /></main>
 
-    <footer>
-      <p>© {new Date().getFullYear()} Siddhant Shah</p>
-      <p class="disc">Written in a personal capacity. Nothing here is investment advice.</p>
-    </footer>
+    {footer && (
+      <footer>
+        <p>© {new Date().getFullYear()} Siddhant Shah</p>
+        <p class="disc">Written in a personal capacity. Nothing here is investment advice.</p>
+      </footer>
+    )}
 
     <style is:global>
       :root{
         --ground:#050C0F; --deep:#0A2027; --abyss:#0C3A42;
         --peacock:#17919E; --glow:#3ED4E0; --azure:#2F6FE8; --iris:#6A5AD8;
-        --text:#DEEAEC; --text-2:#93AAAF; --text-3:#5F757A;
+        --text:#DEEAEC; --text-2:#93AAAF;
+        /* #5F757A measured 3.54-4.05:1 on the grounds it actually sits on — below
+           WCAG AA. It carries dates, captions, meta, TOC links and the footer,
+           so it was the single cause of most contrast failures. */
+        --text-3:#72888D;
         --rule:rgba(255,255,255,.08);
         --serif:"Newsreader Variable",Georgia,"Times New Roman",serif;
         --sans:"Schibsted Grotesk Variable","Helvetica Neue",Arial,sans-serif;
