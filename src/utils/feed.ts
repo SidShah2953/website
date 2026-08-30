@@ -20,6 +20,8 @@ export type FeedItem = {
   date: Date;
   tags: string[];
   words: number;
+  /** Themes declared in frontmatter, merged with any inline markers downstream. */
+  themes?: string[];
   crosspost?: string;
   via?: string;
 };
@@ -46,6 +48,7 @@ export async function getFeed(): Promise<FeedItem[]> {
       words: e.body.split(/\s+/).length,
       articleNumber: e.data.articleNumber,
       seriesName: e.data.series,
+      themes: e.data.themes ?? [],
     }));
 
   // Collapse a series into a single row. Parts are identified by the shared
@@ -98,6 +101,7 @@ export async function getFeed(): Promise<FeedItem[]> {
       date: e.data.publishedAt,
       tags: e.data.tags ?? [],
       words: e.body.split(/\s+/).length,
+      themes: e.data.themes ?? [],
       crosspost: e.data.crosspost,
       via: e.data.via,
     }));
