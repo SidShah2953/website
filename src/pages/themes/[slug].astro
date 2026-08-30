@@ -55,7 +55,9 @@ const href = (p: any) =>
           <a href={href(p)}>
             {/* a note has no title by design, so show the note itself */}
             <span class="pt">{p.entry.data.title ?? excerpt(p.entry.body, 110)}</span>
-            {p.entry.data.description && <span class="pd">{p.entry.data.description}</span>}
+            {"description" in p.entry.data && p.entry.data.description && (
+              <span class="pd">{p.entry.data.description}</span>
+            )}
             <span class="pm">
               {p.kind === "notes" ? "note" : p.kind}
               {p.n > 1 ? ` · mentioned ${p.n}×` : ""}
