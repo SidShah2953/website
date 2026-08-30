@@ -20,11 +20,11 @@ const email = presentation.mail;
 const desc =
   "Siddhant Shah — equity research associate. I write about finance, digital assets, technology, and whatever else I end up measuring.";
 ---
-<Shell title="Siddhant Shah" description={desc} canonical="/" transparentHeader>
+<Shell title="Siddhant Shah" description={desc} canonical="/" transparentHeader snap>
   <PersonSchema slot="head" />
 
   <!-- 1 · the opening -->
-  <section class="hero">
+  <section class="slide hero">
     <Surface />
     <!-- scrim: guarantees copy contrast no matter where the surface flows -->
     <div class="scrim" aria-hidden="true"></div>
@@ -38,11 +38,12 @@ const desc =
     </p>
     </div>
     <div class="scroll-cue" aria-hidden="true"><span></span></div>
+  </div>
   </section>
 
   <!-- 2 · who I am -->
-  <section class="band rise">
-    <h2 class="eyebrow">Who I am</h2>
+  <section class="slide rise">
+    <div class="band"><h2 class="eyebrow">Who I am</h2>
     <div class="two">
       <p class="big">
         I like taking something that looks impenetrable — an accounting rule, a
@@ -56,22 +57,24 @@ const desc =
         <p><a class="ln" href="/about">The longer version →</a></p>
       </div>
     </div>
+  </div>
   </section>
 
   <!-- 3 · what I talk about -->
-  <section class="band rise">
-    <h2 class="eyebrow">What I talk about</h2>
+  <section class="slide rise">
+    <div class="band"><h2 class="eyebrow">What I talk about</h2>
     <p class="lede">
       Every word below is marked up inside the writing itself. Size is how often
       I actually reach for an idea; colour and position are blended from the
       areas it turns up in. Click one to read everything on it.
     </p>
     <WordMap themes={themes} />
+  </div>
   </section>
 
   <!-- 4 · latest -->
-  <section class="band rise">
-    <h2 class="eyebrow">Recently</h2>
+  <section class="slide rise">
+    <div class="band"><h2 class="eyebrow">Recently</h2>
     <ul class="posts">
       {latest.map((p) => (
         <li>
@@ -83,11 +86,12 @@ const desc =
       ))}
     </ul>
     <p><a class="ln" href="/blog">Everything I've written →</a></p>
+  </div>
   </section>
 
   <!-- 5 · contact + list -->
-  <section class="band rise" id="contact">
-    <h2 class="eyebrow">Get in touch</h2>
+  <section class="slide rise" id="contact">
+    <div class="band"><h2 class="eyebrow">Get in touch</h2>
     <div class="two">
       <div>
         <p class="big">Say hello.</p>
@@ -104,10 +108,13 @@ const desc =
 </Shell>
 
 <style>
-  .hero{
+  /* Every homepage section is a full-height slide. Mandatory snap is only safe
+     because each one fits the viewport — verified at 390px through 1512px. */
+  .slide{
     min-height:100svh;display:flex;flex-direction:column;justify-content:center;
-    padding:0 clamp(18px,6vw,80px);margin:0 auto;position:relative;isolation:isolate;
+    position:relative;scroll-snap-align:start;scroll-snap-stop:always;
   }
+  .hero{padding:0 clamp(18px,6vw,80px);isolation:isolate}
   .hero-copy{position:relative;z-index:2;max-width:1180px;margin:0 auto;width:100%}
   .scrim{
     position:absolute;inset:0;z-index:1;pointer-events:none;
@@ -145,7 +152,12 @@ const desc =
   .scroll-cue span{position:absolute;inset:0;background:var(--glow);animation:cue 2.6s ease-in-out infinite}
   @keyframes cue{0%{transform:translateY(-100%)}60%,100%{transform:translateY(100%)}}
 
-  .band{max-width:1180px;margin:0 auto;padding:clamp(70px,11vw,140px) clamp(18px,6vw,80px) 0}
+  .band{
+    max-width:1180px;margin:0 auto;width:100%;
+    padding:clamp(40px,7vw,90px) clamp(18px,6vw,80px);
+  }
+  @media (max-height: 820px){ .band{padding-block:clamp(24px,3.5vw,48px)} }
+  .lede{margin-bottom:clamp(16px,2.4vw,34px)}
   .eyebrow{
     font-family:var(--sans);font-size:11.5px;letter-spacing:.22em;text-transform:uppercase;
     color:var(--text-3);margin:0 0 26px;font-weight:500;
