@@ -118,7 +118,11 @@ const nav = [
       :root{
         --ground:#050C0F; --deep:#0A2027; --abyss:#0C3A42;
         --peacock:#17919E; --glow:#3ED4E0; --azure:#2F6FE8; --iris:#6A5AD8;
-        --text:#DEEAEC; --text-2:#93AAAF;
+        --text:#DEEAEC;
+        /* #93AAAF measured 8.08:1 and read dim — it carries ledes, callout and
+           table body copy, and the article intro. Lifted to 11.14:1, which stays
+           clearly below --text (16.03:1) so the hierarchy survives. */
+        --text-2:#B4C6CA;
         /* #5F757A measured 3.54-4.05:1 on the grounds it actually sits on — below
            WCAG AA. It carries dates, captions, meta, TOC links and the footer,
            so it was the single cause of most contrast failures. */
