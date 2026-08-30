@@ -1,7 +1,7 @@
 /** Audits every page type for horizontal overflow and unreadably small text. */
 import { chromium } from 'playwright';
 const BASE = process.argv[2] ?? 'http://localhost:4321';
-const PAGES = ['/', '/about/', '/blog/', '/research/', '/projects/',
+const PAGES = ['/', '/about/', '/about/experience/', '/about/education/', '/blog/', '/research/', '/projects/',
   '/blog/svi-with-pyro/', '/blog/coin-research-202602/model-walkthrough/',
   '/research/greek-vase-volume-analysis/', '/themes/composability/',
   '/notes/2026-08-30-first/'];

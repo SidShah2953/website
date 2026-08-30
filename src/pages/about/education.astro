@@ -4,10 +4,10 @@ import Entry from "@/components/Entry.astro";
 import formatDateFromJSON from "@/utils/formatDateFromJSON";
 import courses from "@/content/education/courses.json";
 ---
-<Shell title="Education | Siddhant Shah" description="Degrees, and the courses I took because I wanted to." canonical="/education/">
+<Shell title="Education | Siddhant Shah" description="Degrees, and the courses I took because I wanted to." canonical="/about/education/">
   <div class="page">
     <div class="wrap wrap--narrow">
-      <p class="eyebrow">Education</p>
+      <p class="eyebrow crumb"><a href="/about/">About</a> <span>/</span> Education</p>
       <h1 class="h1">Education.</h1>
       <p class="lede">Degrees, and the courses I took because I wanted to.</p>
       <ul class="entries"><Entry
@@ -68,7 +68,7 @@ import courses from "@/content/education/courses.json";
     </article>
   </Fragment>
       </ul>
-      <p class="back"><a href="/about/">← About me</a></p>
+      <p class="back"><a href="/about/">← Back to About</a></p>
     </div>
   </div>
 </Shell>
@@ -76,5 +76,9 @@ import courses from "@/content/education/courses.json";
 <style>
   .entries{ list-style:none;margin:0;padding:0;border-top:1px solid var(--rule); }
   .back{ margin-top:clamp(28px,4vw,48px);font-family:var(--sans);font-size:14px; }
+  .crumb{ display:flex;flex-wrap:wrap;gap:8px;align-items:baseline; }
+  .crumb a{ color:var(--peacock);text-decoration:none; }
+  .crumb a:hover{ color:var(--glow); }
+  .crumb span{ color:var(--text-3); }
   .back a{ color:var(--glow);text-decoration:none; }
 </style>

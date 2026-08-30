@@ -15,6 +15,12 @@ const isDev = process.env.NODE_ENV === 'development';
 // https://astro.build/config
 export default defineConfig({
   output: 'static',
+  // Experience and Education became subpages of About. The old top-level URLs
+  // were live, so they redirect rather than 404.
+  redirects: {
+    '/experience': '/about/experience/',
+    '/education': '/about/education/',
+  },
   ...(isDev ? { image: { service: passthroughImageService() } } : {}),
   vite: {
     plugins: [tailwindcss()],
