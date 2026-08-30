@@ -1,7 +1,7 @@
 ---
 import { getCollection, type CollectionEntry } from "astro:content";
 import Shell from "@/layouts/Shell.astro";
-import { countThemes } from "@/utils/themeIndex";
+import { themesFor } from "@/utils/themeIndex";
 import { THEMES, displayLabel } from "@/data/themes";
 import Article from "@/components/Article.astro";
 import ScholarlyArticleSchema from "@/components/seo/ScholarlyArticleSchema.astro";
@@ -20,7 +20,7 @@ type Props = {
 
 const { entry } = Astro.props;
 const keywordsFromThemes = [
-  ...new Set([...countThemes(entry.body)].map(([s]) => THEMES[s]?.label).filter(Boolean)),
+  ...new Set([...themesFor(entry)].map(([s]) => THEMES[s]?.label).filter(Boolean)),
 ].map(displayLabel);
 const { Content } = await entry.render();
 ---

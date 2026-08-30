@@ -42,10 +42,10 @@ const desc =
     <p class="kicker">Hi — I'm</p>
     <h1>Siddhant Shah</h1>
     <p class="line">
-      I'm an equity research associate. Most of what I write here is about
-      <em>how companies actually make money and what they're worth</em> —
-      accounting rules, unit economics, derivatives, and what changes once those
-      questions move onchain. The rest is side quests.
+      I'm an equity research associate at Rosenblatt Securities in New York,
+      covering <em>digital assets, FinTech and the infrastructure underneath
+      them</em>. I write here about how those companies actually make money and
+      what they're worth. The rest is side quests.
     </p>
     </div>
     <div class="scroll-cue" aria-hidden="true"><span></span></div>
@@ -56,14 +56,16 @@ const desc =
     <div class="band"><h2 class="eyebrow">Who I am</h2>
     <div class="two">
       <p class="big">
-        The method never changes, only the subject does. Build the dataset before
-        you have a view. Name the mechanism you think explains it. Then try hard
-        to prove yourself wrong, and say so out loud when you manage it.
+        I have never treated finance and technology as separate disciplines. The
+        method is the same either way: build the dataset before you have a view,
+        name the mechanism you think explains it, then try hard to prove yourself
+        wrong — and say so out loud when you manage it.
       </p>
       <div class="facts">
-        <p>Equity research associate. Before that, a research assistant in Boston University's Department of Computer Science, building systematic strategies and portfolio construction.</p>
-        <p>The toolkit came first: MS in Applied Data Analytics from Boston University, BS in Mathematics and Computer Science from Chennai Mathematical Institute, and a few years of Bayesian inference and machine-learning work before any of it pointed at markets. CFA Level&nbsp;1. Five years teaching physics and maths to olympiad students, still the fastest way I know to find out whether I actually understand something.</p>
-        <p>{papersWord} peer-reviewed papers. The most recent works out what actually drives volume in decentralised perpetual futures; an earlier one computes the volume of a Greek vase, and is here to show the method travels.</p>
+        <p>Equity Research Associate at Rosenblatt Securities, covering cryptocurrency, FinTech and HPC infrastructure. Before that, quantitative research at Boston University — most recently as a Visiting Researcher, on the market microstructure of DeFi perpetual futures.</p>
+        <p>MS in Applied Data Analytics from Boston University and CFA Level&nbsp;I, both January 2026; BS (Honours) in Mathematics and Computer Science from Chennai Mathematical Institute. Python, R, SQL and a great deal of Excel.</p>
+        <p>{papersWord} peer-reviewed papers, in <em>Stocks &amp; Commodities</em> and MDPI journals: momentum in crude oil, the link between overnight silver and Bitcoin, and most recently the structure of perpetual contracts and the macro factors moving them.</p>
+        <p>Outside work, four years designing and teaching advanced maths and physics for students preparing for the International Junior Science Olympiad in India. I am unreasonably keen on teaching, and on motorsport.</p>
         <p><a class="ln" href="/about">The longer version →</a></p>
       </div>
     </div>
@@ -77,8 +79,8 @@ const desc =
       Mostly the gap between what a company reports and what is actually
       happening — the accounting rule doing the work, the revenue line nobody
       breaks out, the assumption carrying the whole model. Increasingly the same
-      questions asked of onchain markets, where the disclosure is worse and the
-      mechanics are stranger.
+      questions asked of onchain markets, where the disclosure is thinner and the
+      mechanics are stranger. And then whatever else has my attention.
     </p>
     <WordMap themes={themes} />
   </div>
@@ -94,7 +96,7 @@ const desc =
             <span class="pm">
               <span>{fmtDate(f.date)}</span>
               {f.kind === "note" && <span class="tag tag--note">note</span>}
-              {f.children?.length ? <span class="tag">{f.children.length}-part series</span> : null}
+              {f.children?.length ? <span class="tag">series</span> : null}
             </span>
             {/* a note has no headline by design — show the thought itself */}
             <span class="pt">{f.title ?? excerpt(f.body, 110)}</span>
