@@ -231,18 +231,26 @@ const lift = ([r, g, b]: [number, number, number], k = 0.3): string =>
     .toc nav{ display:flex !important; }
   }
   .toc{ border:1px solid var(--rule);border-radius:var(--r-md);padding:clamp(12px,1.6vw,16px);min-width:0; }
-  @media (min-width:1080px){ .toc{ border:0;padding:0;border-inline-start:1px solid var(--rule);
-    padding-inline-start:clamp(12px,1.4vw,18px);border-radius:0; } }
+  @media (min-width:1080px){ .toc{ border:0;padding:0;border-radius:0; } }
   .toc summary{ font-family:var(--sans);font-size:13px;color:var(--text-2);cursor:pointer;letter-spacing:.04em; }
   .toc nav{ display:flex;flex-direction:column;gap:7px;margin-top:12px; }
+  /* A single rail runs the length of the contents; the segment beside the
+     current section lights up. Previously there were two lines — the container
+     border plus a per-link border that only appeared on hover. */
+  .toc nav{ position:relative;border-left:1.5px solid var(--rule); }
   .toc :global(a){
-    display:block;
+    display:block;position:relative;
     font-family:var(--sans);font-size:13px;line-height:1.4;color:var(--text-3);
     text-decoration:none;transition:color .2s;
-    border-left:1.5px solid transparent;padding-left:10px;margin-left:-1.5px;
+    padding:2px 0 2px 12px;
   }
-  .toc :global(a:hover){ color:var(--text); }
-  .toc :global(a.on){ color:var(--glow);border-left-color:var(--peacock); }
+  .toc :global(a)::before{
+    content:"";position:absolute;left:-1.5px;top:0;bottom:0;width:1.5px;
+    background:var(--peacock);opacity:0;transition:opacity .25s;
+  }
+  .toc :global(a:hover){ color:var(--text-2); }
+  .toc :global(a.on){ color:var(--glow); }
+  .toc :global(a.on)::before{ opacity:1; }
   .toc :global(a.lvl3){ padding-inline-start:12px;font-size:12.3px; }
   .prose{ min-width:0;margin-top:clamp(26px,4vw,44px); }
 

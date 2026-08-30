@@ -136,7 +136,6 @@ const laid = placed.map((p, i) => ({
       data-meta={`${(Object.keys(AREAS) as AreaId[]).filter((a) => (t.blend[a] ?? 0) > .02).map((a) => `${AREAS[a].label} ${Math.round((t.blend[a] ?? 0) * 100)}%`).join("  ·  ")} — ${t.count} mention${t.count === 1 ? "" : "s"} across ${t.pieces} piece${t.pieces === 1 ? "" : "s"}`}
     >{t.label}</a>
   ))}
-  <div class="readout" id="wmr" role="status" aria-live="polite"></div>
 </div>
 
 <style>
@@ -166,13 +165,6 @@ const laid = placed.map((p, i) => ({
   .term:hover,.term:focus-visible{
     filter:brightness(1.5) drop-shadow(0 0 20px currentColor);z-index:9;outline:none;
   }
-  .readout{
-    position:absolute;left:50%;bottom:16px;translate:-50% 0;text-align:center;
-    pointer-events:none;opacity:0;transition:opacity .25s;max-width:88%;
-  }
-  .readout.on{opacity:1}
-  .readout b{display:block;font-size:19px;font-weight:400;color:var(--text)}
-  .readout span{font-family:var(--sans);font-size:11.5px;color:var(--text-3);letter-spacing:.03em}
   /* On short viewports the whole slide must still fit the screen, or mandatory
      scroll-snap traps the reader inside a section taller than their window. */
   @media (max-height: 820px){ .wm{max-height:46svh} }
@@ -195,19 +187,9 @@ const laid = placed.map((p, i) => ({
 
 <script>
   const wm = document.getElementById('wm');
-  const out = document.getElementById('wmr');
-  if (wm && out) {
+  if (wm) {
     const terms = [...wm.querySelectorAll<HTMLElement>('.term')];
     for (const t of terms) {
-      const show = () => {
-        out.innerHTML = `<b>${t.dataset.label}</b><span>${t.dataset.meta}</span>`;
-        out.classList.add('on');
-      };
-      const hide = () => out.classList.remove('on');
-      t.addEventListener('pointerenter', show);
-      t.addEventListener('pointerleave', hide);
-      t.addEventListener('focus', show);
-      t.addEventListener('blur', hide);
     }
     /**
    * Server-side placement works from estimated text metrics, which are never

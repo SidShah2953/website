@@ -16,6 +16,13 @@ const inline = (md: string) => marked.parse(md.trim(), { async: false }) as stri
 // Filtering runs on the client over data already in the page — no index to ship,
 // no request to make, and it still works if the JS never loads (every row is
 // rendered; the controls simply do nothing).
+const themesOf = (f: (typeof feed)[number]): string[] => {
+  const bodies = [f.body, ...(f.children ?? []).map((c) => c.body)];
+  const set = new Set<string>();
+  for (const b of bodies) for (const [slug] of countThemes(b)) if (THEMES[slug]) set.add(slug);
+  return [...set];
+};
+
 const areasOf = (f: (typeof feed)[number]): AreaId[] => {
   const bodies = [f.body, ...(f.children ?? []).map((c) => c.body)];
   const set = new Set<AreaId>();
@@ -24,12 +31,20 @@ const areasOf = (f: (typeof feed)[number]): AreaId[] => {
       if (THEMES[slug]) set.add(THEMES[slug].area);
   return [...set];
 };
+// themes are part of the search text, so "stablecoins" finds the piece even when
+// the word is not in its title
 const haystack = (f: (typeof feed)[number]) =>
-  [f.title, f.description, ...(f.children ?? []).map((c) => c.title)]
+  [f.title, f.description, ...(f.children ?? []).map((c) => c.title),
+   ...themesOf(f).map((t) => THEMES[t].label)]
     .filter(Boolean).join(" ").toLowerCase();
 
 const usedAreas = (Object.keys(AREAS) as AreaId[])
   .filter((a) => feed.some((f) => areasOf(f).includes(a)));
+
+// every theme in use, grouped under its area, for the second-level filter
+const usedThemes = [...new Set(feed.flatMap(themesOf))]
+  .map((slug) => ({ slug, ...THEMES[slug] }))
+  .sort((a, b) => a.label.localeCompare(b.label));
 ---
 <Shell title="Writing | Siddhant Shah"
   description="Essays on finance, digital assets and technology, plus shorter notes."
@@ -59,12 +74,28 @@ const usedAreas = (Object.keys(AREAS) as AreaId[])
           ))}
           <button type="button" data-area="note" aria-pressed="false">Notes</button>
         </div>
+        <div class="themes" id="themeRow">
+          <label class="sr" for="theme">Filter by theme</label>
+          <select id="theme">
+            <option value="">All themes</option>
+            {(Object.keys(AREAS) as AreaId[]).map((a) => (
+              usedThemes.some((t) => t.area === a) && (
+                <optgroup label={AREAS[a].label}>
+                  {usedThemes.filter((t) => t.area === a).map((t) => (
+                    <option value={t.slug}>{t.label}</option>
+                  ))}
+                </optgroup>
+              )
+            ))}
+          </select>
+        </div>
         <p class="count" id="count" aria-live="polite"></p>
       </form>
 
       <ul class="feed" id="feed">
         {feed.map((f) => (
-          <li data-kind={f.kind} data-areas={areasOf(f).join(" ")} data-text={haystack(f)}>
+          <li data-kind={f.kind} data-areas={areasOf(f).join(" ")}
+            data-themes={themesOf(f).join(" ")} data-text={haystack(f)}>
             {f.kind === "post" && f.children?.length ? (
               <div class="series">
                 <a class="row" href={f.href}>
@@ -142,6 +173,19 @@ const usedAreas = (Object.keys(AREAS) as AreaId[])
     background:var(--peacock-wash);
   }
   .chips button:focus-visible{ outline:2px solid var(--glow);outline-offset:2px; }
+  .themes select{
+    width:100%;max-width:340px;appearance:none;cursor:pointer;
+    background:var(--surface-1);border:1px solid var(--rule);border-radius:var(--r-pill);
+    padding:9px 34px 9px 16px;color:var(--text-2);
+    font-family:var(--sans);font-size:13.5px;
+    background-image:linear-gradient(45deg,transparent 50%,var(--text-3) 50%),
+                     linear-gradient(135deg,var(--text-3) 50%,transparent 50%);
+    background-position:calc(100% - 18px) 50%, calc(100% - 13px) 50%;
+    background-size:5px 5px, 5px 5px;background-repeat:no-repeat;
+    transition:border-color .25s,color .25s;
+  }
+  .themes select:hover{ color:var(--text);border-color:var(--rule-strong); }
+  .themes select:focus{ outline:none;border-color:var(--peacock);color:var(--text); }
   .count{ font-family:var(--sans);font-size:12.5px;color:var(--text-3);margin:0; }
   .empty{
     font-family:var(--sans);font-size:15px;color:var(--text-2);
@@ -185,9 +229,13 @@ const usedAreas = (Object.keys(AREAS) as AreaId[])
     color:var(--text-3);min-width:4.5ch;
   }
   .note{ padding:clamp(18px,2.4vw,26px) 0;display:grid;gap:8px; }
+  .note .m,.series .m{ display:flex;flex-wrap:wrap;align-items:center;gap:6px 12px; }
   .badge{
     color:var(--peacock);border:1px solid color-mix(in srgb, var(--peacock) 45%, transparent);
-    border-radius:var(--r-pill);padding:2px 9px;letter-spacing:.1em;
+    border-radius:var(--r-pill);padding:3px 10px;letter-spacing:.1em;
+    /* the badge carries padding and a border, so baseline alignment drops it
+       below the date it sits beside — centre the row instead */
+    display:inline-flex;align-items:center;line-height:1;
   }
   .m a{ color:var(--text-3);text-decoration:none;border-bottom:1px solid transparent; }
   /* the permalink was unreachable: nothing linked to /notes/*, yet the pages
@@ -212,7 +260,9 @@ const usedAreas = (Object.keys(AREAS) as AreaId[])
   if (feed && q && tools && count && empty) {
     const rows = [...feed.querySelectorAll<HTMLElement>('li')];
     const chips = [...tools.querySelectorAll<HTMLButtonElement>('[data-area]')];
+    const themeSel = document.getElementById('theme') as HTMLSelectElement | null;
     let area = 'all';
+    let theme = '';
 
     const apply = () => {
       const term = q.value.trim().toLowerCase();
@@ -223,18 +273,20 @@ const usedAreas = (Object.keys(AREAS) as AreaId[])
           (area === 'note' ? r.dataset.kind === 'note'
                            : (r.dataset.areas ?? '').split(' ').includes(area));
         const okTerm = !term || (r.dataset.text ?? '').includes(term);
-        const on = okArea && okTerm;
+        const okTheme = !theme || (r.dataset.themes ?? '').split(' ').includes(theme);
+        const on = okArea && okTerm && okTheme;
         r.hidden = !on;
         if (on) shown++;
       }
       empty.hidden = shown > 0;
       count.textContent =
-        term || area !== 'all'
+        term || area !== 'all' || theme
           ? `${shown} of ${rows.length} ${rows.length === 1 ? 'entry' : 'entries'}`
           : '';
       const url = new URL(location.href);
       term ? url.searchParams.set('q', term) : url.searchParams.delete('q');
       area !== 'all' ? url.searchParams.set('area', area) : url.searchParams.delete('area');
+      theme ? url.searchParams.set('theme', theme) : url.searchParams.delete('theme');
       history.replaceState(null, '', url);
     };
 
@@ -246,8 +298,10 @@ const usedAreas = (Object.keys(AREAS) as AreaId[])
       });
     }
     q.addEventListener('input', apply);
+    themeSel?.addEventListener('change', () => { theme = themeSel.value; apply(); });
     document.getElementById('reset')?.addEventListener('click', () => {
-      q.value = ''; area = 'all';
+      q.value = ''; area = 'all'; theme = '';
+      if (themeSel) themeSel.value = '';
       for (const o of chips) o.setAttribute('aria-pressed', String(o.dataset.area === 'all'));
       apply(); q.focus();
     });
@@ -255,6 +309,10 @@ const usedAreas = (Object.keys(AREAS) as AreaId[])
     // deep links: /blog/?q=stablecoin&area=da
     const p = new URLSearchParams(location.search);
     if (p.get('q')) q.value = p.get('q')!;
+    const th = p.get('theme');
+    if (th && themeSel && [...themeSel.options].some((o) => o.value === th)) {
+      theme = th; themeSel.value = th;
+    }
     const a = p.get('area');
     if (a && chips.some((c) => c.dataset.area === a)) {
       area = a;
