@@ -28,16 +28,12 @@ const presentation: Presentation = {
       link: "https://www.linkedin.com/in/shah-siddhant/",
     },
     {
-      label: "Github",
+      label: "GitHub",
       link: "https://github.com/SidShah2953",
     },
     {
-      label: "Medium",
-      link: "https://medium.com/@siddhantshah29",
-    },
-    {
-      label: "Paragraph",
-      link: "https://paragraph.com/@siddhantshah29",
+      label: "RSS",
+      link: "/blog/rss.xml",
     },
     {
       label: "Resume",

@@ -42,7 +42,7 @@ export const THEMES: Record<string, { area: AreaId; label: string }> = {
 
   // Technology
   "machine-learning":      { area: "tech",  label: "machine learning" },
-  "bayesian-inference":    { area: "tech",  label: "bayesian inference" },
+  "bayesian-inference":    { area: "tech",  label: "Bayesian inference" },
   "statistics":            { area: "tech",  label: "statistics" },
   "data-engineering":      { area: "tech",  label: "data engineering" },
 

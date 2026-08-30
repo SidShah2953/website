@@ -96,6 +96,20 @@ const lift = ([r, g, b]: [number, number, number], k = 0.3): string =>
     )}
   </header>
 
+  {(entry.data.doi || entry.data.pdfUrl) && (
+    <p class="col cite">
+      {entry.data.publication && <span class="venue">{entry.data.publication}</span>}
+      {entry.data.doi && (
+        <a href={`https://doi.org/${entry.data.doi}`} rel="noopener">
+          doi:{entry.data.doi}
+        </a>
+      )}
+      {entry.data.pdfUrl && !entry.data.doi && (
+        <a href={entry.data.pdfUrl} rel="noopener">Read the paper ↗</a>
+      )}
+    </p>
+  )}
+
   {thesisHtml && (
     <aside class="col thesis">
       <p class="eyebrow">The short version</p>
@@ -190,6 +204,13 @@ const lift = ([r, g, b]: [number, number, number], k = 0.3): string =>
   }
   .themes a:hover{ background:color-mix(in srgb, var(--tc) 16%, transparent); }
 
+  .cite{
+    display:flex;flex-wrap:wrap;gap:6px clamp(12px,2vw,18px);align-items:baseline;
+    margin:clamp(14px,2vw,20px) 0 0;font-family:var(--sans);
+    font-size:clamp(12.5px,1.2vw,13.5px);color:var(--text-3);
+  }
+  .cite .venue{ font-style:italic; }
+  .cite a{ color:var(--glow);text-decoration:none;border-bottom:1px solid var(--glow-line); }
   .thesis{
     margin-top:clamp(26px,4vw,42px);padding:clamp(18px,2.6vw,28px);
     border:1px solid var(--rule);border-radius:16px;background:var(--surface-1);

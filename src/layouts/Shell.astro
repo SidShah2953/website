@@ -126,7 +126,10 @@ const nav = [
         /* #5F757A measured 3.54-4.05:1 on the grounds it actually sits on — below
            WCAG AA. It carries dates, captions, meta, TOC links and the footer,
            so it was the single cause of most contrast failures. */
-        --text-3:#72888D;
+        /* #72888D at 5.27:1 read too dim for dates, captions and meta. #8CA2A6
+           is 7.35:1 — still clearly a third step below --text-2 (11.14) and
+           --text (16.03), so the hierarchy holds. */
+        --text-3:#8CA2A6;
         --rule:rgba(255,255,255,.08);
         --rule-strong:rgba(255,255,255,.14);
 
