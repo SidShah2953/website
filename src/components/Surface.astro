@@ -193,10 +193,15 @@ if (host && cv && gl) {
     const uMouse = gl.getUniformLocation(prog,'uMouse');
     const uScroll = gl.getUniformLocation(prog,'uScroll');
 
-    // raymarching is fill-rate bound, so render below device resolution
-    const SCALE = 0.62, MAXDPR = 1.5;
+    // Raymarching is fill-rate bound. The old fixed 0.62 x capped-1.5 DPR meant
+    // rendering ~22% of the pixels of a Retina surface and upscaling — which is
+    // exactly what the visible pixelation was. Start at native and step down
+    // only if the device actually cannot hold frame rate.
+    const MAXDPR = 2;
+    const TIERS = [1, 0.78, 0.6, 0.45];
+    let tier = 0;
     const resize = () => {
-      const dpr = Math.min(devicePixelRatio || 1, MAXDPR) * SCALE;
+      const dpr = Math.min(devicePixelRatio || 1, MAXDPR) * TIERS[tier];
       const w = Math.max(1, Math.floor(host.clientWidth * dpr));
       const h = Math.max(1, Math.floor(host.clientHeight * dpr));
       if (cv.width !== w || cv.height !== h) { cv.width = w; cv.height = h; gl.viewport(0,0,w,h); }
@@ -226,10 +231,20 @@ if (host && cv && gl) {
     visible = true;
     document.addEventListener('visibilitychange', () => { if (!document.hidden) start(); });
 
+    // rolling frame-cost measurement, so quality adapts instead of being guessed
+    let last = 0, slow = 0, samples = 0;
     const t0 = performance.now();
     const frame = (now:number) => {
       raf = 0;
       if (!visible || document.hidden) return;           // stop entirely when unseen
+      if (last) {
+        const dt = now - last;
+        if (samples++ > 12 && tier < TIERS.length - 1) {
+          if (dt > 24) slow++; else slow = Math.max(0, slow - 1);
+          if (slow > 20) { tier++; slow = 0; samples = 0; resize(); }
+        }
+      }
+      last = now;
       resize();
       m.x += (target.x - m.x) * .045;
       m.y += (target.y - m.y) * .045;
