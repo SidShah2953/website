@@ -49,9 +49,14 @@ const nav = [
         --hdr-h:64px;
       }
       *{box-sizing:border-box}
-      html{scroll-behavior:smooth;-webkit-font-smoothing:antialiased}
+      /* Grid and flex children default to min-width:auto, so one long unbreakable
+         string (an email address, a URL) can force a track wider than the
+         viewport. This is the single most common cause of horizontal overflow. */
+      *,*::before,*::after{ min-width:0; }
+      html{scroll-behavior:smooth;-webkit-font-smoothing:antialiased;overflow-x:clip}
       body{
         margin:0;background:var(--ground);color:var(--text);
+        overflow-wrap:break-word;
         font-family:var(--serif);font-weight:300;line-height:1.62;
         font-size:17px;overflow-x:hidden;
       }
@@ -99,6 +104,66 @@ const nav = [
       .hdr nav a:focus-visible{outline:2px solid var(--glow);outline-offset:4px;border-radius:2px}
 
       main{position:relative;z-index:1}
+
+      /* ---- shared page kit -------------------------------------------------
+         Every width here is relative. Nothing is a fixed pixel column, so the
+         layout survives any viewport or a mid-session resize.                */
+      .wrap{
+        width:100%;
+        max-width:min(1180px, 100% - clamp(32px, 8vw, 160px));
+        margin-inline:auto;
+      }
+      .wrap--narrow{ max-width:min(720px, 100% - clamp(32px, 8vw, 120px)); }
+      .page{ padding-block: calc(var(--hdr-h) + clamp(36px,7vw,86px)) clamp(40px,8vw,110px); }
+
+      .eyebrow{
+        font-family:var(--sans);font-size:clamp(11.5px,1.1vw,12px);font-weight:500;
+        letter-spacing:.22em;text-transform:uppercase;color:var(--text-3);margin:0 0 clamp(14px,2vw,24px);
+      }
+      .h1{ font-size:clamp(34px,7vw,68px);line-height:1.02;margin:0 0 clamp(14px,2.2vw,22px); }
+      .h2{ font-size:clamp(24px,4vw,38px);line-height:1.12;margin:0 0 clamp(12px,1.8vw,18px); }
+      .lede{ color:var(--text-2);font-size:clamp(16px,1.9vw,20px);max-width:62ch;margin:0 0 clamp(22px,3.4vw,40px); }
+
+      /* long-form reading column */
+      .prose{ max-width:68ch;font-size:clamp(16.5px,1.15vw,18.5px);line-height:1.72; }
+      .prose > * + *{ margin-top:1.15em; }
+      .prose h2{ font-size:clamp(22px,3vw,30px);line-height:1.2;margin-top:2.1em; }
+      .prose h3{ font-size:clamp(18.5px,2.2vw,23px);line-height:1.25;margin-top:1.8em; }
+      .prose a{ color:var(--glow);text-decoration:none;
+        background-image:linear-gradient(currentColor,currentColor);
+        background-size:100% 1px;background-repeat:no-repeat;background-position:0 100%; }
+      .prose a:hover{ color:#fff; }
+      .prose blockquote{ margin-inline:0;padding-left:clamp(14px,2vw,22px);
+        border-left:2px solid var(--peacock);color:var(--text-2);font-style:italic; }
+      .prose code{ font-family:ui-monospace,SFMono-Regular,monospace;font-size:.86em;
+        background:rgba(255,255,255,.07);padding:.15em .4em;border-radius:4px; }
+      .prose pre{ overflow-x:auto;padding:clamp(14px,2vw,20px);border-radius:12px;
+        border:1px solid var(--rule);background:rgba(0,0,0,.34);font-size:.86em;line-height:1.6; }
+      .prose pre code{ background:none;padding:0; }
+      .prose img,.prose video{ max-width:100%;height:auto;border-radius:12px; }
+      /* wide things scroll themselves rather than the page */
+      .prose table{ display:block;overflow-x:auto;max-width:100%;border-collapse:collapse;font-size:.92em; }
+      .prose th,.prose td{ border-bottom:1px solid var(--rule);padding:.55em .8em;text-align:left;white-space:nowrap; }
+      .prose .katex-display{ overflow-x:auto;overflow-y:hidden;padding-block:.4em;max-width:100%; }
+      .prose .katex{ max-width:100%; }
+      /* inline maths can still be wider than a phone column — let it scroll */
+      .prose :where(.katex-display) > .katex{ white-space:nowrap; }
+      .prose mjx-container,.prose .katex-html{ max-width:100%;overflow-x:auto; }
+
+      /* feed used by the blog index and the homepage */
+      .feed{ list-style:none;margin:0;padding:0;border-top:1px solid var(--rule); }
+      .feed > li{ border-bottom:1px solid var(--rule); }
+      .feed a.row{
+        display:grid;gap:6px;padding:clamp(18px,2.4vw,26px) 0;text-decoration:none;
+        transition:padding-inline-start .4s cubic-bezier(.2,.7,.3,1);
+      }
+      .feed a.row:hover{ padding-inline-start:clamp(6px,1.2vw,14px); }
+      .feed .t{ font-size:clamp(18px,2.2vw,25px);line-height:1.24;color:var(--text); }
+      .feed a.row:hover .t{ color:var(--glow); }
+      .feed .d{ font-family:var(--sans);font-size:clamp(13.5px,1.3vw,14.5px);color:var(--text-3);
+        line-height:1.55;max-width:74ch; }
+      .feed .m{ font-family:var(--sans);font-size:clamp(11.5px,1.05vw,12.5px);color:var(--text-3);
+        letter-spacing:.09em;text-transform:uppercase;display:flex;flex-wrap:wrap;gap:6px 14px; }
       footer{
         position:relative;z-index:1;border-top:1px solid var(--rule);
         margin-top:clamp(60px,10vw,120px);padding:38px clamp(18px,4vw,42px) 54px;

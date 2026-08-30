@@ -1,0 +1,95 @@
+---
+import Shell from "@/layouts/Shell.astro";
+import PersonSchema from "@/components/seo/PersonSchema.astro";
+import presentation from "@/data/presentation";
+import { allPieces } from "@/utils/allPieces";
+
+const pieces = await allPieces();
+const research = pieces.filter((p) => p.kind === "research")
+  .sort((a, b) => +b.entry.data.publishedAt - +a.entry.data.publishedAt);
+const socials = presentation.socials.filter((s) => s.label !== "Email");
+---
+<Shell title="About | Siddhant Shah"
+  description="Siddhant Shah — equity research associate. Background, published research, and how to get in touch."
+  canonical="/about/">
+  <PersonSchema slot="head" />
+
+  <div class="page">
+    <div class="wrap wrap--narrow">
+      <p class="eyebrow">About</p>
+      <h1 class="h1">I explain hard things about money.</h1>
+      <p class="lede">
+        And, fairly often, about things that aren't money at all — lap times,
+        ancient pottery, fertility records. The method travels better than the
+        subject does.
+      </p>
+    </div>
+
+    <div class="wrap wrap--narrow prose about">
+      <p>
+        I'm an equity research associate. The day job is working out what a
+        business is actually worth: reading the filings closely, building the
+        model, and being honest about which assumptions are carrying the answer.
+      </p>
+      <p>
+        This site is where I think out loud about that. It is <strong>not</strong>
+        investment advice, and it isn't my firm's research — that work belongs to
+        them and stays there. What's here is the part I'd explain to a curious
+        friend over coffee: why an accounting rule made a profitable company post a
+        $667&nbsp;million loss, what a stablecoin's balance sheet is really doing,
+        why composability is the most important word nobody uses.
+      </p>
+      <p>
+        Before this I was a research assistant in Boston University's Department of
+        Computer Science, working on systematic strategies and portfolio
+        construction. Along the way I've measured some things that had nothing to
+        do with markets, which I'd argue is the point rather than a distraction.
+      </p>
+
+      <h2>Education</h2>
+      <ul>
+        <li><strong>MS, Applied Data Analytics</strong> — Boston University</li>
+        <li><strong>BS, Mathematics &amp; Computer Science</strong> — Chennai Mathematical Institute</li>
+        <li><strong>CFA</strong> — Level&nbsp;1 cleared</li>
+      </ul>
+
+      <h2>Published research</h2>
+      <ul class="pubs">
+        {research.map((p) => (
+          <li>
+            <a href={`/research/${p.entry.id.replace(/\.(md|mdx)$/, "").toLowerCase()}/`}>
+              {p.entry.data.title}
+            </a>
+            {p.entry.data.publication && <span class="ven"> — {p.entry.data.publication}</span>}
+          </li>
+        ))}
+      </ul>
+
+      <h2>Teaching</h2>
+      <p>
+        I coach students for the International Junior Science Olympiad and have
+        taught introductory options and financial mathematics at STEMS. Teaching is
+        the fastest way I know to find out whether you actually understand
+        something.
+      </p>
+
+      <h2>Elsewhere</h2>
+      <p class="links">
+        <a href={`mailto:${presentation.mail}`}>{presentation.mail}</a>
+        {socials.map((s) => <a href={s.link} rel="me">{s.label}</a>)}
+        <a href="/Resume.pdf">Résumé</a>
+      </p>
+    </div>
+  </div>
+</Shell>
+
+<style>
+  .about{ margin-top:clamp(10px,2vw,20px); }
+  .about h2{ font-family:var(--sans);font-weight:500;letter-spacing:-.015em;
+    font-size:clamp(15px,1.5vw,17px);text-transform:uppercase;
+    letter-spacing:.14em;color:var(--text-3);margin-top:2.6em; }
+  .about ul{ padding-left:1.1em; }
+  .about li{ margin-top:.5em; }
+  .pubs .ven{ color:var(--text-3);font-size:.92em; }
+  .links{ display:flex;flex-wrap:wrap;gap:10px clamp(16px,3vw,28px);font-family:var(--sans);font-size:15px; }
+</style>

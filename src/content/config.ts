@@ -56,4 +56,27 @@ const research = defineCollection({
   }),
 });
 
-export const collections = { projects, education, blog, research };
+// Short-form notes: the "flow" half of Show Your Work. A note is a thought, a
+// link with a comment, a chart that surprised me — typically under 150 words.
+//
+// These live here rather than being pulled from X on purpose. The X API removed
+// its free read tier in Feb 2026 (reads are now $0.005 each, pay-per-use), and
+// a static build cannot call an authenticated API at request time anyway. So the
+// repo is the source of truth and X is a mirror: write here, cross-post there.
+// Nothing breaks if the API changes terms again, and the writing stays owned.
+const notes = defineCollection({
+  type: "content",
+  schema: z.object({
+    publishedAt: z.date(),
+    // Optional — most notes are too short to deserve a headline.
+    title: z.string().optional(),
+    tags: z.array(z.string()).default([]),
+    // Where this was also posted, if anywhere.
+    crosspost: z.string().url().optional(),
+    // A link the note is about.
+    via: z.string().url().optional(),
+    isHidden: z.boolean().default(false),
+  }),
+});
+
+export const collections = { projects, education, blog, research, notes };

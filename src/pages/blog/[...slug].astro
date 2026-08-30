@@ -1,7 +1,7 @@
 ---
 import { getCollection } from 'astro:content';
-import Layout from '@/layouts/Layout.astro';
-import ContentPage from '@/components/ContentPage.astro';
+import Shell from '@/layouts/Shell.astro';
+import Article from '@/components/Article.astro';
 import ArticleSchema from '@/components/seo/ArticleSchema.astro';
 import BreadcrumbSchema from '@/components/seo/BreadcrumbSchema.astro';
 import { estimateReadingTime } from '@/utils/estimateReadingTime';
@@ -54,7 +54,7 @@ const entrySlug = entry.id.replace(/\.(md|mdx)$/, '').toLowerCase();
 const canonicalUrl = entry.data.canonical || `/blog/${entrySlug}/`;
 const ogImage = entry.data.ogImage || '/social-prev.png';
 ---
-<Layout
+<Shell
   title={entry.data.title + ' | Siddhant Shah'}
   description={entry.data.description}
   canonical={canonicalUrl}
@@ -100,14 +100,13 @@ const ogImage = entry.data.ogImage || '/social-prev.png';
     ]}
   />
 
-  <ContentPage
+  <Article
     type="blog"
     entry={entry}
     Content={Content}
-    readingTime={stats.minutes}
     seriesArticles={seriesArticles}
     parentSeries={parentSeries}
     prevArticle={prevArticle}
     nextArticle={nextArticle}
   />
-</Layout>
+</Shell>
