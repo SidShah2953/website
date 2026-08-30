@@ -1,27 +1,48 @@
 ---
-type Props = {
-  href: string;
-  filename: string;
-};
-
+type Props = { href: string; filename: string };
 const { href, filename } = Astro.props;
 ---
-
-<a
-  href={href}
-  download={filename}
-  class="group not-prose flex items-stretch gap-3 px-3 py-2 my-4 rounded-lg border border-finance-cyan/25 bg-finance-cyan/5 hover:bg-finance-cyan/10 hover:border-finance-cyan/50 transition-all duration-200 no-underline"
->
-  <div class="flex-shrink-0 aspect-square flex items-center justify-center w-8 rounded-md bg-finance-cyan/10 border border-finance-cyan/20">
-    <svg class="w-5 h-5 text-finance-cyan" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+<a class="dl" href={href} download={filename}>
+  <span class="ic" aria-hidden="true">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"
+      stroke-linecap="round" stroke-linejoin="round">
+      <path d="M12 3v12" /><path d="m7 11 5 5 5-5" /><path d="M4 20h16" />
     </svg>
-  </div>
-  <div class="flex-1 min-w-0 flex flex-col justify-center gap-1.5">
-    <span class="text-xs text-finance-cyan/50 font-medium uppercase tracking-wider leading-none">Download</span>
-    <span class="text-finance-cyan font-medium text-sm leading-tight">{filename}</span>
-  </div>
-  <svg class="self-center w-4 h-4 text-finance-cyan/50 group-hover:text-finance-cyan group-hover:translate-y-0.5 transition-all duration-200 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-  </svg>
+  </span>
+  <span class="tx">
+    <span class="lb">Download</span>
+    <span class="fn">{filename}</span>
+  </span>
+  <span class="ar" aria-hidden="true">↓</span>
 </a>
+
+<style>
+  .dl{
+    display:flex;align-items:center;gap:clamp(12px,1.6vw,16px);
+    margin:clamp(22px,3vw,32px) 0;padding:clamp(13px,1.6vw,16px) clamp(15px,1.8vw,18px);
+    border:1px solid var(--rule);border-radius:14px;text-decoration:none;
+    background:rgba(255,255,255,.028);
+    transition:border-color .3s, background .3s, transform .3s cubic-bezier(.2,.7,.3,1);
+  }
+  .dl:hover{
+    border-color:color-mix(in srgb, var(--peacock) 60%, transparent);
+    background:rgba(23,145,158,.09);transform:translateY(-2px);
+  }
+  .ic{
+    flex:none;width:34px;height:34px;display:grid;place-items:center;border-radius:10px;
+    border:1px solid color-mix(in srgb, var(--peacock) 40%, transparent);
+    color:var(--glow);background:rgba(23,145,158,.10);
+  }
+  .ic svg{ width:17px;height:17px; }
+  .tx{ display:grid;gap:3px;min-width:0; }
+  .lb{
+    font-family:var(--sans);font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--text-3);
+  }
+  .fn{
+    font-family:var(--sans);font-size:clamp(14px,1.4vw,15px);color:var(--text);
+    overflow-wrap:anywhere;
+  }
+  .ar{ margin-left:auto;color:var(--text-3);font-size:15px;transition:color .3s,translate .3s; }
+  .dl:hover .ar{ color:var(--glow);translate:0 3px; }
+</style>
