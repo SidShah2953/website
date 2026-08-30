@@ -43,7 +43,7 @@ export function buildIndex<T extends Entry>(
     if (isArchived(entry)) continue;                 // archived pieces leave the map
     for (const [slug, n] of countThemes(entry.body)) {
       if (!THEMES[slug]) continue;                   // T.astro already threw; belt and braces
-      const cur = acc.get(slug) ?? { count: 0, pieces: 0, blend: { fin: 0, da: 0, tech: 0, craft: 0 } };
+      const cur = acc.get(slug) ?? { count: 0, pieces: 0, blend: { fin: 0, da: 0, tech: 0, side: 0 } };
       cur.count += n;
       cur.pieces += 1;
       for (const [a, w] of Object.entries(areas)) {

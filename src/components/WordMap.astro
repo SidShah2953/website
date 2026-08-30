@@ -11,7 +11,7 @@ const { themes } = Astro.props;
 
 const ANCHOR: Record<AreaId, { x: number; y: number }> = {
   fin: { x: .17, y: .26 }, da: { x: .83, y: .26 },
-  tech: { x: .83, y: .78 }, craft: { x: .17, y: .78 },
+  tech: { x: .83, y: .78 }, side: { x: .17, y: .78 },
 };
 const counts = themes.map((t) => t.count);
 const lo = Math.min(...counts, 1), hi = Math.max(...counts, 1);

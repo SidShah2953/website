@@ -5,6 +5,8 @@ import Article from '@/components/Article.astro';
 import ArticleSchema from '@/components/seo/ArticleSchema.astro';
 import BreadcrumbSchema from '@/components/seo/BreadcrumbSchema.astro';
 import { estimateReadingTime } from '@/utils/estimateReadingTime';
+import { countThemes } from '@/utils/themeIndex';
+import { THEMES, displayLabel } from '@/data/themes';
 
 export async function getStaticPaths() {
   const toSlug = (id: string) => id.replace(/\.(md|mdx)$/, '').toLowerCase();
@@ -56,6 +58,12 @@ export async function getStaticPaths() {
 
 const { entry, seriesArticles, parentSeries, prevArticle, nextArticle, seriesName } = Astro.props;
 const stats = estimateReadingTime(entry.body);
+// Keywords come from the inline theme markers, the same source the on-page chips
+// use. The legacy frontmatter tags said "Crypto, Finance" on a page whose chip
+// read "Derivatives" — two vocabularies describing one piece.
+const keywordsFromThemes = [
+  ...new Set([...countThemes(entry.body)].map(([s]) => THEMES[s]?.label).filter(Boolean)),
+].map(displayLabel);
 // A post marked isHidden is kept out of the feed and the RSS, but its page is
 // still emitted so existing links keep working. It must not be advertised:
 // without this it was submitted in the sitemap as index,follow.
@@ -98,7 +106,7 @@ const ogImage = entry.data.ogImage || '/social-prev.png';
     updatedAt={entry.data.updatedAt}
     slug={entrySlug}
     image={ogImage}
-    tags={entry.data.tags}
+    tags={keywordsFromThemes.length ? keywordsFromThemes : entry.data.tags}
   />
   <BreadcrumbSchema
     slot="head"
