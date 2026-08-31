@@ -31,6 +31,10 @@ const blog = defineCollection({
     updatedAt: z.date().optional(),
     tags: z.array(z.string()).default([]),
     isHidden: z.boolean().default(false),
+    /** Opt in to a newsletter broadcast for this piece. Nothing is ever
+     *  emailed without it, so edits, republishes and back-fills cannot
+     *  fire a send by accident. */
+    newsletter: z.boolean().default(false),
     readingTimeMinutes: z.number().optional(), // injected at build
     canonical: z.string().url().optional(),
     ogImage: z.string().optional(),
@@ -89,6 +93,10 @@ const notes = defineCollection({
     // An unknown slug fails the build rather than silently vanishing.
     themes: z.array(z.string()).default([]),
     isHidden: z.boolean().default(false),
+    /** Opt in to a newsletter broadcast for this piece. Nothing is ever
+     *  emailed without it, so edits, republishes and back-fills cannot
+     *  fire a send by accident. */
+    newsletter: z.boolean().default(false),
   }),
 });
 
