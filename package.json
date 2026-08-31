@@ -8,6 +8,7 @@
     "build": "astro build",
     "preview": "astro preview",
     "check": "astro check",
+    "check:readdepth": "node scripts/checks/readdepth.mjs",
     "astro": "astro"
   },
   "dependencies": {
