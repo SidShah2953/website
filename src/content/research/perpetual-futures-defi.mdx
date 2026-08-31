@@ -1,0 +1,47 @@
+---
+title: "Perpetual Futures in Decentralised Finance: Mechanics, Economic Claims, and the Drivers of Trading Volume"
+publishedAt: 2026-07-08T00:00:00Z
+description: "A multi-asset study of DeFi perpetual futures across crypto, tokenized equities and tokenized commodities, using endogenous event detection to identify 1,797 volume anomalies and a systematic 24/7 trading premium."
+authors: ["Siddhant Shah", "Eugene Pinsky"]
+publication: "International Journal of Financial Studies 14(7): 178"
+tags: ["Digital Assets", "Market Structure", "Derivatives"]
+themes: []
+isPublished: true
+thesis: |
+  Perpetual futures now trade around the clock on assets whose underlying markets
+  do not. That mismatch is measurable, and it produces a persistent structure in
+  volume that a conventional event study — anchored to an opening bell and a
+  known event calendar — cannot see.
+doi: "10.3390/ijfs14070178"
+pdfUrl: "https://doi.org/10.3390/ijfs14070178"
+---
+
+<T k="derivatives">Perpetual futures</T> in <T k="defi">DeFi</T> reached roughly
+$41B in daily notional by early 2026, across three quite different underlyings:
+native crypto, <T k="tokenization">tokenized</T> US equities, and tokenized
+commodities. Those three inherit very different reference markets, and comparing
+them is the point.
+
+## The dataset
+
+17 assets — 5 crypto, 8 tokenized US equities, 4 tokenized commodities — across
+three DeFi platforms, collected over 7.5 months from public REST APIs and
+cross-referenced against conventional market data.
+
+## Endogenous event detection
+
+Classical event studies begin with a calendar: you know the announcement date and
+measure around it. A market that never closes has no bell and no agreed calendar,
+so the method has to invert. We detect abnormal volume first, using rolling
+three-day *t*-tests, and only then ask what each anomaly coincided with.
+
+That surfaced **1,797 statistically significant volume anomalies**, which we map
+back to identifiable catalysts.
+
+## The 24/7 premium
+
+The clearest structural finding is a systematic weekend and holiday effect: volume
+craters on Saturdays and spikes on days when traditional markets are closed. There
+is also a maturity gradient in how faithfully each contract tracks its underlying —
+crypto perpetuals track closely, equity perpetuals less so, and commodity
+perpetuals worst of all.

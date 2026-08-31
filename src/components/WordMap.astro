@@ -1,0 +1,282 @@
+---
+/**
+ * The word map. Terms come from inline <T k="..."> markers in the writing.
+ * Position is barycentric across four fixed area anchors, colour is blended in
+ * the same ratio — so hue and position always agree.
+ */
+import { AREAS, displayLabel, type AreaId } from "@/data/themes";
+import type { ThemeStat } from "@/utils/themeIndex";
+interface Props { themes: ThemeStat[] }
+const { themes } = Astro.props;
+
+const ANCHOR: Record<AreaId, { x: number; y: number }> = {
+  fin: { x: .17, y: .26 }, da: { x: .83, y: .26 },
+  tech: { x: .83, y: .78 }, side: { x: .17, y: .78 },
+};
+const counts = themes.map((t) => t.count);
+const lo = Math.min(...counts, 1), hi = Math.max(...counts, 1);
+
+// Barycentric placement, then a deterministic relaxation pass to stop labels
+// overlapping. Most themes carry a similar Finance/Digital-Assets blend, so
+// their true positions collide hard; jitter alone is not enough. Labels are
+// pushed apart while being pulled back toward their real position, so meaning
+// survives and nothing stacks.
+const BOX = { w: 1000, h: 640 };                 // virtual layout space
+
+type P = {
+  t: (typeof themes)[number];
+  x: number; y: number; hx: number; hy: number;  // current + home
+  w: number; h: number; size: number; weight: number;
+};
+
+const placed: P[] = themes
+  .map((t) => {
+    let x = 0, y = 0, tot = 0;
+    for (const a of Object.keys(ANCHOR) as AreaId[]) {
+      const w = t.blend[a] ?? 0; if (!w) continue;
+      x += ANCHOR[a].x * w; y += ANCHOR[a].y * w; tot += w;
+    }
+    x /= tot || 1; y /= tot || 1;
+    const k = Math.pow((t.count - lo) / (hi - lo || 1), .45);
+    const size = 19 + k * 24;
+    return {
+      t, size, weight: k > .66 ? 400 : k > .34 ? 300 : 200,
+      hx: x * BOX.w, hy: y * BOX.h,
+      x: x * BOX.w, y: y * BOX.h,
+      // measured against rendered Newsreader: width ~= chars * fontSize * 0.42,
+      // and the line box is exactly fontSize * 1.62 (the inherited line-height).
+      w: t.label.length * size * 0.42 + 38,
+      // gap must exceed twice the drift amplitude (~4px each) or two labels
+      // animating toward each other will touch.
+      h: size * 1.62 + 20,
+    };
+  })
+  // biggest first: the large labels get their true position, small ones yield
+  .sort((a, b) => b.size - a.size);
+
+// The four area labels are immovable obstacles.
+const fixed = (Object.keys(ANCHOR) as AreaId[]).map((a) => ({
+  x: ANCHOR[a].x * BOX.w, y: ANCHOR[a].y * BOX.h,
+  w: AREAS[a].label.length * 10.5 + 56, h: 62,
+}));
+
+type Box = { x: number; y: number; w: number; h: number };
+const hits = (a: Box, b: Box) =>
+  Math.abs(a.x - b.x) < (a.w + b.w) / 2 && Math.abs(a.y - b.y) < (a.h + b.h) / 2;
+
+/**
+ * Greedy spiral placement. Force relaxation reaches equilibrium while still
+ * overlapping — the spring back toward the true position balances the push
+ * apart — so instead each label is placed in turn at the nearest free spot to
+ * where it actually belongs. Terminates, and cannot leave an overlap.
+ */
+const settled: Box[] = [...fixed];
+const overlapArea = (a: Box, b: Box) =>
+  Math.max(0, (a.w + b.w) / 2 - Math.abs(a.x - b.x)) *
+  Math.max(0, (a.h + b.h) / 2 - Math.abs(a.y - b.y));
+
+for (const p of placed) {
+  const clampX = (v: number) => Math.min(BOX.w - p.w / 2 - 6, Math.max(p.w / 2 + 6, v));
+  const clampY = (v: number) => Math.min(BOX.h - p.h / 2 - 22, Math.max(p.h / 2 + 18, v));
+
+  let best: Box | null = null;
+  let fallback: { box: Box; cost: number } | null = null;
+
+  outer:
+  for (let ring = 0; ring < 260; ring++) {
+    const r = ring * 3;
+    const steps = ring === 0 ? 1 : Math.min(96, 12 + ring * 4);
+    for (let s = 0; s < steps; s++) {
+      const a = (s / steps) * Math.PI * 2 + ring * 0.7;
+      const cand: Box = {
+        x: clampX(p.hx + Math.cos(a) * r),
+        y: clampY(p.hy + Math.sin(a) * r * 0.72),   // prefer spreading sideways
+        w: p.w, h: p.h,
+      };
+      const cost = settled.reduce((n, o) => n + overlapArea(cand, o), 0);
+      if (cost === 0) { best = cand; break outer; }
+      // remember the least-bad spot in case nothing is ever free
+      const dist = Math.hypot(cand.x - p.hx, cand.y - p.hy);
+      const score = cost * 1000 + dist;
+      if (!fallback || score < fallback.cost) fallback = { box: cand, cost: score };
+    }
+  }
+
+  const chosen = best ?? fallback!.box;
+  p.x = chosen.x; p.y = chosen.y;
+  settled.push({ x: p.x, y: p.y, w: p.w, h: p.h });
+}
+
+const byCount = [...placed].sort((a, b) => b.t.count - a.t.count);
+const rankOf = new Map(byCount.map((p, i) => [p.t.slug, i]));
+
+const laid = placed.map((p, i) => ({
+  ...p.t,
+  left: (p.x / BOX.w) * 100,
+  top: (p.y / BOX.h) * 100,
+  size: p.size, weight: p.weight,
+  phase: i * 0.73, amp: 1.4 + (i % 5) * 0.42,
+  rank: rankOf.get(p.t.slug) ?? 99,
+  drift: Math.hypot(p.x - p.hx, p.y - p.hy),
+}));
+---
+<div class="wm" id="wm">
+  {(Object.keys(AREAS) as AreaId[]).map((a) => (
+    <span class="anchor" data-area={a}
+      style={`left:${ANCHOR[a].x * 100}%;top:${ANCHOR[a].y * 100}%;color:rgb(${AREAS[a].rgb.join(",")})`}>
+      <i style={`background:rgb(${AREAS[a].rgb.join(",")});box-shadow:0 0 24px rgb(${AREAS[a].rgb.join(",")})`}></i>
+      {AREAS[a].label}
+    </span>
+  ))}
+  {laid.map((t) => (
+    <a class="term" href={`/themes/${t.slug}/`}
+      data-ph={t.phase} data-amp={t.amp} data-rank={t.rank}
+      style={`left:${t.left.toFixed(3)}%;top:${t.top.toFixed(3)}%;color:rgb(${t.rgb.join(",")});--s:${t.size.toFixed(1)};font-weight:${t.weight};text-shadow:0 0 ${Math.round(t.size * .6)}px rgba(${t.rgb.join(",")},.28)`}
+      data-label={displayLabel(t.label)}
+      data-meta={`${(Object.keys(AREAS) as AreaId[]).filter((a) => (t.blend[a] ?? 0) > .02).map((a) => `${AREAS[a].label} ${Math.round((t.blend[a] ?? 0) * 100)}%`).join("  ·  ")} — ${t.count} mention${t.count === 1 ? "" : "s"} across ${t.pieces} piece${t.pieces === 1 ? "" : "s"}`}
+    >{displayLabel(t.label)}</a>
+  ))}
+</div>
+
+<style>
+  .wm{
+    container-type:size;
+    position:relative;width:100%;aspect-ratio:1000/640;max-height:62svh;min-height:300px;
+    border-radius:var(--r-lg);overflow:hidden;
+    background:radial-gradient(88% 78% at 50% 46%,var(--peacock-wash),transparent 72%);
+  }
+  .anchor{
+    position:absolute;translate:-50% -50%;text-align:center;pointer-events:none;
+    /* the four areas are the headline of this graphic, not a legend — they were
+       reading as smaller than the terms they contain */
+    font-family:var(--sans);font-size:clamp(13px,1.5vw,17px);font-weight:700;
+    letter-spacing:.06em;text-transform:uppercase;opacity:.92;transition:opacity .4s;
+    text-shadow:0 0 26px currentColor;
+  }
+  .anchor i{display:block;width:8px;height:8px;border-radius:50%;margin:0 auto 10px}
+  .term{
+    position:absolute;translate:-50% -50%;white-space:nowrap;text-decoration:none;
+    font-family:var(--serif);letter-spacing:-.01em;
+    /* scale with whichever container axis is tighter: the layout was solved in a
+       1000x640 space, so 1 unit = 0.1cqw horizontally and 0.15625cqh vertically */
+    font-size:max(12px, min(calc(var(--s) * 0.1cqw), calc(var(--s) * 0.15625cqh)));
+    transition:filter .3s,opacity .45s;will-change:transform;
+  }
+  .term:hover,.term:focus-visible{
+    filter:brightness(1.5) drop-shadow(0 0 20px currentColor);z-index:9;outline:none;
+  }
+  /* On short viewports the whole slide must still fit the screen, or mandatory
+     scroll-snap traps the reader inside a section taller than their window. */
+  @media (max-height: 820px){ .wm{max-height:46svh} }
+  @media (max-height: 700px){ .wm{max-height:40svh} }
+
+  /* a narrow map cannot carry 18 labels legibly — drop the least-used */
+  @container (max-width: 700px){
+    .term[data-rank="12"],.term[data-rank="13"],.term[data-rank="14"],
+    .term[data-rank="15"],.term[data-rank="16"],.term[data-rank="17"]{display:none}
+    .wm{aspect-ratio:1000/820}
+  }
+  @container (max-width: 460px){
+    .term[data-rank="6"],.term[data-rank="7"],
+    .term[data-rank="8"],.term[data-rank="9"],
+    .term[data-rank="10"],.term[data-rank="11"]{display:none}
+    .anchor{font-size:12px;letter-spacing:.04em}
+  }
+  @media (prefers-reduced-motion:reduce){.term{transition:opacity .2s}}
+</style>
+
+<script>
+  const wm = document.getElementById('wm');
+  if (wm) {
+    const terms = [...wm.querySelectorAll<HTMLElement>('.term')];
+    for (const t of terms) {
+    }
+    /**
+   * Server-side placement works from estimated text metrics, which are never
+   * exactly right across weights and glyphs. This pass re-resolves using the
+   * real measured boxes, so what ships is correct rather than approximately
+   * correct. Runs before the terms are revealed, so nothing visibly jumps.
+   */
+  const settle = () => {
+    const box = wm.getBoundingClientRect();
+    if (!box.width) return;
+    const st = terms.filter((e) => e.offsetParent !== null).map((e) => {
+      const r = e.getBoundingClientRect();
+      return {
+        e,
+        x: r.left - box.left + r.width / 2,
+        y: r.top - box.top + r.height / 2,
+        hx: 0, hy: 0,
+        w: r.width + 14, h: r.height + 10,
+      };
+    });
+    st.forEach((s) => { s.hx = s.x; s.hy = s.y; });
+
+    // the four area labels are immovable
+    const anchors = [...wm.querySelectorAll('.anchor')].map((e) => {
+      const r = e.getBoundingClientRect();
+      return { x: r.left - box.left + r.width / 2, y: r.top - box.top + r.height / 2,
+               w: r.width + 20, h: r.height + 14 };
+    });
+
+    for (let pass = 0; pass < 700; pass++) {
+      let moved = false;
+      for (let i = 0; i < st.length; i++) {
+        for (let j = i + 1; j < st.length; j++) {
+          const a = st[i], b = st[j];
+          const dx = b.x - a.x, dy = b.y - a.y;
+          const ox = (a.w + b.w) / 2 - Math.abs(dx);
+          const oy = (a.h + b.h) / 2 - Math.abs(dy);
+          if (ox <= 0 || oy <= 0) continue;
+          moved = true;
+          if (ox / (a.w + b.w) < oy / (a.h + b.h)) {
+            const push = (ox / 2 + .5) * (dx < 0 ? -1 : 1);
+            a.x -= push; b.x += push;
+          } else {
+            const push = (oy / 2 + .5) * (dy < 0 ? -1 : 1);
+            a.y -= push; b.y += push;
+          }
+        }
+      }
+      for (const s of st) {
+        for (const a of anchors) {
+          const dx = s.x - a.x, dy = s.y - a.y;
+          const ox = (s.w + a.w) / 2 - Math.abs(dx);
+          const oy = (s.h + a.h) / 2 - Math.abs(dy);
+          if (ox <= 0 || oy <= 0) continue;
+          moved = true;
+          if (ox / (s.w + a.w) < oy / (s.h + a.h)) s.x += (dx < 0 ? -ox : ox);
+          else s.y += (dy < 0 ? -oy : oy);
+        }
+        s.x = Math.min(box.width - s.w / 2 - 4, Math.max(s.w / 2 + 4, s.x));
+        s.y = Math.min(box.height - s.h / 2 - 4, Math.max(s.h / 2 + 4, s.y));
+      }
+      if (!moved) break;
+    }
+    for (const s of st) {
+      s.e.style.left = ((s.x / box.width) * 100).toFixed(3) + '%';
+      s.e.style.top = ((s.y / box.height) * 100).toFixed(3) + '%';
+    }
+  };
+
+  const fonts = (document as any).fonts;
+  if (fonts?.ready) fonts.ready.then(() => requestAnimationFrame(settle));
+  else requestAnimationFrame(settle);
+  addEventListener('resize', () => requestAnimationFrame(settle), { passive: true });
+
+  if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      const t0 = performance.now();
+      const drift = (now: number) => {
+        const s = (now - t0) / 1000;
+        for (const t of terms) {
+          const ph = +(t.dataset.ph || 0), amp = +(t.dataset.amp || 2);
+          const dx = Math.sin(s * .17 + ph) * amp;
+          const dy = Math.cos(s * .14 + ph * 1.3) * amp * .8;
+          t.style.transform = `translate(${dx.toFixed(2)}px,${dy.toFixed(2)}px)`;
+        }
+        requestAnimationFrame(drift);
+      };
+      requestAnimationFrame(drift);
+    }
+  }
+</script>

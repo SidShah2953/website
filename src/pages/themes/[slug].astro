@@ -1,0 +1,87 @@
+---
+import Shell from "@/layouts/Shell.astro";
+import BreadcrumbSchema from "@/components/seo/BreadcrumbSchema.astro";
+import { THEMES, AREAS, displayLabel } from "@/data/themes";
+import { allPieces } from "@/utils/allPieces";
+import { getCollection } from "astro:content";
+import { live } from "@/utils/archive";
+import { excerpt } from "@/utils/feed";
+import { themesFor } from "@/utils/themeIndex";
+
+export async function getStaticPaths() {
+  const pieces = await allPieces();
+  // notes carry their themes in frontmatter, and belong on these pages too
+  const notes = live(await getCollection("notes"))
+    .filter((n) => !n.data.isHidden)
+    .map((entry) => ({
+      entry, kind: "notes" as const,
+      slug: entry.id.replace(/\.(md|mdx)$/, "").toLowerCase(),
+      areas: {},
+    }));
+  const all = [...pieces, ...notes];
+  // A theme nothing is tagged with is an empty page. Emitting it gives Google a
+  // page whose body reads "Nothing tagged with this yet."
+  return Object.entries(THEMES).flatMap(([slug, t]) => {
+    const used = all
+      .map((p) => ({ ...p, n: themesFor(p.entry).get(slug) ?? 0 }))
+      .filter((p) => p.n > 0)
+      .sort((a, b) => +b.entry.data.publishedAt - +a.entry.data.publishedAt);
+    if (used.length === 0) return [];
+    return [{ params: { slug }, props: { slug, theme: t, used } }];
+  });
+}
+const { slug, theme, used } = Astro.props;
+const area = AREAS[theme.area];
+const rgb = area.rgb.join(",");
+const href = (p: any) =>
+  `/${p.kind === "blog" ? "blog" : p.kind}/${p.entry.id.replace(/\.(md|mdx)$/, "").toLowerCase()}/`;
+---
+<Shell title={`${theme.label} | Siddhant Shah`}
+  description={`Everything I've written on ${theme.label}.`}
+  canonical={`/themes/${slug}/`}>
+  <BreadcrumbSchema slot="head" items={[{ name: "Home", url: "/" }, { name: "Writing", url: "/blog/" }, { name: displayLabel(theme.label) }]} />
+  <div class="page">
+    <section class="wrap wrap--narrow">
+    <p class="eyebrow" style={`color:rgb(${rgb})`}>{area.label}</p>
+    <h1 class="h1" style={`color:rgb(${rgb})`}>{displayLabel(theme.label)}</h1>
+    <p class="lede">
+      {used.length === 0
+        ? "Nothing tagged with this yet."
+        : `${used.length} piece${used.length === 1 ? "" : "s"}, most recent first.`}
+    </p>
+    <ul class="posts">
+      {used.map((p) => (
+        <li>
+          <a href={href(p)}>
+            {/* a note has no title by design, so show the note itself */}
+            <span class="pt">{p.entry.data.title ?? excerpt(p.entry.body, 110)}</span>
+            {"description" in p.entry.data && p.entry.data.description && (
+              <span class="pd">{p.entry.data.description}</span>
+            )}
+            <span class="pm">
+              {p.kind === "notes" ? "note" : p.kind}
+              {p.n > 1 ? ` · mentioned ${p.n}×` : ""}
+            </span>
+          </a>
+        </li>
+      ))}
+    </ul>
+    <p><a class="ln" href="/themes/">← All themes</a></p>
+    </section>
+  </div>
+</Shell>
+
+<style>
+  /* This page used to carry its own 1060px column and its own gutter, so it
+     sat at a different left edge from every other listing. It now uses the
+     shared .page/.wrap kit, like /blog, /research and /projects. */
+  .lede{margin-bottom:clamp(24px,3.4vw,40px)}
+  .posts{list-style:none;margin:0 0 34px;padding:0;border-top:1px solid var(--rule)}
+  .posts li{border-bottom:1px solid var(--rule)}
+  .posts a{display:grid;gap:5px;padding:24px 0;text-decoration:none;transition:padding-left .4s cubic-bezier(.2,.7,.3,1)}
+  .posts a:hover{padding-left:14px}
+  .pt{font-size:clamp(19px,2.1vw,25px);color:var(--text);line-height:1.24}
+  .pd{font-family:var(--sans);font-size:14px;color:var(--text-3);max-width:74ch;line-height:1.55}
+  .pm{font-family:var(--sans);font-size:11.5px;color:var(--text-3);letter-spacing:.06em;text-transform:uppercase}
+  .ln{font-family:var(--sans);font-size:14.5px;text-decoration:none;color:var(--glow);border-bottom:1px solid var(--glow-line)}
+</style>

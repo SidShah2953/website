@@ -1,0 +1,388 @@
+---
+import SEOTags from "@/components/seo/SEOTags.astro";
+import Analytics from "@/components/Analytics.astro";
+import type { HeadTags } from "@/utils/types/HeadTags";
+
+// Self-hosted variable fonts — no third-party request, one file per family.
+import "@fontsource-variable/newsreader";
+import "@fontsource-variable/schibsted-grotesk";
+export type Props = HeadTags & {
+  transparentHeader?: boolean;
+  snap?: boolean;
+  /**
+   * "surface" — the raymarched hero graphic. Homepage only.
+   * "lines"   — flow lines: the same field the surface is built from, drawn as
+   *             still contours instead of lit geometry. Same mathematics, far
+   *             quieter, so the text stays the subject. This is the default.
+   */
+  atmosphere?: "surface" | "lines" | "none";
+  /**
+   * Set false where the page owns its own ending. On the snapping homepage the
+   * last slide fills the viewport, so a trailing footer sits past the final
+   * snap point and cannot be scrolled to — it moves into the contact section
+   * instead.
+   */
+  footer?: boolean;
+};
+const { transparentHeader = false, snap = false, atmosphere = "lines", footer = true, ...headTags } = Astro.props;
+
+/* ---------------------------------------------------------------------------
+   Flow lines, generated once at build time. These trace the same value-noise
+   field the hero shader displaces, so the interior pages read as a contour map
+   of the landing page rather than a different idea. Deterministic, no runtime
+   JS, and it ships as a few hundred bytes of path data.
+--------------------------------------------------------------------------- */
+const LW = 1200, LH = 900, ROWS = 15, STEP = 24;
+
+const h2 = (x: number, y: number) => {
+  const n = Math.sin(x * 127.1 + y * 311.7) * 43758.5453;
+  return n - Math.floor(n);
+};
+const smooth = (t: number) => t * t * (3 - 2 * t);
+const vnoise = (x: number, y: number) => {
+  const xi = Math.floor(x), yi = Math.floor(y);
+  const xf = smooth(x - xi), yf = smooth(y - yi);
+  const a = h2(xi, yi), b = h2(xi + 1, yi), c = h2(xi, yi + 1), d = h2(xi + 1, yi + 1);
+  return (a * (1 - xf) + b * xf) * (1 - yf) + (c * (1 - xf) + d * xf) * yf;
+};
+const fbm2 = (x: number, y: number) => {
+  let v = 0, amp = 0.5, fx = x, fy = y;
+  for (let i = 0; i < 3; i++) { v += amp * vnoise(fx, fy); fx *= 1.97; fy *= 1.97; amp *= 0.5; }
+  return v;
+};
+
+const lines = Array.from({ length: ROWS }, (_, r) => {
+  const base = (LH / (ROWS - 1)) * r;
+  // amplitude swells in the middle of the page, like a wave passing through
+  const swell = 1 - Math.abs(r / (ROWS - 1) - 0.5) * 1.4;
+  const amp = 26 + 54 * Math.max(swell, 0);
+  let d = "";
+  for (let x = 0; x <= LW; x += STEP) {
+    const y = base + (fbm2(x / 320, r * 0.62) - 0.5) * 2 * amp;
+    d += `${x === 0 ? "M" : "L"}${x} ${y.toFixed(1)} `;
+  }
+  return { d: d.trim(), o: (0.13 + 0.11 * Math.max(swell, 0)).toFixed(3) };
+});
+const path = Astro.url.pathname.replace(/\/$/, "") || "/";
+const nav = [
+  { href: "/", label: "Home" },
+  { href: "/blog", label: "Blog" },
+  { href: "/about", label: "About" },
+];
+---
+<!DOCTYPE html>
+<html lang="en" class={snap ? "snap" : undefined}>
+  <SEOTags {...headTags} />
+  <Analytics />
+  <slot name="head" />
+  <body>
+    {atmosphere === "surface" && (
+      <div class="sky" aria-hidden="true"><i class="s1"></i><i class="s2"></i><i class="s3"></i></div>
+    )}
+
+    {atmosphere === "lines" && (
+      <div class="lines" aria-hidden="true">
+        <svg viewBox={`0 0 ${LW} ${LH}`} preserveAspectRatio="xMidYMid slice" focusable="false">
+          <defs>
+            <linearGradient id="lg" x1="0" y1="0" x2="1" y2="0.35">
+              <stop offset="0%" stop-color="var(--peacock)" />
+              <stop offset="52%" stop-color="var(--azure)" />
+              <stop offset="100%" stop-color="var(--iris)" />
+            </linearGradient>
+          </defs>
+          {lines.map((l) => (
+            <path d={l.d} fill="none" stroke="url(#lg)" stroke-width="1.15"
+              stroke-opacity={l.o} vector-effect="non-scaling-stroke" />
+          ))}
+        </svg>
+      </div>
+    )}
+
+    <header id="hdr" class={transparentHeader ? "hdr" : "hdr solid"}>
+      <a class="mark" href="/"><span id="markName">Siddhant Shah</span></a>
+      <nav aria-label="Main">
+        {nav.map((n) => (
+          <a href={n.href} aria-current={path === n.href || (n.href !== "/" && path.startsWith(n.href)) ? "page" : undefined}>{n.label}</a>
+        ))}
+      </nav>
+    </header>
+
+    <main><slot /></main>
+
+    {footer && (
+      <footer>
+        <p>© {new Date().getFullYear()} Siddhant Shah</p>
+        <p class="disc">Written in a personal capacity. Nothing here is investment advice.</p>
+      </footer>
+    )}
+
+    <style is:global>
+      :root{
+        --ground:#050C0F; --deep:#0A2027; --abyss:#0C3A42;
+        --peacock:#208EC5; --glow:#45B5ED; --azure:#2F6FE8; --iris:#6A5AD8;
+        --text:#DEEAEC;
+        /* #93AAAF measured 8.08:1 and read dim — it carries ledes, callout and
+           table body copy, and the article intro. Lifted to 11.14:1, which stays
+           clearly below --text (16.03:1) so the hierarchy survives. */
+        --text-2:#B4C6CA;
+        /* #5F757A measured 3.54-4.05:1 on the grounds it actually sits on — below
+           WCAG AA. It carries dates, captions, meta, TOC links and the footer,
+           so it was the single cause of most contrast failures. */
+        /* #72888D at 5.27:1 read too dim for dates, captions and meta. #8CA2A6
+           is 7.35:1 — still clearly a third step below --text-2 (11.14) and
+           --text (16.03), so the hierarchy holds. */
+        --text-3:#8CA2A6;
+        --rule:rgba(255,255,255,.08);
+        --rule-strong:rgba(255,255,255,.14);
+
+        /* Surfaces — every raised panel on the site is one of these three, so a
+           card, a callout and a table header cannot drift apart. */
+        --surface-1:rgba(255,255,255,.028);   /* cards, callouts, the disclosure */
+        --surface-2:rgba(255,255,255,.05);    /* hover state of the above */
+        --surface-3:var(--surface-3);    /* inline code, chips */
+        --surface-sunk:#0C1519;               /* sticky table headers */
+
+        /* Accent tints. Named by intent so a component asks for "the peacock
+           wash" rather than inventing another alpha. */
+        --peacock-wash:rgba(32,142,197,.10);
+        --peacock-wash-strong:rgba(32,142,197,.17);
+        --peacock-line:rgba(32,142,197,.42);
+        --glow-line:rgba(69,181,237,.38);
+        --glow-line-soft:rgba(69,181,237,.24);
+
+        /* Scrim stops — used by the homepage veil over the shader */
+        --scrim-0:rgba(5,12,15,.86);
+        --scrim-1:rgba(5,12,15,.62);
+        --scrim-2:rgba(5,12,15,.34);
+        --scrim-3:rgba(5,12,15,.22);
+
+        --on-accent:#04171B;                  /* text that sits on a peacock fill */
+        --warn:#E0A88F;                       /* the one non-palette signal colour */
+
+        /* Ambient layers. The flow-line gradient and the drifting sky blobs are
+           the only places the palette appears at low saturation, so they get
+           named stops rather than one-off literals. */
+        --haze-teal:var(--haze-teal);
+        --haze-navy:var(--haze-navy);
+        --haze-iris:var(--haze-iris);
+        --header-bg:var(--header-bg);
+        --code-bg:var(--code-bg);
+        --selection:var(--selection);
+        /* Radius scale. Ten values were in use (10/12/14/16/26px and friends),
+           all doing panel duty, which is why panels disagreed by a couple of
+           pixels wherever two sat side by side. */
+        --r-sm:8px;      /* inline code, small chips */
+        --r-md:16px;     /* cards, callouts, inputs, figures */
+        --r-lg:20px;     /* large containers: word map, spreadsheet, hero panels */
+        --r-pill:999px;  /* buttons, badges, tags */
+
+        --serif:"Newsreader Variable",Georgia,"Times New Roman",serif;
+        --sans:"Schibsted Grotesk Variable","Helvetica Neue",Arial,sans-serif;
+        --hdr-h:64px;
+      }
+      *{box-sizing:border-box}
+      /* Grid and flex children default to min-width:auto, so one long unbreakable
+         string (an email address, a URL) can force a track wider than the
+         viewport. This is the single most common cause of horizontal overflow.
+         Fixing it at the source matters: an overflow-x:hidden safety net on body
+         makes body its own scroll container, which silently kills scroll-snap
+         set on html. */
+      *,*::before,*::after{ min-width:0; }
+      html{scroll-behavior:smooth;-webkit-font-smoothing:antialiased}
+      body{
+        margin:0;background:var(--ground);color:var(--text);
+        overflow-wrap:break-word;
+        font-family:var(--serif);font-weight:300;line-height:1.62;
+        font-size:17px;
+      }
+      h1,h2,h3,h4{margin:0;font-weight:300;text-wrap:balance;letter-spacing:-.022em}
+      a{color:inherit}
+      .sky{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+
+      /* Flow lines: still, low-contrast, and behind everything. No animation —
+         interior pages are for reading, so the atmosphere holds position. */
+      .lines{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+      .lines svg{width:100%;height:100%;display:block}
+      .lines::after{
+        content:"";position:absolute;inset:0;
+        background:
+          radial-gradient(120% 78% at 50% -8%, var(--peacock-wash-strong), transparent 62%),
+          linear-gradient(180deg, var(--scrim-2) 0%, transparent 26%,
+                                  transparent 72%, var(--scrim-1) 100%);
+      }
+      .sky i{position:absolute;display:block;border-radius:50%;filter:blur(80px);opacity:.55}
+      .s1{width:64vw;height:64vw;left:-16vw;top:-20vw;background:radial-gradient(circle,var(--haze-teal),transparent 68%);animation:f1 34s ease-in-out infinite}
+      .s2{width:54vw;height:54vw;right:-14vw;top:12vh;background:radial-gradient(circle,var(--haze-navy),transparent 68%);animation:f2 43s ease-in-out infinite}
+      .s3{width:48vw;height:48vw;left:20vw;bottom:-20vw;background:radial-gradient(circle,var(--haze-iris),transparent 70%);animation:f3 39s ease-in-out infinite}
+      @keyframes f1{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(7vw,5vh) scale(1.14)}}
+      @keyframes f2{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(-6vw,7vh) scale(1.1)}}
+      @keyframes f3{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(5vw,-6vh) scale(1.16)}}
+
+      .hdr{
+        position:fixed;top:0;left:0;right:0;height:var(--hdr-h);z-index:50;
+        display:flex;align-items:center;justify-content:space-between;
+        padding:0 clamp(18px,4vw,42px);
+        background:transparent;backdrop-filter:blur(0px);
+        border-bottom:1px solid transparent;
+        transition:background .5s ease,backdrop-filter .5s ease,border-color .5s ease;
+      }
+      .hdr.solid,.hdr.filled{
+        background:var(--header-bg);backdrop-filter:blur(16px) saturate(140%);
+        border-bottom-color:var(--rule);
+      }
+      .mark{
+        font-family:var(--sans);font-weight:500;font-size:14.5px;letter-spacing:-.01em;
+        text-decoration:none;opacity:0;transform:translateY(6px);
+        transition:opacity .5s ease,transform .5s ease;
+      }
+      .hdr.solid .mark,.hdr.filled .mark{opacity:1;transform:none}
+      .hdr nav{display:flex;gap:clamp(14px,2.4vw,30px);font-family:var(--sans);font-size:14px}
+      .hdr nav a{
+        text-decoration:none;color:var(--text-2);padding:4px 0;position:relative;
+        transition:color .3s;
+      }
+      .hdr nav a::after{
+        content:"";position:absolute;left:0;right:0;bottom:0;height:1px;
+        background:var(--glow);transform:scaleX(0);transform-origin:left;
+        transition:transform .35s cubic-bezier(.2,.7,.3,1);
+      }
+      .hdr nav a:hover,.hdr nav a[aria-current="page"]{color:var(--text)}
+      .hdr nav a:hover::after,.hdr nav a[aria-current="page"]::after{transform:scaleX(1)}
+      .hdr nav a:focus-visible{outline:2px solid var(--glow);outline-offset:4px;border-radius:2px}
+
+      main{position:relative;z-index:1}
+
+      /* ---- shared page kit -------------------------------------------------
+         Every width here is relative. Nothing is a fixed pixel column, so the
+         layout survives any viewport or a mid-session resize.                */
+      .wrap{
+        width:100%;
+        max-width:min(1180px, 100% - clamp(32px, 8vw, 160px));
+        margin-inline:auto;
+      }
+      .wrap--narrow{ max-width:min(720px, 100% - clamp(32px, 8vw, 120px)); }
+      .page{ padding-block: calc(var(--hdr-h) + clamp(36px,7vw,86px)) clamp(40px,8vw,110px); }
+
+      .eyebrow{
+        font-family:var(--sans);font-size:clamp(11.5px,1.1vw,12px);font-weight:500;
+        letter-spacing:.22em;text-transform:uppercase;color:var(--text-3);margin:0 0 clamp(14px,2vw,24px);
+      }
+      .h1{ font-size:clamp(34px,7vw,68px);line-height:1.02;margin:0 0 clamp(14px,2.2vw,22px); }
+      .h2{ font-size:clamp(24px,4vw,38px);line-height:1.12;margin:0 0 clamp(12px,1.8vw,18px); }
+      .lede{ color:var(--text-2);font-size:clamp(16px,1.9vw,20px);max-width:62ch;margin:0 0 clamp(22px,3.4vw,40px); }
+
+      /* long-form reading column */
+      /* Never put .prose on the same element as .wrap: both set a max-width and
+         .wrap centres with auto margins, so the narrower prose box gets centred
+         inside the wider one and the body copy sits indented from its heading. */
+      .prose{ max-width:68ch;margin-inline:0;font-size:clamp(16.5px,1.15vw,18.5px);line-height:1.72; }
+      .prose > * + *{ margin-top:1.15em; }
+      .prose h2{ font-size:clamp(22px,3vw,30px);line-height:1.2;margin-top:2.1em; }
+      .prose h3{ font-size:clamp(18.5px,2.2vw,23px);line-height:1.25;margin-top:1.8em; }
+      .prose a{ color:var(--glow);text-decoration:none;
+        background-image:linear-gradient(currentColor,currentColor);
+        background-size:100% 1px;background-repeat:no-repeat;background-position:0 100%; }
+      .prose a:hover{ color:var(--text); }
+      .prose blockquote{ margin-inline:0;padding-left:clamp(14px,2vw,22px);
+        border-left:2px solid var(--peacock);color:var(--text-2);font-style:italic; }
+      .prose code{ font-family:ui-monospace,SFMono-Regular,monospace;font-size:.86em;
+        background:var(--surface-3);padding:.15em .4em;border-radius:4px; }
+      .prose pre{ overflow-x:auto;padding:clamp(14px,2vw,20px);border-radius:var(--r-md);
+        border:1px solid var(--rule);background:var(--code-bg);font-size:.86em;line-height:1.6; }
+      .prose pre code{ background:none;padding:0; }
+      .prose img,.prose video{ max-width:100%;height:auto;border-radius:var(--r-md); }
+      /* wide things scroll themselves rather than the page */
+      .prose table{ display:block;overflow-x:auto;max-width:100%;border-collapse:collapse;font-size:.92em; }
+      .prose th,.prose td{ border-bottom:1px solid var(--rule);padding:.55em .8em;text-align:left;white-space:nowrap; }
+      .prose .katex-display{ overflow-x:auto;overflow-y:hidden;padding-block:.4em;max-width:100%; }
+      /* KaTeX's stylesheet sets .katex{font-size:1.21em}, which made every
+         formula 21% larger than the sentence around it (20.04px against 16.56px).
+         1.06 keeps maths optically level with the text without shrinking it. */
+      .prose .katex{ max-width:100%;font-size:1.06em; }
+      .prose .katex-display{ font-size:1.1em; }
+      .prose .katex-display > .katex{ font-size:1em; }
+      /* inline maths can still be wider than a phone column — let it scroll */
+      .prose :where(.katex-display) > .katex{ white-space:nowrap; }
+      .prose mjx-container,.prose .katex-html{ max-width:100%;overflow-x:auto; }
+
+      /* feed used by the blog index and the homepage */
+      .feed{ list-style:none;margin:0;padding:0;border-top:1px solid var(--rule); }
+      .feed > li{ border-bottom:1px solid var(--rule); }
+      .feed a.row{
+        display:grid;gap:6px;padding:clamp(18px,2.4vw,26px) 0;text-decoration:none;
+        transition:padding-inline-start .4s cubic-bezier(.2,.7,.3,1);
+      }
+      .feed a.row:hover{ padding-inline-start:clamp(6px,1.2vw,14px); }
+      .feed .t{ font-size:clamp(18px,2.2vw,25px);line-height:1.24;color:var(--text); }
+      .feed a.row:hover .t{ color:var(--glow); }
+      .feed .d{ font-family:var(--sans);font-size:clamp(13.5px,1.3vw,14.5px);color:var(--text-3);
+        line-height:1.55;max-width:74ch; }
+      .feed .m{ font-family:var(--sans);font-size:clamp(11.5px,1.05vw,12.5px);color:var(--text-3);
+        letter-spacing:.09em;text-transform:uppercase;display:flex;flex-wrap:wrap;gap:6px 14px; }
+      footer{
+        position:relative;z-index:1;border-top:1px solid var(--rule);
+        margin-top:clamp(60px,10vw,120px);padding:38px clamp(18px,4vw,42px) 54px;
+        font-family:var(--sans);font-size:13px;color:var(--text-3);
+        display:flex;flex-wrap:wrap;gap:8px 26px;
+        justify-content:space-between;align-items:baseline;
+      }
+      footer p:first-child{ margin-inline-end:auto;text-align:left; }
+      footer .disc{ text-align:right; }
+      @media (max-width:640px){ footer .disc{ text-align:left; } }
+      footer p{margin:0}
+      .disc{max-width:52ch}
+      ::selection{background:var(--selection)}
+      :focus-visible{outline:2px solid var(--glow);outline-offset:3px}
+
+      /* Scroll snapping, homepage only. Sections are full-height slides, so a
+         reader always lands on one rather than halfway between two. Disabled on
+         short viewports and under reduced motion, where forcing a snap point
+         traps people inside content taller than their screen. */
+      html.snap{ scroll-padding-top:0; }
+      /* Snapping is only applied once script has confirmed every slide actually
+         fits. Mandatory snap over a slide taller than the viewport traps the
+         reader — they physically cannot scroll to its bottom. A viewport-height
+         media query cannot express this because the cause is content height. */
+      @media (prefers-reduced-motion:no-preference){
+        html.snap.snap-ok{ scroll-snap-type:y mandatory; }
+      }
+
+      /* scroll choreography: sections rise in, and settle out downward */
+      .rise{opacity:0;transform:translateY(34px);
+        transition:opacity .95s cubic-bezier(.2,.7,.3,1),transform .95s cubic-bezier(.2,.7,.3,1)}
+      .rise.in{opacity:1;transform:none}
+
+      @media (prefers-reduced-motion:reduce){
+        html{scroll-behavior:auto}
+        .sky i{animation:none!important}
+        .rise{opacity:1!important;transform:none!important;transition:none!important}
+        *{transition-duration:.01ms!important}
+      }
+    </style>
+
+    <script>
+      const hdr = document.getElementById('hdr')!;
+      if (!hdr.classList.contains('solid')) {
+        const onScroll = () => hdr.classList.toggle('filled', window.scrollY > 80);
+        onScroll();
+        addEventListener('scroll', onScroll, { passive: true });
+      }
+      // enable snapping only while every slide fits the viewport
+      const root = document.documentElement;
+      if (root.classList.contains('snap')) {
+        const slides = [...document.querySelectorAll<HTMLElement>('.slide')];
+        const fits = () => slides.every((s) => s.getBoundingClientRect().height <= innerHeight + 1);
+        const sync = () => root.classList.toggle('snap-ok', slides.length > 0 && fits());
+        sync();
+        addEventListener('resize', sync, { passive: true });
+        if ((document as any).fonts?.ready) (document as any).fonts.ready.then(sync);
+      }
+
+      const io = new IntersectionObserver(
+        (es) => es.forEach((e) => e.isIntersecting && e.target.classList.add('in')),
+        { threshold: 0.1, rootMargin: '0px 0px -8% 0px' },
+      );
+      document.querySelectorAll('.rise').forEach((n) => io.observe(n));
+    </script>
+  </body>
+</html>

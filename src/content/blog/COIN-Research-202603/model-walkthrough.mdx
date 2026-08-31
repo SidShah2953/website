@@ -1,8 +1,10 @@
 ---
+demonstrative: true
+series: "Coinbase: The Infrastructure Flywheel"
 title: "Inside the Model: A Walk-Through of the Coinbase FY2019-FY2030 Equity Research Framework"
 publishedAt: 2026-03-09
 description: "Architecture, assumptions, and outputs of the nine-tab financial model behind the Coinbase Infrastructure Flywheel series"
-tags: ["Crypto", "Finance"]
+tags: ["Digital Assets", "Finance"]
 isHidden: false
 articleNumber: 8
 thesis: |
@@ -22,9 +24,9 @@ import ModelDownload from "@/components/ModelDownload.astro";
 
 The workbook has nine tabs organized into five functional categories.
 
-The `Cover` tab is a live-linked dashboard displaying KPIs, trading multiples, the DCF price range, and navigation links. The thesis and the valuation summary are visible before opening anything else — by design.
+The `Cover` tab is a live-linked dashboard displaying KPIs, trading multiples, the <T k="valuation">DCF</T> price range, and navigation links. The thesis and the valuation summary are visible before opening anything else — by design.
 
-The `Assumptions` tab is the single control panel for the entire model. Every forecast-period driver — macro variables, revenue build-ups, operating margin targets, balance sheet mechanics — flows from here. Change one cell and it propagates through all three financial statements, the DCF, and every supporting schedule simultaneously.
+The `Assumptions` tab is the single control panel for the entire model. Every forecast-period driver — macro variables, revenue build-ups, operating margin targets, balance sheet mechanics — flows from here. Change one cell and it propagates through all three financial statements, the <T k="valuation">DCF</T>, and every supporting schedule simultaneously.
 
 The three `Financial Statement` tabs (Income Statement, Balance Sheet, Cash Flow Statement) span FY2019A through FY2030E and are fully integrated: cash is the balance sheet plug, the cash flow statement reconciles net income to cash, and every major line traces back to Assumptions.
 
@@ -38,7 +40,7 @@ The four `Supporting` tabs are USDC Scenarios (the 3x3 Circle renewal risk matri
 <ModelDownload href="/COIN Model.xlsx" filename="COIN Model.xlsx" />
 {/* <ExcelEmbed src="/COIN Model.xlsx" filename="COIN Model.xlsx" /> */}
 
-The model is designed to be read in a specific sequence that builds analytical context before introducing complexity.
+<T k="financial-modelling">The model</T> is designed to be read in a specific sequence that builds analytical context before introducing complexity.
 
 Start with the `Cover` tab — thesis and valuation range upfront. Move to `Assumptions` next. This is the engine room, and understanding what drives the forecasts makes every subsequent tab legible. Then work through the `Income Statement` to see how the eight revenue lines collapse into EBIT and net income, the `Balance Sheet` to confirm the cash plug and the balance check row, and the `Cash Flow Statement` to see how OCF, ICF, and FCF connect the first two statements.
 
@@ -49,7 +51,7 @@ Once the three-statement model is clear, the `DCF` tab follows naturally: WACC i
 
 ### Macro & Market
 
-The Federal Funds Rate is the single most important exogenous variable in the model. It drives USDC revenue directly — through reserve interest income — and interest income on Coinbase's cash balance. The modeled FOMC path runs from $4.33\%$ in FY2025A to $2.25\%$ by FY2030E, producing a stablecoin revenue profile that peaks in FY2027E and then declines as rates normalize.
+The Federal Funds Rate is the single most important exogenous variable in <T k="financial-modelling">the model</T>. It drives USDC revenue directly — through reserve interest income — and interest income on Coinbase's cash balance. The modeled FOMC path runs from $4.33\%$ in FY2025A to $2.25\%$ by FY2030E, producing a stablecoin revenue profile that peaks in FY2027E and then declines as rates normalize.
 
 Crypto market cap grows from \$$3.2$T to \$$6.5$T across the forecast period — approximately $12\%$ CAGR — serving as the macroeconomic backdrop against which trading volumes and asset balances are sized. ETH staking yield compresses from $4.0\%$ to $2.7\%$ as network participation rises from $30\%$ to $40\%$ of total ETH supply. BTC year-end price assumptions range from \$$80$K to \$$120$K; ETH average price assumptions from \$$2,500$ to \$$4,500$.
 
@@ -61,7 +63,7 @@ Deribit is modeled as a standalone revenue line growing from \$$400$M to \$$600$
 
 ### Subscription & Services
 
-USDC revenue is built from first principles: on-platform USDC balance (\$$17.8$B growing to \$$28$B) multiplied by $100\%$ of reserve yield, plus off-platform USDC (\$$52$B growing to \$$92$B) multiplied by $50\%$ of reserve yield. The resulting gross revenue line is the most rate-sensitive in the model and the primary subject of the USDC Scenarios tab.
+USDC revenue is built from first principles: on-platform USDC balance (\$$17.8$B growing to \$$28$B) multiplied by $100\%$ of reserve yield, plus off-platform USDC (\$$52$B growing to \$$92$B) multiplied by $50\%$ of reserve yield. The resulting gross revenue line is the most rate-sensitive in <T k="financial-modelling">the model</T> and the primary subject of the USDC Scenarios tab.
 
 Blockchain rewards revenue is built from ETH custody volume ($2.5$M to $3.5$M ETH) multiplied by price and yield — and declines from \$$677$M in FY2025A to \$$425$M by FY2030E as yield compression outpaces asset appreciation in the base case. Coinbase One ARR grows from \$$180$M to \$$672$M as the subscriber base expands from $0.97$M to $2.8$M at an average revenue per subscriber of \$$185$-\$$240$ annually. Interest income steps up significantly in FY2026E (Deribit balance sheet addition) then declines as rates fall, ending at \$$185$M.
 
@@ -168,14 +170,14 @@ The `PP&E schedule` applies a standard roll-forward: beginning balance plus cape
 
 The `Shares schedule` starts with a basic share count of $256$M and applies \$$1.5$B per year in buybacks at the prevailing share price. Diluted share count includes outstanding RSUs and options under the treasury stock method, declining from $287$M to approximately $259$M as buybacks more than offset new equity awards over the forecast period.
 
-The `Working Capital schedule` derives accounts receivable from DSO assumptions (declining from $16$ to $12$ days), accounts payable from DPO assumptions (declining from $31$ to $14$ days), and accrued liabilities from $14$-$15\%$ of operating expenses. The large working capital jump from \$$41$M to \$$1,679$M in FY2026E reflects the Deribit balance sheet reclassification — a one-time integration step that drives the low FY2026E FCFF in the DCF. Not a structural signal.
+The `Working Capital schedule` derives accounts receivable from DSO assumptions (declining from $16$ to $12$ days), accounts payable from DPO assumptions (declining from $31$ to $14$ days), and accrued liabilities from $14$-$15\%$ of operating expenses. The large working capital jump from \$$41$M to \$$1,679$M in FY2026E reflects the Deribit balance sheet reclassification — a one-time integration step that drives the low FY2026E FCFF in the <T k="valuation">DCF</T>. Not a structural signal.
 
 The `Tax schedule` calculates the income tax provision as pretax income multiplied by the $21\%$ effective tax rate from FY2026E forward, consistent with Coinbase's disclosed forward ETR guidance. The deferred tax asset starts at \$$571$M and draws down at approximately \$$50$M per year as temporary timing differences reverse.
 
 
 ## Sources & Data Provenance
 
-Historical financials are sourced from standardized financials (COIN US Equity) and confirmed against Coinbase's 10-K and 10-Q filings on SEC EDGAR. The Deribit PPA is an analyst estimate; official allocation has not been published. WACC inputs are sourced as follows: risk-free rate from FRED DGS10 (February 2026); equity risk premium from Damodaran's implied ERP (January 2026); beta from a five-year monthly OLS regression; cost of debt from Coinbase's publicly filed bond indentures. Macro assumptions are based on the FOMC dot-plot as of February 2026 for the Fed Funds Rate path and analyst estimates for crypto market cap. Peer multiples are sourced from consensus data as of March 2026.
+Historical financials are sourced from standardized financials (COIN US Equity) and confirmed against Coinbase's 10-K and 10-Q filings on SEC EDGAR. The Deribit PPA is an analyst estimate; official allocation has not been published. WACC inputs are sourced as follows: risk-free rate from FRED DGS10 (February 2026); equity risk premium from Damodaran's implied ERP (January 2026); beta from a five-year monthly OLS regression; cost of debt from Coinbase's publicly filed bond indentures. Macro assumptions are based on the FOMC dot-plot as of February 2026 for the Fed Funds Rate path and analyst estimates for crypto market cap. Peer multiples are sourced from <T k="equity-research">consensus</T> data as of March 2026.
 
 
 ## Key Risks & Sensitivity Levers

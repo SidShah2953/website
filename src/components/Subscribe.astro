@@ -1,0 +1,122 @@
+---
+/**
+ * Mailing list signup, wired for Kit (formerly ConvertKit).
+ *
+ * Set PUBLIC_NEWSLETTER_ACTION to the form endpoint Kit gives you, which looks
+ * like https://app.kit.com/forms/<FORM_ID>/subscriptions
+ *
+ * Kit expects the email field to be named `email_address`. Posting `email`
+ * — the obvious guess — succeeds and Kit silently receives nothing, so the
+ * field name below is deliberate, and the build warns if the endpoint looks
+ * wrong rather than letting signups disappear.
+ *
+ * Works without JavaScript: the plain form POST lands on Kit's own confirmation
+ * page. With JavaScript it posts in the background and confirms inline.
+ */
+const action = import.meta.env.PUBLIC_NEWSLETTER_ACTION ?? "";
+const ready = Boolean(action);
+
+if (ready && !/\/forms\/[^/]+\/subscriptions\/?$/.test(action)) {
+  console.warn(
+    `[Subscribe] PUBLIC_NEWSLETTER_ACTION="${action}" does not look like a Kit ` +
+    `form endpoint (expected .../forms/<FORM_ID>/subscriptions). ` +
+    `Signups may be silently dropped.`,
+  );
+}
+---
+<div class="sub" data-subscribe>
+  <p class="big">Or get new writing by email.</p>
+  <p class="note">Whenever I publish. No other email, ever.</p>
+
+  {ready ? (
+    <>
+      <form class="row" method="post" action={action} target="_blank" data-form>
+        <label class="sr" for="sub-email">Email address</label>
+        <input id="sub-email" type="email" name="email_address" required
+          placeholder="you@example.com" autocomplete="email" />
+        <button type="submit">Subscribe</button>
+      </form>
+      <p class="status" data-status role="status" aria-live="polite" hidden></p>
+    </>
+  ) : (
+    <>
+      <form class="row" aria-disabled="true" onsubmit="return false">
+        <label class="sr" for="sub-email">Email address</label>
+        <input id="sub-email" type="email" placeholder="you@example.com" disabled />
+        <button type="button" disabled>Subscribe</button>
+      </form>
+      <p class="warn">Not connected yet — set <code>PUBLIC_NEWSLETTER_ACTION</code> to your Kit form endpoint.</p>
+    </>
+  )}
+</div>
+
+<style>
+  .sub{display:flex;flex-direction:column;gap:12px}
+  .big{font-size:clamp(20px,2.4vw,27px);line-height:1.3;margin:0;color:var(--text)}
+  .note{font-family:var(--sans);font-size:13.5px;color:var(--text-3);margin:0}
+  .row{display:flex;gap:9px;flex-wrap:wrap;margin-top:6px}
+  input{
+    flex:1 1 220px;background:var(--surface-2);border:1px solid var(--rule);
+    border-radius:var(--r-pill);padding:13px 20px;color:var(--text);
+    font-family:var(--sans);font-size:14.5px;transition:border-color .3s,background .3s;
+  }
+  input::placeholder{color:var(--text-3)}
+  input:focus{outline:none;border-color:var(--peacock);background:var(--surface-3)}
+  input:disabled{opacity:.5}
+  button{
+    border:0;border-radius:var(--r-pill);padding:13px 26px;cursor:pointer;
+    font-family:var(--sans);font-size:14.5px;font-weight:500;color:var(--on-accent);
+    background:linear-gradient(102deg,var(--glow),var(--peacock) 55%,var(--azure));
+    background-size:200% 100%;transition:background-position .5s,opacity .3s;
+  }
+  button:hover:not(:disabled){background-position:100% 0}
+  button:disabled{opacity:.4;cursor:not-allowed}
+  .status{font-family:var(--sans);font-size:13.5px;margin:2px 0 0;color:var(--glow)}
+  .status[data-bad]{color:var(--warn)}
+  .warn{font-family:var(--sans);font-size:12.5px;color:var(--warn);margin:2px 0 0}
+  code{font-family:ui-monospace,monospace;font-size:12px;background:var(--surface-3);padding:2px 6px;border-radius:var(--r-sm)}
+  .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+</style>
+
+<script>
+  for (const root of document.querySelectorAll<HTMLElement>('[data-subscribe]')) {
+    const form = root.querySelector<HTMLFormElement>('[data-form]');
+    const status = root.querySelector<HTMLElement>('[data-status]');
+    if (!form || !status) continue;
+
+    form.addEventListener('submit', async (e) => {
+      const btn = form.querySelector('button')!;
+      const input = form.querySelector<HTMLInputElement>('input')!;
+      if (!input.value) return;
+
+      // Post in the background so the reader stays on the page. If that is
+      // blocked for any reason, fall through to the normal form submit, which
+      // still works — hence no preventDefault until the fetch is under way.
+      e.preventDefault();
+      btn.disabled = true;
+      const original = btn.textContent;
+      btn.textContent = 'Subscribing…';
+      status.hidden = true;
+      status.removeAttribute('data-bad');
+
+      try {
+        const res = await fetch(form.action, {
+          method: 'POST',
+          headers: { Accept: 'application/json' },
+          body: new FormData(form),
+        });
+        if (!res.ok) throw new Error(String(res.status));
+        form.reset();
+        status.textContent = 'Thanks — check your inbox to confirm.';
+        status.hidden = false;
+      } catch {
+        // Network or CORS failure — let the browser post it the ordinary way.
+        // form.submit() does not fire a submit event, so this cannot recurse.
+        form.submit();
+      } finally {
+        btn.disabled = false;
+        btn.textContent = original;
+      }
+    });
+  }
+</script>

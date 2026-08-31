@@ -1,8 +1,8 @@
 ---
 import type { CollectionEntry } from "astro:content";
 import { getCollection } from "astro:content";
-import Layout from "@/layouts/Layout.astro";
-import ContentPage from "@/components/ContentPage.astro";
+import Shell from "@/layouts/Shell.astro";
+import Article from "@/components/Article.astro";
 import BreadcrumbSchema from "@/components/seo/BreadcrumbSchema.astro";
 
 export async function getStaticPaths() {
@@ -21,7 +21,7 @@ type Props = {
 const { entry } = Astro.props;
 const { Content } = await entry.render();
 ---
-<Layout
+<Shell
   title={`${entry.data.title} | Projects`}
   description={entry.data.description}
   canonical={`/projects/${entry.slug}/`}
@@ -39,7 +39,6 @@ const { Content } = await entry.render();
     integrity="sha384-MlJdn/WNKDGXveldHDdyRP1R4CTHr3FeuDNfhsLPYrq2t0UBkUdK2jyTnXPEK1NQ"
     crossorigin="anonymous"
   />
-  {import.meta.env.PROD && <script slot="head" data-goatcounter="https://siddhants.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>}
 
   <BreadcrumbSchema
     slot="head"
@@ -50,5 +49,5 @@ const { Content } = await entry.render();
     ]}
   />
 
-  <ContentPage type="project" entry={entry} Content={Content} />
-</Layout>
+  <Article type="project" entry={entry} Content={Content} />
+</Shell>

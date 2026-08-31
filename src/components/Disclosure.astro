@@ -1,0 +1,107 @@
+---
+/**
+ * Compliance disclosure.
+ *
+ * `variant="mark"` renders the asterisk that sits at the first mention of
+ * anything that could be read as a view on a security. It links down to the
+ * full statement, which `variant="full"` renders at the foot of the page.
+ *
+ * The pairing matters: a disclaimer only buried in the footer is easy to argue
+ * nobody saw. An asterisk at the point of the claim, resolving to a statement
+ * on the same page, is the form regulators and compliance teams expect.
+ */
+interface Props { variant?: "mark" | "full" | "exercise"; id?: string }
+const { variant = "full", id = "disclosure" } = Astro.props;
+const year = new Date().getFullYear();
+---
+{variant === "exercise" ? (
+  <aside class="exercise" role="note" aria-label="Illustrative exercise">
+    <p class="h">Illustrative exercise</p>
+    <p>
+      This is a <strong>demonstrative modelling exercise</strong>, written to show
+      a method — how the numbers are built, which assumptions carry the answer,
+      and where the disclosure gaps are. It is <strong>not a price target, not a
+      recommendation, and not a view on the security</strong>. Any valuation range
+      shown is an output of the stated assumptions, not a judgement about what the
+      shares are worth. See the <a href={`#${id}`}>full disclosure</a>.
+    </p>
+  </aside>
+) : variant === "mark" ? (
+  <a href={`#${id}`} class="disc-mark" aria-describedby={id}
+    title="Not investment advice — see the disclosure">
+    <span aria-hidden="true">*</span>
+    <span class="sr">Disclosure: not investment advice</span>
+  </a>
+) : (
+  <aside class="disclosure" id={id} role="note" aria-label="Disclosure">
+    <p class="h">Disclosure</p>
+    <p>
+      Written in a personal capacity. Everything here is my own opinion and not
+      that of Rosenblatt Securities or any employer, and it is
+      <strong>not investment advice</strong>, not
+      a recommendation, and not an offer or solicitation to buy or sell any
+      security. Nothing here is research prepared for, or distributed on behalf
+      of, any firm.
+    </p>
+    <p>
+      I may hold positions in securities or assets discussed. Figures are drawn
+      from public filings and public sources and may be wrong, stale, or
+      restated; do your own work before acting on anything. Nothing on this site
+      creates a client relationship.
+    </p>
+    <p class="c">© {year} Siddhant Shah</p>
+  </aside>
+)}
+
+<style>
+  .disc-mark{
+    display:inline-block;text-decoration:none;color:var(--peacock);
+    font-family:var(--sans);font-size:.72em;vertical-align:super;line-height:0;
+    padding-inline:1px;transition:color .25s;
+  }
+  .disc-mark:hover,.disc-mark:focus-visible{ color:var(--glow); }
+  .sr{
+    position:absolute;width:1px;height:1px;overflow:hidden;
+    clip:rect(0 0 0 0);white-space:nowrap;
+  }
+  .disclosure{
+    margin-top:clamp(40px,6vw,72px);padding:clamp(18px,2.4vw,26px);
+    border:1px solid var(--rule);border-radius:var(--r-md);
+    border-left:2px solid var(--peacock);
+    background:var(--surface-1);
+    scroll-margin-top:calc(var(--hdr-h) + 20px);
+  }
+  @media (max-height: 780px){
+    .disclosure{ padding:clamp(13px,1.8vw,18px);margin-top:clamp(20px,3vw,32px) }
+  }
+  .disclosure p{
+    margin:0 0 .8em;font-family:var(--sans);
+    font-size:clamp(12.5px,1.2vw,13.5px);line-height:1.65;color:var(--text-3);
+  }
+  .disclosure p:last-child{ margin-bottom:0; }
+  .disclosure .h{
+    font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;
+    color:var(--peacock);margin-bottom:.7em;
+  }
+  .disclosure strong{ color:var(--text-2);font-weight:600; }
+  .disclosure .c{ color:var(--text-3);opacity:.75;margin-top:1.2em; }
+  .disclosure :target,
+  .disclosure:target{ border-left-color:var(--glow); }
+
+  .exercise{
+    margin:0 0 clamp(24px,3.4vw,36px);padding:clamp(16px,2.2vw,22px);
+    border:1px solid color-mix(in srgb, var(--peacock) 40%, transparent);
+    border-left:2px solid var(--peacock);border-radius:var(--r-md);
+    background:var(--peacock-wash);
+  }
+  .exercise .h{
+    font-family:var(--sans);font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;
+    color:var(--glow);margin:0 0 .6em;
+  }
+  .exercise p{
+    margin:0;font-family:var(--sans);font-size:clamp(13px,1.25vw,14px);
+    line-height:1.62;color:var(--text-2);
+  }
+  .exercise strong{ color:var(--text);font-weight:600; }
+  .exercise a{ color:var(--glow);text-decoration:none;border-bottom:1px solid var(--glow-line); }
+</style>

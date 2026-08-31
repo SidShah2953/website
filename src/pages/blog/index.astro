@@ -1,174 +1,319 @@
 ---
-import { getCollection } from 'astro:content';
-import ContentListLayout from '@/layouts/ContentListLayout.astro';
-import ContentCard from '@/components/ContentCard.astro';
-import { estimateReadingTime } from '@/utils/estimateReadingTime';
+import Shell from "@/layouts/Shell.astro";
+import BreadcrumbSchema from "@/components/seo/BreadcrumbSchema.astro";
+import { getFeed, fmtDate, readingMinutes } from "@/utils/feed";
+import { marked } from "marked";
+import Disclosure from "@/components/Disclosure.astro";
+import { AREAS, THEMES, displayLabel, type AreaId } from "@/data/themes";
+import { countThemes, themesFor } from "@/utils/themeIndex";
 
-const allBlogPosts = await getCollection('blog');
+const feed = await getFeed();
+const posts = feed.reduce((n, f) => n + (f.kind === "post" ? 1 + (f.children?.length ?? 0) : 0), 0);
+const notes = feed.filter((f) => f.kind === "note").length;
+// notes render inline in the feed — they're too short to deserve their own click
+const inline = (md: string) => marked.parse(md.trim(), { async: false }) as string;
 
-// Count sub-articles per series (slug prefix = parent slug)
-const seriesArticleCounts: Record<string, number> = {};
-allBlogPosts
-  .filter(p => p.slug.includes('/'))
-  .forEach(p => {
-    const parentSlug = p.slug.split('/')[0];
-    seriesArticleCounts[parentSlug] = (seriesArticleCounts[parentSlug] ?? 0) + 1;
-  });
+// Filtering runs on the client over data already in the page — no index to ship,
+// no request to make, and it still works if the JS never loads (every row is
+// rendered; the controls simply do nothing).
+const themesOf = (f: (typeof feed)[number]): string[] => {
+  const set = new Set<string>();
+  for (const slug of f.themes ?? []) if (THEMES[slug]) set.add(slug);
+  for (const b of [f.body, ...(f.children ?? []).map((c) => c.body)])
+    for (const [slug] of countThemes(b)) if (THEMES[slug]) set.add(slug);
+  for (const c of f.children ?? [])
+    for (const slug of c.themes ?? []) if (THEMES[slug]) set.add(slug);
+  return [...set];
+};
 
-// Derive which top-level posts are series homes
-const seriesHomeSlugs = new Set(Object.keys(seriesArticleCounts));
+// derived from themesOf so a declared theme counts the same as an inline marker
+const areasOf = (f: (typeof feed)[number]): AreaId[] =>
+  [...new Set(themesOf(f).map((slug) => THEMES[slug].area))];
+// themes are part of the search text, so "stablecoins" finds the piece even when
+// the word is not in its title
+const haystack = (f: (typeof feed)[number]) =>
+  [f.title, f.description, ...(f.children ?? []).map((c) => c.title),
+   ...themesOf(f).map((t) => THEMES[t].label)]
+    .filter(Boolean).join(" ").toLowerCase();
 
-// Blog index: top-level posts only (no sub-articles), not hidden
-const blogPosts = allBlogPosts
-  .filter(p => !p.data.isHidden && !p.slug.includes('/'))
-  .sort((a, b) => b.data.publishedAt.getTime() - a.data.publishedAt.getTime());
+const usedAreas = (Object.keys(AREAS) as AreaId[])
+  .filter((a) => feed.some((f) => areasOf(f).includes(a)));
 
-// Inject reading time (if not stored yet)
-const enriched = blogPosts.map(p => {
-  if (!p.data.readingTimeMinutes) {
-    const stats = estimateReadingTime(p.body);
-    return { ...p, data: { ...p.data, readingTimeMinutes: stats.minutes } };
-  }
-  return p;
-});
-
-// Collect all unique tags
-const allTags = [...new Set(enriched.flatMap(p => p.data.tags))].sort();
-
-// Pass all posts to client-side for filtering
-const postsData = enriched.map(p => ({
-  slug: p.slug,
-  title: p.data.title,
-  description: p.data.description,
-  publishedAt: p.data.publishedAt.toISOString(),
-  tags: p.data.tags,
-  isSeries: seriesHomeSlugs.has(p.slug),
-  articleCount: seriesArticleCounts[p.slug] ?? 0,
-}));
+// every theme in use, grouped under its area, for the second-level filter
+const usedThemes = [...new Set(feed.flatMap(themesOf))]
+  .map((slug) => ({ slug, ...THEMES[slug] }))
+  .sort((a, b) => a.label.localeCompare(b.label));
 ---
+<Shell title="Writing | Siddhant Shah"
+  description="Essays on finance, digital assets and technology, plus shorter notes."
+  canonical="/blog/">
+  <BreadcrumbSchema slot="head" items={[{ name: "Home", url: "/" }, { name: "Writing" }]} />
+  <div class="page">
+    <div class="wrap wrap--narrow">
+      <p class="eyebrow">Writing</p>
+      <h1 class="h1">Everything, newest first.</h1>
+      <p class="lede">
+        {posts} longer {posts === 1 ? "piece" : "pieces"} and {notes} shorter
+        {notes === 1 ? "note" : "notes"}. The long ones are worth your time; the
+        short ones are me thinking out loud.
+      </p>
+    </div>
 
-<ContentListLayout
-  title="Blog"
-  pageTitle="Blog | Siddhant Shah"
-  description="Long-form posts, experiments & deeper dives into finance, tech, and quantitative analysis."
-  allTags={allTags}
-  enableTagFilter={true}
-  contentType="blog"
->
-  {enriched.map(post => (
-    <ContentCard
-      type="blog"
-      slug={post.slug}
-      title={post.data.title}
-      description={post.data.description}
-      publishedAt={post.data.publishedAt}
-      tags={post.data.tags}
-      isSeries={seriesHomeSlugs.has(post.slug)}
-      articleCount={seriesArticleCounts[post.slug]}
-    />
-  ))}
-</ContentListLayout>
+    <div class="wrap wrap--narrow">
+      <form class="tools" role="search" id="tools" onsubmit="return false">
+        <label class="sr" for="q">Search writing</label>
+        <input id="q" type="search" placeholder="Search titles and descriptions…"
+          autocomplete="off" spellcheck="false" />
+        <div class="chips" role="group" aria-label="Filter by area">
+          <button type="button" data-area="all" aria-pressed="true">All</button>
+          {usedAreas.map((a) => (
+            <button type="button" data-area={a} aria-pressed="false"
+              style={`--ac: rgb(${AREAS[a].rgb.join(",")})`}>{AREAS[a].label}</button>
+          ))}
+          <button type="button" data-area="note" aria-pressed="false">Notes</button>
+          <label class="sr" for="theme">Filter by theme</label>
+          <select id="theme">
+            <option value="">All themes</option>
+            {(Object.keys(AREAS) as AreaId[]).map((a) => (
+              usedThemes.some((t) => t.area === a) && (
+                <optgroup label={AREAS[a].label}>
+                  {usedThemes.filter((t) => t.area === a).map((t) => (
+                    <option value={t.slug}>{displayLabel(t.label)}</option>
+                  ))}
+                </optgroup>
+              )
+            ))}
+          </select>
+        </div>
+        <p class="count" id="count" aria-live="polite"></p>
+      </form>
 
-<script is:inline define:vars={{ postsData }}>
-  const posts = postsData;
-  const container = document.getElementById('content-container');
-  const tagMessage = document.getElementById('tag-message');
-  const noPostsMessage = document.getElementById('no-posts-message');
-  const tagFilters = document.querySelectorAll('.tag-filter');
-
-  function renderPosts(filtered, selectedTag) {
-    if (filtered.length === 0) {
-      container.classList.add('hidden');
-      noPostsMessage.classList.remove('hidden');
-      return;
-    }
-
-    container.classList.remove('hidden');
-    noPostsMessage.classList.add('hidden');
-
-    container.innerHTML = filtered.map(post => {
-      const date = new Date(post.publishedAt).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' }).replace(/\//g, '/');
-      const seriesBadge = post.isSeries
-        ? `<div class="flex items-center gap-2 mb-2">
-            <span class="inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-md bg-finance-purple/20 text-finance-purple border border-finance-purple/40 uppercase tracking-wide">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                <line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/>
-                <line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/>
-              </svg>
-              Series${post.articleCount ? ` · ${post.articleCount} parts` : ''}
-            </span>
-          </div>`
-        : '';
-      return `
-        <a class="content-card content-card--blog group glass-card-hover p-6 flex flex-col gap-3 relative overflow-hidden" href="/blog/${post.slug}" data-tags="${post.tags.join(',')}">
-          <div class="absolute inset-0 bg-gradient-to-br from-finance-cyan/0 to-finance-blue/0 group-hover:from-finance-cyan/5 group-hover:to-finance-blue/5 transition-all duration-300 rounded-2xl"></div>
-          <div class="relative z-10">
-            <div class="flex w-full items-start justify-between gap-4 flex-wrap">
-              <div class="flex-1">
-                ${seriesBadge}
-                <h2 class="font-semibold text-white group-hover:text-finance-cyan transition-colors leading-tight text-xl">${post.title}</h2>
+      <ul class="feed" id="feed">
+        {feed.map((f) => (
+          <li data-kind={f.kind} data-areas={areasOf(f).join(" ")}
+            data-themes={themesOf(f).join(" ")} data-text={haystack(f)}>
+            {f.kind === "post" && f.children?.length ? (
+              <div class="series">
+                <a class="row" href={f.href}>
+                  <span class="m">
+                    <span>{fmtDate(f.date)}</span>
+                    <span class="badge">series</span>
+                  </span>
+                  <span class="t">{f.title}</span>
+                  {f.description && <span class="d">{f.description}</span>}
+                </a>
+                <details class="parts">
+                  <summary>
+                    <span class="open">All {f.children.length} parts</span>
+                    <span class="shut">Hide parts</span>
+                  </summary>
+                  <ol>
+                    {f.children.map((c) => (
+                      <li>
+                        <a href={c.href}>
+                          <span class="n">{c.articleNumber ?? "·"}</span>{c.title}
+                        </a>
+                      </li>
+                    ))}
+                  </ol>
+                </details>
               </div>
-              <div class="flex flex-row items-center gap-3 text-sm text-neutral-400 shrink-0">
-                <time datetime="${post.publishedAt}">${date}</time>
-                <svg width="20" height="20" viewBox="0 0 18 18" fill="none" class="transition-all duration-300 group-hover:translate-x-1 group-hover:translate-y-[-2px] opacity-60 group-hover:opacity-100">
-                  <path d="M5.25 12.75L12.75 5.25" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
-                  <path d="M5.25 5.25H12.75V12.75" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
-                </svg>
-              </div>
-            </div>
-            <p class="text-neutral-300 leading-relaxed line-clamp-2 mt-2">${post.description}</p>
-          </div>
-        </a>
-      `;
-    }).join('');
+            ) : f.kind === "post" ? (
+              <a class="row" href={f.href}>
+                <span class="m">
+                  <span>{fmtDate(f.date)}</span>
+                  <span>{readingMinutes(f.words)} min</span>
+                </span>
+                <span class="t">{f.title}</span>
+                {f.description && <span class="d">{f.description}</span>}
+              </a>
+            ) : (
+              <article class="note">
+                <p class="m">
+                  <a class="perma" href={f.href}>{fmtDate(f.date)}</a>
+                  <span class="badge">note</span>
+                  {f.crosspost && <a href={f.crosspost} rel="noopener">also on X ↗</a>}
+                </p>
+                {f.title && <h2 class="nt">{f.title}</h2>}
+                <div class="nb" set:html={inline(f.body)} />
+                {f.via && <p class="m"><a href={f.via} rel="noopener">source ↗</a></p>}
+              </article>
+            )}
+          </li>
+        ))}
+      </ul>
+      <p class="empty" id="empty" hidden>Nothing matches that. <button type="button" id="reset">Clear filters</button></p>
+      <Disclosure />
+    </div>
+  </div>
+</Shell>
 
-    if (selectedTag) {
-      tagMessage.innerHTML = `Showing posts tagged with <strong class="text-neutral-200">${selectedTag}</strong>`;
-      tagMessage.classList.remove('hidden');
-    } else {
-      tagMessage.classList.add('hidden');
-    }
+<style>
+  .tools{ display:grid;gap:12px;margin-bottom:clamp(18px,2.6vw,28px); }
+  .tools input{
+    width:100%;background:var(--surface-1);border:1px solid var(--rule);
+    border-radius:var(--r-pill);padding:12px 18px;color:var(--text);
+    font-family:var(--sans);font-size:15px;transition:border-color .25s,background .25s;
   }
+  .tools input::placeholder{ color:var(--text-3); }
+  .tools input:focus{ outline:none;border-color:var(--peacock);background:var(--surface-2); }
+  .chips{ display:flex;flex-wrap:wrap;gap:7px;align-items:center; }
+  .chips button{
+    appearance:none;cursor:pointer;background:var(--surface-1);color:var(--text-2);
+    border:1px solid var(--rule);border-radius:var(--r-pill);padding:7px 14px;
+    font-family:var(--sans);font-size:13px;transition:all .2s;
+  }
+  .chips button:hover{ color:var(--text);border-color:var(--rule-strong); }
+  .chips button[aria-pressed="true"]{
+    color:var(--ac,var(--glow));border-color:var(--ac,var(--peacock));
+    background:var(--peacock-wash);
+  }
+  .chips button:focus-visible{ outline:2px solid var(--glow);outline-offset:2px; }
+  .chips select{
+    appearance:none;cursor:pointer;margin-inline-start:auto;
+    background:var(--surface-1);border:1px solid var(--rule);border-radius:var(--r-pill);
+    padding:7px 32px 7px 14px;color:var(--text-2);
+    font-family:var(--sans);font-size:13px;line-height:1;
+    background-image:linear-gradient(45deg,transparent 50%,var(--text-3) 50%),
+                     linear-gradient(135deg,var(--text-3) 50%,transparent 50%);
+    background-position:calc(100% - 18px) 50%, calc(100% - 13px) 50%;
+    background-size:5px 5px, 5px 5px;background-repeat:no-repeat;
+    transition:border-color .25s,color .25s;
+  }
+  .chips select:hover{ color:var(--text);border-color:var(--rule-strong); }
+  .chips select:focus{ outline:none;border-color:var(--peacock);color:var(--text); }
+  .count{ font-family:var(--sans);font-size:12.5px;color:var(--text-3);margin:0; }
+  .empty{
+    font-family:var(--sans);font-size:15px;color:var(--text-2);
+    padding:clamp(22px,4vw,38px) 0;margin:0;text-align:center;
+  }
+  .empty button{
+    appearance:none;background:none;border:0;cursor:pointer;color:var(--glow);
+    font:inherit;text-decoration:underline;padding:0;
+  }
+  .sr{ position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap; }
+  .series .row{ padding-bottom:10px; }
+  .parts{ padding:0 0 clamp(14px,2vw,20px); }
+  .parts summary{
+    list-style:none;cursor:pointer;display:inline-flex;align-items:center;gap:7px;
+    font-family:var(--sans);font-size:13px;color:var(--peacock);
+    padding:5px 0;transition:color .25s;
+  }
+  .parts summary::-webkit-details-marker{ display:none; }
+  .parts summary::after{
+    content:"";width:6px;height:6px;border-right:1.4px solid currentColor;
+    border-bottom:1.4px solid currentColor;rotate:45deg;translate:0 -2px;
+    transition:rotate .3s cubic-bezier(.2,.7,.3,1);
+  }
+  .parts[open] summary::after{ rotate:225deg;translate:0 1px; }
+  .parts summary:hover{ color:var(--glow); }
+  .parts .shut,.parts[open] .open{ display:none; }
+  .parts[open] .shut{ display:inline; }
+  .parts ol{
+    list-style:none;margin:10px 0 0;padding:0 0 0 clamp(12px,2vw,18px);
+    border-left:1px solid var(--rule);display:grid;gap:2px;
+  }
+  .parts ol a{
+    display:grid;grid-template-columns:auto 1fr;gap:12px;align-items:baseline;
+    padding:8px 0;text-decoration:none;color:var(--text-2);
+    font-size:clamp(15px,1.5vw,16.5px);line-height:1.35;
+    transition:color .22s, padding-inline-start .3s cubic-bezier(.2,.7,.3,1);
+  }
+  .parts ol a:hover{ color:var(--glow);padding-inline-start:6px; }
+  .parts .n{
+    font-family:var(--sans);font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;
+    color:var(--text-3);min-width:4.5ch;
+  }
+  .note{ padding:clamp(18px,2.4vw,26px) 0;display:grid;gap:8px; }
+  .note .m,.series .m{ display:flex;flex-wrap:wrap;align-items:center;gap:6px 12px; }
+  .badge{
+    color:var(--peacock);border:1px solid color-mix(in srgb, var(--peacock) 45%, transparent);
+    border-radius:var(--r-pill);padding:3px 10px;letter-spacing:.1em;
+    /* the badge carries padding and a border, so baseline alignment drops it
+       below the date it sits beside — centre the row instead */
+    display:inline-flex;align-items:center;line-height:1;
+  }
+  .m a{ color:var(--text-3);text-decoration:none;border-bottom:1px solid transparent; }
+  /* the permalink was unreachable: nothing linked to /notes/*, yet the pages
+     were indexed and duplicated the feed body */
+  .perma{ border-bottom-color:var(--rule) !important; }
+  .m a:hover{ color:var(--glow);border-bottom-color:currentColor; }
+  .nt{ font-size:clamp(17px,2vw,21px);line-height:1.25;margin:0; }
+  .nb{ font-size:clamp(16px,1.15vw,17.5px);line-height:1.68;color:var(--text);max-width:64ch; }
+  .nb :global(p){ margin:0 0 .7em; }
+  .nb :global(p:last-child){ margin-bottom:0; }
+  .nb :global(a){ color:var(--glow);text-decoration:none;border-bottom:1px solid var(--glow-line); }
+  .nb :global(em){ font-style:italic;color:var(--text); }
+  .nb :global(strong){ color:var(--text);font-weight:500; }
+</style>
 
-  function filterByTag(tag) {
-    const filtered = tag ? posts.filter(p => p.tags.includes(tag)) : posts;
+<script>
+  const feed = document.getElementById('feed');
+  const q = document.getElementById('q') as HTMLInputElement | null;
+  const tools = document.getElementById('tools');
+  const count = document.getElementById('count');
+  const empty = document.getElementById('empty');
+  if (feed && q && tools && count && empty) {
+    const rows = [...feed.querySelectorAll<HTMLElement>('li')];
+    const chips = [...tools.querySelectorAll<HTMLButtonElement>('[data-area]')];
+    const themeSel = document.getElementById('theme') as HTMLSelectElement | null;
+    let area = 'all';
+    let theme = '';
 
-    // Update URL without reload
-    const url = new URL(window.location);
-    if (tag) {
-      url.searchParams.set('tag', tag);
-    } else {
-      url.searchParams.delete('tag');
-    }
-    window.history.pushState({}, '', url);
-
-    // Update button states
-    tagFilters.forEach(btn => {
-      const btnTag = btn.dataset.tag;
-      if (btnTag === tag) {
-        btn.classList.remove('bg-neutral-800', 'text-neutral-400');
-        btn.classList.add('bg-neutral-700', 'text-neutral-100');
-      } else {
-        btn.classList.remove('bg-neutral-700', 'text-neutral-100');
-        btn.classList.add('bg-neutral-800', 'text-neutral-400', 'hover:bg-neutral-700');
+    const apply = () => {
+      const term = q.value.trim().toLowerCase();
+      let shown = 0;
+      for (const r of rows) {
+        const okArea =
+          area === 'all' ||
+          (area === 'note' ? r.dataset.kind === 'note'
+                           : (r.dataset.areas ?? '').split(' ').includes(area));
+        const okTerm = !term || (r.dataset.text ?? '').includes(term);
+        const okTheme = !theme || (r.dataset.themes ?? '').split(' ').includes(theme);
+        const on = okArea && okTerm && okTheme;
+        r.hidden = !on;
+        if (on) shown++;
       }
+      empty.hidden = shown > 0;
+      count.textContent =
+        term || area !== 'all' || theme
+          ? `${shown} of ${rows.length} ${rows.length === 1 ? 'entry' : 'entries'}`
+          : '';
+      const url = new URL(location.href);
+      term ? url.searchParams.set('q', term) : url.searchParams.delete('q');
+      area !== 'all' ? url.searchParams.set('area', area) : url.searchParams.delete('area');
+      theme ? url.searchParams.set('theme', theme) : url.searchParams.delete('theme');
+      history.replaceState(null, '', url);
+    };
+
+    for (const c of chips) {
+      c.addEventListener('click', () => {
+        area = c.dataset.area!;
+        for (const o of chips) o.setAttribute('aria-pressed', String(o === c));
+        apply();
+      });
+    }
+    q.addEventListener('input', apply);
+    themeSel?.addEventListener('change', () => { theme = themeSel.value; apply(); });
+    document.getElementById('reset')?.addEventListener('click', () => {
+      q.value = ''; area = 'all'; theme = '';
+      if (themeSel) themeSel.value = '';
+      for (const o of chips) o.setAttribute('aria-pressed', String(o.dataset.area === 'all'));
+      apply(); q.focus();
     });
 
-    renderPosts(filtered, tag);
-  }
-
-  // Set up click handlers
-  tagFilters.forEach(btn => {
-    btn.addEventListener('click', () => {
-      const tag = btn.dataset.tag;
-      filterByTag(tag);
-    });
-  });
-
-  // Check URL on load
-  const urlParams = new URLSearchParams(window.location.search);
-  const initialTag = urlParams.get('tag');
-  if (initialTag) {
-    filterByTag(initialTag);
+    // deep links: /blog/?q=stablecoin&area=da
+    const p = new URLSearchParams(location.search);
+    if (p.get('q')) q.value = p.get('q')!;
+    const th = p.get('theme');
+    if (th && themeSel && [...themeSel.options].some((o) => o.value === th)) {
+      theme = th; themeSel.value = th;
+    }
+    const a = p.get('area');
+    if (a && chips.some((c) => c.dataset.area === a)) {
+      area = a;
+      for (const o of chips) o.setAttribute('aria-pressed', String(o.dataset.area === a));
+    }
+    apply();
   }
 </script>

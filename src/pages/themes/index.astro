@@ -1,0 +1,74 @@
+---
+import Shell from "@/layouts/Shell.astro";
+import BreadcrumbSchema from "@/components/seo/BreadcrumbSchema.astro";
+import { AREAS, THEMES, displayLabel, type AreaId } from "@/data/themes";
+import { allPieces } from "@/utils/allPieces";
+import { buildIndex } from "@/utils/themeIndex";
+
+const pieces = await allPieces();
+const index = buildIndex(pieces.map((p) => ({ entry: p.entry, areas: p.areas })));
+const byArea = (Object.keys(AREAS) as AreaId[]).map((a) => ({
+  id: a,
+  ...AREAS[a],
+  themes: index.filter((t) => THEMES[t.slug]?.area === a).sort((x, y) => y.count - x.count),
+})).filter((g) => g.themes.length > 0);
+const total = index.reduce((n, t) => n + t.pieces, 0);
+---
+<Shell title="Themes | Siddhant Shah"
+  description="Every theme I write about, grouped by area — from accounting and valuation to tokenization, inference and the things I measure for fun."
+  canonical="/themes/">
+  <BreadcrumbSchema slot="head" items={[{ name: "Home", url: "/" }, { name: "Writing", url: "/blog/" }, { name: "Themes" }]} />
+  <div class="page">
+    <div class="wrap wrap--narrow">
+      <p class="eyebrow">Themes</p>
+      <h1 class="h1">What I keep coming back to.</h1>
+      <p class="lede">
+        Marked inline in the writing itself, so a theme's weight is how often I
+        actually reach for it — {index.length} themes across {total} appearances.
+      </p>
+
+      {byArea.map((g) => (
+        <section class="area">
+          <h2 class="ah" style={`--ac: rgb(${g.rgb.join(",")})`}>{g.label}</h2>
+          <ul class="tl">
+            {g.themes.map((t) => (
+              <li>
+                <a href={`/themes/${t.slug}/`} style={`--ac: rgb(${t.rgb.join(",")})`}>
+                  <span class="n">{displayLabel(t.label)}</span>
+                  <span class="c">{t.pieces} {t.pieces === 1 ? "piece" : "pieces"}</span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ))}
+
+      <p class="back"><a href="/blog/">← All writing</a></p>
+    </div>
+  </div>
+</Shell>
+
+<style>
+  .area{ margin-top:clamp(30px,4.5vw,52px); }
+  .ah{
+    font-family:var(--sans);font-size:clamp(11.5px,1.15vw,12.5px);font-weight:500;
+    letter-spacing:.18em;text-transform:uppercase;color:var(--ac);
+    margin:0 0 clamp(12px,1.8vw,18px);
+  }
+  .tl{ list-style:none;margin:0;padding:0;border-top:1px solid var(--rule); }
+  .tl li{ border-bottom:1px solid var(--rule); }
+  .tl a{
+    display:flex;flex-wrap:wrap;gap:6px 16px;align-items:baseline;justify-content:space-between;
+    padding:clamp(12px,1.6vw,16px) 0;text-decoration:none;
+    transition:padding-inline-start .35s cubic-bezier(.2,.7,.3,1);
+  }
+  .tl a:hover{ padding-inline-start:clamp(6px,1.2vw,12px); }
+  .n{ font-size:clamp(17px,1.9vw,21px);line-height:1.28;color:var(--text); }
+  .tl a:hover .n{ color:var(--ac); }
+  .c{
+    font-family:var(--sans);font-size:clamp(11.5px,1.15vw,12.5px);color:var(--text-3);
+    letter-spacing:.08em;text-transform:uppercase;
+  }
+  .back{ margin-top:clamp(34px,5vw,60px);font-family:var(--sans);font-size:14px; }
+  .back a{ color:var(--glow);text-decoration:none; }
+</style>

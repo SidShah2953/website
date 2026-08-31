@@ -64,6 +64,9 @@ const openGraph = {
         { rel: "apple-touch-icon", href: "/favicon.svg" },
         { rel: "apple-touch-icon-precomposed", href: "/favicon.svg" },
         { rel: "sitemap", href: "/sitemap-index.xml" },
+        // without this the feed is undiscoverable — no reader or browser can find it
+        { rel: "alternate", type: "application/rss+xml",
+          title: "Siddhant Shah — Writing", href: "/blog/rss.xml" },
       ],
       meta: [
         { name: "viewport", content: "width=device-width, initial-scale=1" },
