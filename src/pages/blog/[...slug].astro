@@ -1,52 +1,73 @@
 ---
 import { getCollection } from 'astro:content';
-import Layout from '@/layouts/Layout.astro';
-import ContentPage from '@/components/ContentPage.astro';
+import Shell from '@/layouts/Shell.astro';
+import Article from '@/components/Article.astro';
 import ArticleSchema from '@/components/seo/ArticleSchema.astro';
 import BreadcrumbSchema from '@/components/seo/BreadcrumbSchema.astro';
 import { estimateReadingTime } from '@/utils/estimateReadingTime';
+import { themesFor } from '@/utils/themeIndex';
+import { THEMES, displayLabel } from '@/data/themes';
 
 export async function getStaticPaths() {
   const toSlug = (id: string) => id.replace(/\.(md|mdx)$/, '').toLowerCase();
   const allPosts = await getCollection('blog');
 
-  return allPosts.map(p => {
-    const slug = toSlug(p.id);
-    const isSubArticle = slug.includes('/');
-    const isSeriesHome = !isSubArticle && allPosts.some(a => toSlug(a.id).startsWith(slug + '/'));
+  // Series membership comes from the shared `series` frontmatter field, not from
+  // the slug prefix. The prefix approach broke silently when the home post was
+  // renamed 202602 -> 202603 while its parts stayed in the 202602/ folder: the
+  // home stopped being recognised as a home and every part lost its parent.
+  const partsOf = new Map<string, typeof allPosts>();
+  for (const a of allPosts) {
+    const name = a.data.series;
+    if (!name || a.data.articleNumber == null) continue;
+    if (!partsOf.has(name)) partsOf.set(name, []);
+    partsOf.get(name)!.push(a);
+  }
+  for (const list of partsOf.values()) {
+    list.sort((x, y) => (x.data.articleNumber ?? 0) - (y.data.articleNumber ?? 0));
+  }
+  // the home is the piece that names the series but is not itself numbered
+  const homeOf = new Map<string, (typeof allPosts)[number]>();
+  for (const a of allPosts) {
+    if (a.data.series && a.data.articleNumber == null) homeOf.set(a.data.series, a);
+  }
 
-    let seriesArticles = undefined;
-    let parentSeries = undefined;
+  return allPosts.map(p => {
+    const seriesName = p.data.series;
+    const siblings = seriesName ? partsOf.get(seriesName) : undefined;
+    const home = seriesName ? homeOf.get(seriesName) : undefined;
+    const isPart = Boolean(seriesName && p.data.articleNumber != null);
+
+    const seriesArticles = siblings && siblings.length > 0 ? siblings : undefined;
+    const parentSeries = isPart && home && home.id !== p.id ? home : undefined;
+
     let prevArticle = undefined;
     let nextArticle = undefined;
-
-    if (isSeriesHome) {
-      seriesArticles = allPosts
-        .filter(a => toSlug(a.id).startsWith(slug + '/'))
-        .sort((a, b) => (a.data.articleNumber ?? 0) - (b.data.articleNumber ?? 0));
-    }
-
-    if (isSubArticle) {
-      const parentSlug = slug.split('/')[0];
-      const siblings = allPosts
-        .filter(a => toSlug(a.id).startsWith(parentSlug + '/'))
-        .sort((a, b) => (a.data.articleNumber ?? 0) - (b.data.articleNumber ?? 0));
-      parentSeries = allPosts.find(a => toSlug(a.id) === parentSlug);
+    if (isPart && siblings) {
       const idx = siblings.findIndex(a => a.id === p.id);
       prevArticle = idx > 0 ? siblings[idx - 1] : undefined;
-      nextArticle = idx < siblings.length - 1 ? siblings[idx + 1] : undefined;
-      seriesArticles = siblings;
+      nextArticle = idx >= 0 && idx < siblings.length - 1 ? siblings[idx + 1] : undefined;
     }
 
     return {
-      params: { slug },
-      props: { entry: p, seriesArticles, parentSeries, prevArticle, nextArticle },
+      params: { slug: toSlug(p.id) },
+      props: { entry: p, seriesArticles, parentSeries, prevArticle, nextArticle, seriesName },
     };
   });
 }
 
-const { entry, seriesArticles, parentSeries, prevArticle, nextArticle } = Astro.props;
+const { entry, seriesArticles, parentSeries, prevArticle, nextArticle, seriesName } = Astro.props;
 const stats = estimateReadingTime(entry.body);
+// Keywords come from the inline theme markers, the same source the on-page chips
+// use. The legacy frontmatter tags said "Crypto, Finance" on a page whose chip
+// read "Derivatives" — two vocabularies describing one piece.
+const keywordsFromThemes = [
+  ...new Set([...themesFor(entry)].map(([s]) => THEMES[s]?.label).filter(Boolean)),
+].map(displayLabel);
+// A post marked isHidden is kept out of the feed and the RSS, but its page is
+// still emitted so existing links keep working. It must not be advertised:
+// without this it was submitted in the sitemap as index,follow.
+const hidden = entry.data.isHidden === true;
 const { Content } = await entry.render();
 
 // Build SEO props from frontmatter
@@ -54,7 +75,8 @@ const entrySlug = entry.id.replace(/\.(md|mdx)$/, '').toLowerCase();
 const canonicalUrl = entry.data.canonical || `/blog/${entrySlug}/`;
 const ogImage = entry.data.ogImage || parentSeries?.data.ogImage || '/social-prev.png';
 ---
-<Layout
+<Shell
+  noindex={hidden}
   title={entry.data.title + ' | Siddhant Shah'}
   description={entry.data.description}
   canonical={canonicalUrl}
@@ -73,8 +95,6 @@ const ogImage = entry.data.ogImage || parentSeries?.data.ogImage || '/social-pre
     integrity="sha384-MlJdn/WNKDGXveldHDdyRP1R4CTHr3FeuDNfhsLPYrq2t0UBkUdK2jyTnXPEK1NQ"
     crossorigin="anonymous"
   />
-  <script slot="head" defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "e709a605fa1c4a3895e2987e5a9ca9c6"}'></script>
-  {import.meta.env.PROD && <script slot="head" data-goatcounter="https://siddhants.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>}
 
   <ArticleSchema
     slot="head"
@@ -84,7 +104,7 @@ const ogImage = entry.data.ogImage || parentSeries?.data.ogImage || '/social-pre
     updatedAt={entry.data.updatedAt}
     slug={entrySlug}
     image={ogImage}
-    tags={entry.data.tags}
+    tags={keywordsFromThemes.length ? keywordsFromThemes : entry.data.tags}
   />
   <BreadcrumbSchema
     slot="head"
@@ -100,14 +120,14 @@ const ogImage = entry.data.ogImage || parentSeries?.data.ogImage || '/social-pre
     ]}
   />
 
-  <ContentPage
+  <Article
     type="blog"
     entry={entry}
     Content={Content}
-    readingTime={stats.minutes}
     seriesArticles={seriesArticles}
+  seriesName={seriesName}
     parentSeries={parentSeries}
     prevArticle={prevArticle}
     nextArticle={nextArticle}
   />
-</Layout>
+</Shell>

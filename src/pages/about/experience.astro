@@ -1,0 +1,42 @@
+---
+import Shell from "@/layouts/Shell.astro";
+import BreadcrumbSchema from "@/components/seo/BreadcrumbSchema.astro";
+import Entry from "@/components/Entry.astro";
+import { ROLES } from "@/data/experience";
+---
+<Shell title="Experience | Siddhant Shah"
+  description="Where I have worked, and what I actually did there."
+  canonical="/about/experience/">
+  <BreadcrumbSchema slot="head" items={[{ name: "Home", url: "/" }, { name: "About", url: "/about/" }, { name: "Experience" }]} />
+  <div class="page">
+    <div class="wrap wrap--narrow">
+      <p class="eyebrow crumb"><a href="/about/">About</a> <span>/</span> Experience</p>
+      <h1 class="h1">Experience.</h1>
+      <p class="lede">Where I have worked, and what I actually did there.</p>
+      <ul class="entries">
+        {ROLES.map((r) => (
+          <Entry
+            organization={r.organization}
+            organizationUrl={r.organizationUrl}
+            subtitle={r.subtitle}
+            dateRange={r.dateRange}
+            location={r.location}
+            items={r.items}
+            skills={r.skills}
+          />
+        ))}
+      </ul>
+      <p class="back"><a href="/about/">← Back to About</a></p>
+    </div>
+  </div>
+</Shell>
+
+<style>
+  .entries{ list-style:none;margin:0;padding:0;border-top:1px solid var(--rule); }
+  .back{ margin-top:clamp(28px,4vw,48px);font-family:var(--sans);font-size:14px; }
+  .back a{ color:var(--glow);text-decoration:none; }
+  .crumb{ display:flex;flex-wrap:wrap;gap:8px;align-items:baseline; }
+  .crumb a{ color:var(--peacock);text-decoration:none; }
+  .crumb a:hover{ color:var(--glow); }
+  .crumb span{ color:var(--text-3); }
+</style>

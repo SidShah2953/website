@@ -1,206 +1,264 @@
 ---
-import { getCollection } from "astro:content";
-
-import HomeLayout from "@/layouts/HomeLayout.astro";
-import SocialLinks from "@/components/SocialLinks.astro";
-import ContentCard from "@/components/ContentCard.astro";
-import Link from "@/components/shared/Link.astro";
+import Shell from "@/layouts/Shell.astro";
 import PersonSchema from "@/components/seo/PersonSchema.astro";
-import convertAsteriskToStrongTag from "@/utils/convertAsteriskToStrongTag";
-
+import WordMap from "@/components/WordMap.astro";
+import Surface from "@/components/Surface.astro";
+import Subscribe from "@/components/Subscribe.astro";
+import Disclosure from "@/components/Disclosure.astro";
+import { allPieces } from "@/utils/allPieces";
+import { buildIndex } from "@/utils/themeIndex";
+import { getFeed, fmtDate, excerpt } from "@/utils/feed";
 import presentation from "@/data/presentation";
 
-const posts = (await getCollection("blog")).filter(p => !p.data.isHidden && !p.slug.includes('/')).sort(function (first, second) {
-  return second.data.publishedAt.getTime() - first.data.publishedAt.getTime();
-});
-const projects = (await getCollection("projects")).sort(function (first, second) {
-  return second.data.publishedAt.getTime() - first.data.publishedAt.getTime();
-});
-const research = (await getCollection("research")).filter(r => r.data.isPublished).sort(function (first, second) {
-  return second.data.publishedAt.getTime() - first.data.publishedAt.getTime();
-});
+const pieces = await allPieces();
+const themes = buildIndex(pieces.map((p) => ({ entry: p.entry, areas: p.areas })));
 
-const seoDescription = "Siddhant Shah - Research Assistant at Boston University specializing in quantitative finance, machine learning, and data analytics. Published researcher in trading strategies and portfolio optimization.";
+// getFeed() collapses a series into its home post, so the eight COIN parts are
+// nested rather than filling this list
+const latest = (await getFeed()).slice(0, 3);
+
+// counted, not typed — the previous copy said "four" and had been wrong since
+// the IJFS paper went live
+const papers = pieces.filter((p) => p.kind === "research").length;
+// spelled out: a sentence should not open with a numeral
+const WORDS = ["No", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten"];
+const papersWord = WORDS[papers] ?? String(papers);
+
+const email = presentation.mail;
+const desc =
+  "Siddhant Shah — equity research associate. I write about finance, digital assets, technology, and whatever else I end up measuring.";
 ---
-
-<HomeLayout
-  title="Siddhant Shah"
-  description={seoDescription}
-  canonical="/"
->
+<Shell title="Siddhant Shah" description={desc} canonical="/" transparentHeader snap atmosphere="surface" footer={false}>
   <PersonSchema slot="head" />
 
-  <main class="flex flex-col gap-16">
-    <!-- Hero Section -->
-    <article class="glass-card p-8 md:p-12 relative overflow-hidden">
-      <div class="flex flex-col gap-8">
-        <div class="flex w-full flex-col gap-4">
-          <h1 class="text-5xl md:text-6xl font-bold text-finance-cyan">Siddhant Shah</h1>
-          <div class="h-px w-24 bg-gradient-to-r from-finance-cyan/60 to-transparent"></div>
-        </div>
-        <h2
-          class="w-auto max-w-[70ch] text-xl md:text-2xl leading-relaxed text-neutral-300"
-          set:html={convertAsteriskToStrongTag(presentation.description)}
-        />
-        <div class="flex flex-wrap gap-3 mt-2 text-sm text-neutral-400">
-          <span>Research</span>
-          <span>•</span>
-          <span>Machine Learning</span>
-          <span>•</span>
-          <span>Data Analytics</span>
-          <span>•</span>
-          <span>Python, R, SQL</span>
-        </div>
-        <SocialLinks />
+  <!-- 1 · the opening -->
+  <Surface />
+  <!-- fixed scrim over the surface: guarantees copy contrast on every section,
+       not just the hero, since the graphic now travels the whole page -->
+  <div class="veil" aria-hidden="true"></div>
+
+  <section class="slide hero">
+    <div class="hero-copy">
+    <p class="kicker">Hi — I'm</p>
+    <h1>Siddhant Shah</h1>
+    <p class="line">
+      I'm an equity research associate at Rosenblatt Securities in New York,
+      covering <em>digital assets, FinTech and the infrastructure underneath
+      them</em>. I write here about how those companies actually make money and
+      what they're worth. The rest is side quests.
+    </p>
+    </div>
+    <div class="scroll-cue" aria-hidden="true"><span></span></div>
+  </section>
+
+  <!-- 2 · who I am -->
+  <section class="slide rise">
+    <div class="band"><h2 class="eyebrow">Who I am</h2>
+    <div class="two">
+      <p class="big">
+        I have never treated finance and technology as separate disciplines. The
+        method is the same either way: build the dataset before you have a view,
+        name the mechanism you think explains it, then try hard to prove yourself
+        wrong — and say so out loud when you manage it.
+      </p>
+      <div class="facts">
+        <p>Equity Research Associate at Rosenblatt Securities, covering cryptocurrency, FinTech and HPC infrastructure. Before that, quantitative research at Boston University — most recently as a Visiting Researcher, on the market microstructure of DeFi perpetual futures.</p>
+        <p>MS in Applied Data Analytics from Boston University and CFA Level&nbsp;I, both January 2026; BS (Honours) in Mathematics and Computer Science from Chennai Mathematical Institute. Python, R, SQL and a great deal of Excel.</p>
+        <p>{papersWord} peer-reviewed papers, in <em>Stocks &amp; Commodities</em> and MDPI journals: momentum in crude oil, the link between overnight silver and Bitcoin, and most recently the structure of perpetual contracts and the macro factors moving them.</p>
+        <p>Outside work, four years designing and teaching advanced maths and physics for students preparing for the International Junior Science Olympiad in India. I am unreasonably keen on teaching, and on motorsport.</p>
+        <p><a class="ln" href="/about">The longer version →</a></p>
       </div>
-    </article>
+    </div>
+  </div>
+  </section>
 
-    <!-- Current Work - Research Assistant -->
-    <article class="flex flex-col gap-6">
-      <header class="flex w-full flex-row flex-wrap justify-between items-center gap-2">
-        <h3 class="text-2xl md:text-3xl font-bold text-white">Current Role</h3>
-        <Link href="./experience" label="See All Experience" isUnderline='True' />
-      </header>
-      <div class="glass-card p-6 md:p-8 flex flex-col gap-4">
-        <div>
-          <div class="flex w-full items-start justify-between flex-wrap gap-3">
-            <h4 class="text-xl md:text-2xl font-bold text-white">
-              <a href="https://www.bu.edu" class="hover:text-finance-cyan transition-colors">
-                Boston University, Department of Computer Science
-              </a>
-            </h4>
-            <p class="text-neutral-500 text-sm">Oct 2024 - Present</p>
-          </div>
-          <h5 class="text-lg text-neutral-300 font-medium mt-2">Research Assistant</h5>
-          <ul class="list-disc pl-6 mt-4 space-y-2 text-neutral-300 leading-relaxed">
-            <li>Developed proprietary trading strategies with mean-variance optimization across 9 sector ETFs, implementing risk-constrained portfolio construction and performance analytics (Sharpe ratios, drawdowns, transaction costs)</li>
-            <li>Published 3 research papers on trading strategies in leading journals (Stocks & Commodities Magazine, MLAIJ)</li>
-            <li>Achieved 19.9% annualized returns on crude oil momentum strategies and 68.65% returns on cross-asset Bitcoin trading over multi-year backtests</li>
-          </ul>
-          <div class="mt-4 pt-4 border-t border-glass-border">
-            <p class="text-sm text-neutral-400">
-              <span class="text-finance-cyan font-semibold">Skills:</span> Python, R, SQL, Pandas, NumPy, scikit-learn, PyTorch, Backtesting, Portfolio Optimization
-            </p>
-          </div>
-        </div>
-      </div>
-    </article>
+  <!-- 3 · what I talk about -->
+  <section class="slide rise">
+    <div class="band"><h2 class="eyebrow">What I talk about</h2>
+    <p class="big">
+      Mostly the gap between what a company reports and what is actually
+      happening — the accounting rule doing the work, the revenue line nobody
+      breaks out, the assumption carrying the whole model. Increasingly the same
+      questions asked of onchain markets, where the disclosure is thinner and the
+      mechanics are stranger. And then whatever else has my attention.
+    </p>
+    <WordMap themes={themes} />
+  </div>
+  </section>
 
-    <!-- Technical Skills -->
-    <article class="flex flex-col gap-6">
-      <header>
-        <h3 class="text-2xl md:text-3xl font-bold text-white">Technical Expertise</h3>
-      </header>
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div class="glass-card p-6">
-          <h4 class="text-lg font-semibold text-white mb-3">Programming & Tools</h4>
-          <ul class="space-y-2 text-neutral-400 text-sm">
-            <li>Python (Pandas, NumPy, scikit-learn, PyTorch)</li>
-            <li>R (Statistical Analysis & Visualization)</li>
-            <li>SQL, PySpark, KDB+/q</li>
-            <li>Git, LaTeX, Advanced Excel/VBA</li>
-          </ul>
-        </div>
-        <div class="glass-card p-6">
-          <h4 class="text-lg font-semibold text-white mb-3">Certifications & Education</h4>
-          <ul class="space-y-2 text-neutral-400 text-sm">
-            <li>Cleared Level 1 of the CFA Program </li>
-            <li>MS in Applied Data Analytics (Boston University)</li>
-            <li>BS in Mathematics & CS (Chennai Mathematical Institute)</li>
-          </ul>
-        </div>
-        <div class="glass-card p-6">
-          <h4 class="text-lg font-semibold text-white mb-3">Quantitative Finance</h4>
-          <ul class="space-y-2 text-neutral-400 text-sm">
-            <li>Portfolio Optimization & Risk Management</li>
-            <li>Algorithmic Trading Strategy Development</li>
-            <li>Statistical Arbitrage & Alpha Generation</li>
-            <li>Backtesting & Performance Attribution</li>
-          </ul>
-        </div>
-        <div class="glass-card p-6">
-          <h4 class="text-lg font-semibold text-white mb-3">Machine Learning & Data Science</h4>
-          <ul class="space-y-2 text-neutral-400 text-sm">
-            <li>Ensemble Methods & Random Forests</li>
-            <li>Time-Series Analysis & Forecasting</li>
-            <li>Feature Engineering & Model Optimization</li>
-            <li>Statistical Modeling & Hypothesis Testing</li>
-          </ul>
-        </div>
-      </div>
-    </article>
+  <!-- 4 · latest -->
+  <section class="slide rise">
+    <div class="band"><h2 class="eyebrow">Recently</h2>
+    <ul class="posts">
+      {latest.map((f) => (
+        <li>
+          <a href={f.href}>
+            <span class="pm">
+              <span>{fmtDate(f.date)}</span>
+              {f.kind === "note" && <span class="tag tag--note">note</span>}
+              {f.children?.length ? <span class="tag">series</span> : null}
+            </span>
+            {/* a note has no headline by design — show the thought itself */}
+            <span class="pt">{f.title ?? excerpt(f.body, 110)}</span>
+            {f.kind !== "note" && f.description && <span class="pd">{f.description}</span>}
+          </a>
+        </li>
+      ))}
+    </ul>
+    <p><a class="ln" href="/blog">Everything I've written →</a></p>
+  </div>
+  </section>
 
-    <!-- Blog Posts -->
-    <article class="flex flex-col gap-8">
-      <header class="flex w-full flex-row flex-wrap justify-between items-center gap-2">
-        <h3 class="text-2xl md:text-3xl font-bold text-white">Latest Posts</h3>
-        <Link href="./blog" label="See All Posts" isUnderline='True' />
-      </header>
-      {posts.length === 0 && <p>Soon, stay connected...</p>}
-      <section class="flex flex-col gap-2 md:flex-row md:flex-wrap">
-        {
-          posts.length !== 0 &&
-            posts
-              .slice(0, 2)
-              .map((post) => (
-                <ContentCard
-                  type="blog"
-                  slug={post.slug}
-                  title={post.data.title}
-                  description={post.data.description}
-                  publishedAt={post.data.publishedAt}
-                />
-              ))
-        }
-      </section>
-    </article>
-
-    <!-- Key Projects -->
-    <article class="flex flex-col gap-8">
-      <header class="flex w-full flex-row flex-wrap justify-between items-center gap-2">
-        <h3 class="text-2xl md:text-3xl font-bold text-white">Featured Projects</h3>
-        <Link href="./projects" label="See All Projects" isUnderline='True' />
-      </header>
-      <section class="flex flex-col gap-4 md:flex-row md:flex-wrap">
-        {
-          projects.length !== 0 &&
-            projects
-              .slice(0, 3)
-              .map((project) => (
-                <ContentCard
-                  type="projects"
-                  slug={project.slug}
-                  title={project.data.title}
-                  description={project.data.description}
-                  publishedAt={project.data.publishedAt}
-                />
-              ))
-        }
-      </section>
-    </article>
-
-    <!-- Research Publications -->
-    <article class="flex flex-col gap-8">
-      <header class="flex w-full flex-row flex-wrap justify-between items-center gap-2">
-        <h3 class="text-2xl md:text-3xl font-bold text-white">Published Research</h3>
-        <Link href="./research" label="See All Publications" isUnderline='True' />
-      </header>
-      {research.length !== 0 && (
-        <section class="flex flex-col gap-4">
-          {research.slice(0, 3).map((paper) => (
-            <ContentCard
-              type="research"
-              slug={paper.slug}
-              title={paper.data.title}
-              description={paper.data.description}
-              publishedAt={paper.data.publishedAt}
-              authors={paper.data.authors}
-              publication={paper.data.publication}
-              tags={paper.data.tags}
-            />
+  <!-- 5 · contact + list -->
+  <section class="slide rise" id="contact">
+    <div class="band"><h2 class="eyebrow">Get in touch</h2>
+    <div class="two">
+      <div>
+        <p class="big">Tell me where I've got it wrong.</p>
+        <p class="facts"><a class="ln" href={`mailto:${email}`}>{email}</a></p>
+        <p class="facts">
+          {presentation.socials.filter((s) => s.label !== "Email").map((s) => (
+            <a class="ln sm" href={s.link} rel="me">{s.label}</a>
           ))}
-        </section>
-      )}
-    </article>
-  </main>
-</HomeLayout>
+        </p>
+      </div>
+      <Subscribe />
+    </div>
+    </div>
+
+    <!-- the footer lives here: past the last snap point it is unreachable.
+         A sibling of the band above, not a child of it: nesting one .band in
+         another applied the gutter twice and pinched the disclosure inwards. -->
+    <div class="band"><Disclosure /></div>
+  </section>
+</Shell>
+
+<style>
+  /* Every homepage section is a full-height slide. Mandatory snap is only safe
+     because each one fits the viewport — verified at 390px through 1512px. */
+  .slide{
+    min-height:100svh;display:flex;flex-direction:column;justify-content:center;
+    position:relative;scroll-snap-align:start;scroll-snap-stop:always;
+  }
+  .hero{padding:0 clamp(18px,6vw,80px);isolation:isolate}
+  .hero-copy{position:relative;z-index:2;max-width:1180px;margin:0 auto;width:100%}
+  /* Scrim stops come from the shared --scrim-* set. The two densities that set
+     has no stop for are mixed from --ground, so no literal colour is written
+     here and the shade still tracks the palette. */
+  .veil{
+    position:fixed;inset:0;z-index:0;pointer-events:none;
+    background:
+      linear-gradient(103deg, var(--scrim-0) 0%, var(--scrim-1) 30%,
+                              var(--scrim-3) 56%, transparent 74%),
+      linear-gradient(180deg, var(--scrim-2) 0%, transparent 22%,
+                              transparent 78%,
+                              color-mix(in srgb, var(--ground) 42%, transparent) 100%);
+  }
+  @media(max-width:860px){
+    .veil{background:linear-gradient(180deg,
+      color-mix(in srgb, var(--ground) 80%, transparent) 0%, var(--scrim-1) 38%,
+      var(--scrim-1) 70%, color-mix(in srgb, var(--ground) 80%, transparent) 100%)}
+  }
+  /* content rides above the fixed surface + veil */
+  .slide{ z-index:1; }
+  .kicker{
+    font-family:var(--sans);font-size:12px;letter-spacing:.24em;text-transform:uppercase;
+    color:var(--text-3);margin:0 0 18px;
+    animation:up .9s .05s cubic-bezier(.2,.7,.3,1) both;
+  }
+  .hero h1{
+    font-size:clamp(52px,11.5vw,148px);line-height:.94;letter-spacing:-.045em;
+    margin:0 0 clamp(22px,3.4vw,38px);
+    background:linear-gradient(104deg,var(--glow) 0%,var(--peacock) 34%,var(--azure) 68%,var(--iris) 100%);
+    background-size:200% 100%;
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+    animation:up 1.05s .16s cubic-bezier(.2,.7,.3,1) both, hue 15s 1.4s ease-in-out infinite;
+  }
+  .hero .line{
+    font-size:clamp(18px,2.2vw,26px);color:var(--text-2);max-width:34ch;margin:0;
+    animation:up 1s .3s cubic-bezier(.2,.7,.3,1) both;
+  }
+  .hero .line em{font-style:italic;color:var(--text)}
+  @keyframes up{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:none}}
+  @keyframes hue{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
+
+  .scroll-cue{position:absolute;left:50%;bottom:38px;translate:-50% 0;
+    width:1px;height:52px;background:linear-gradient(var(--text-3),transparent);overflow:hidden}
+  .scroll-cue span{position:absolute;inset:0;background:var(--glow);animation:cue 2.6s ease-in-out infinite}
+  @keyframes cue{0%{transform:translateY(-100%)}60%,100%{transform:translateY(100%)}}
+
+  .band{
+    max-width:1180px;margin:0 auto;width:100%;
+    padding:clamp(40px,7vw,90px) clamp(18px,6vw,80px);
+  }
+  @media (max-height: 820px){ .band{padding-block:clamp(24px,3.5vw,48px)} }
+  /* the contact slide carries both the form and the full-width disclosure, so on
+     short viewports it is the one that tips over the snap-fit threshold */
+  @media (max-height: 780px){
+    #contact .band{ padding-block:clamp(16px,2.4vw,30px) }
+    #contact .eyebrow{ margin-bottom:clamp(10px,1.6vw,16px) }
+  }
+  /* the contact slide carries the form and the disclosure, so it is the one most
+     likely to exceed a small phone */
+  @media (max-width: 640px){
+    #contact .two{ gap:clamp(18px,4vw,28px) }
+    #contact .big{ font-size:clamp(19px,5vw,24px) }
+  }
+  .lede{margin-bottom:clamp(16px,2.4vw,34px)}
+  .eyebrow{
+    font-family:var(--sans);font-size:11.5px;letter-spacing:.22em;text-transform:uppercase;
+    color:var(--text-3);margin:0 0 26px;font-weight:500;
+  }
+  .two{display:grid;gap:clamp(26px,4vw,64px)}
+  .two > *{min-width:0}
+  @media(min-width:860px){.two{grid-template-columns:1.15fr .85fr;align-items:start}}
+  .big{font-size:clamp(23px,3.1vw,38px);line-height:1.28;margin:0;color:var(--text)}
+  .facts{color:var(--text-2);font-size:16px;margin:0 0 14px}
+  .facts em{font-style:italic}
+  .lede{color:var(--text-2);max-width:62ch;font-size:17px;margin:0 0 34px}
+
+  .ln{
+    font-family:var(--sans);font-size:14.5px;text-decoration:none;color:var(--glow);
+    border-bottom:1px solid var(--glow-line);padding-bottom:1px;transition:border-color .3s;
+  }
+  .ln:hover{border-bottom-color:var(--glow)}
+  .ln.sm{margin-right:20px}
+  .facts a{overflow-wrap:anywhere}
+
+  .posts{list-style:none;margin:0 0 30px;padding:0;border-top:1px solid var(--rule)}
+  .posts li{border-bottom:1px solid var(--rule)}
+  .posts a{
+    display:grid;gap:5px;padding:24px 0;text-decoration:none;
+    transition:padding-left .4s cubic-bezier(.2,.7,.3,1);
+  }
+  .posts a:hover{padding-left:14px}
+  .pt{font-size:clamp(19px,2.1vw,25px);color:var(--text);line-height:1.24}
+  .pm{
+    font-family:var(--sans);font-size:clamp(11.5px,1.1vw,12.5px);color:var(--text-3);
+    letter-spacing:.09em;text-transform:uppercase;
+    display:flex;flex-wrap:wrap;gap:6px 12px;align-items:center;
+  }
+  .pm .tag{
+    color:var(--peacock);border:1px solid color-mix(in srgb, var(--peacock) 42%, transparent);
+    border-radius:var(--r-pill);padding:2px 9px;letter-spacing:.1em;
+  }
+  /* only notes step down — a series is a bigger entry than one article,
+     and .tag alone was catching the series badge too */
+  li:has(.tag--note) .pt{font-size:clamp(17px,1.8vw,21px);color:var(--text)}
+  .pd{font-family:var(--sans);font-size:14px;color:var(--text-3);max-width:74ch;line-height:1.55}
+  .posts a:hover .pt{color:var(--glow)}
+
+  .colophon{
+    margin-top:auto;padding-top:clamp(26px,4vw,44px);
+    border-top:1px solid var(--rule);
+    display:flex;flex-wrap:wrap;gap:8px clamp(18px,3vw,30px);
+    justify-content:space-between;align-items:baseline;
+    font-family:var(--sans);font-size:13.5px;color:var(--text-3);
+  }
+  .colophon p{margin:0}
+  .colophon p:first-child{ margin-inline-end:auto;text-align:left; }
+  .colophon .disc{ max-width:52ch;text-align:right; }
+  @media (max-width:640px){
+    .colophon .disc{ text-align:left; }
+  }
+</style>

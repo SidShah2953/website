@@ -1,7 +1,9 @@
 ---
 import { getCollection, type CollectionEntry } from "astro:content";
-import Layout from "@/layouts/Layout.astro";
-import ContentPage from "@/components/ContentPage.astro";
+import Shell from "@/layouts/Shell.astro";
+import { themesFor } from "@/utils/themeIndex";
+import { THEMES, displayLabel } from "@/data/themes";
+import Article from "@/components/Article.astro";
 import ScholarlyArticleSchema from "@/components/seo/ScholarlyArticleSchema.astro";
 import BreadcrumbSchema from "@/components/seo/BreadcrumbSchema.astro";
 
@@ -17,10 +19,13 @@ type Props = {
 };
 
 const { entry } = Astro.props;
+const keywordsFromThemes = [
+  ...new Set([...themesFor(entry)].map(([s]) => THEMES[s]?.label).filter(Boolean)),
+].map(displayLabel);
 const { Content } = await entry.render();
 ---
 
-<Layout
+<Shell
   title={`${entry.data.title} | Research`}
   description={entry.data.description}
   canonical={`/research/${entry.slug}/`}
@@ -31,7 +36,6 @@ const { Content } = await entry.render();
     alt: entry.data.title
   }}
 >
-  {import.meta.env.PROD && <script slot="head" data-goatcounter="https://siddhants.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>}
 
   <ScholarlyArticleSchema
     slot="head"
@@ -43,7 +47,7 @@ const { Content } = await entry.render();
     publication={entry.data.publication}
     doi={entry.data.doi}
     arxiv={entry.data.arxiv}
-    tags={entry.data.tags}
+    tags={keywordsFromThemes.length ? keywordsFromThemes : entry.data.tags}
   />
   <BreadcrumbSchema
     slot="head"
@@ -54,5 +58,5 @@ const { Content } = await entry.render();
     ]}
   />
 
-  <ContentPage type="research" entry={entry} Content={Content} />
-</Layout>
+  <Article type="research" entry={entry} Content={Content} />
+</Shell>

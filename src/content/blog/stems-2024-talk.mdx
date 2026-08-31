@@ -7,6 +7,7 @@ isHidden: false
 ogImage: /og/stems-2024-talk.png
 thesis: | 
     The value of an option lies in the fact that you are not obligated to exercise it. If you are able to sell an asset at a higher price, or if you are able to buy it for a lower price, you can let the contract expire, and your downside is limited to the price of the contract.
+themes: ["teaching"]
 ---
 
 import { Image } from 'astro:assets';
@@ -50,13 +51,13 @@ import img1 from '/src/assets/posts/stems-2024-talk/Image-1.png';
 
 - Consider a situation where you are uncertain about the price of a good you are selling.
     
-    You need to sell each unit for a minimum of $\operatorname{Rs.} 40$ to cover your costs, and you need to sell at least $100$ units by the end of the month. You find someone who is willing to accept this deal, if you decide to execute it, but they ask for $\operatorname{Rs.}10$ to give you this option.
+    You need to sell each unit for a minimum of $\operatorname{Rs.} 40$ to cover your costs, and you need to sell at least $100$ units by the end of the month. You find someone who is willing to accept this deal, if you decide to execute it, but they ask for $\operatorname{Rs.}10$ to give you this <T k="derivatives">option</T>.
     
     Thus, for $\operatorname{Rs.}10$, you get the choice to sell a fixed quantity of your good, at the fixed price. If you choose to execute this deal, you get the $\operatorname{Rs.}4000$ at the end of the month. If you don't execute this deal, you get nothing, and your $\operatorname{Rs.}10$ will not be refunded.
     
 - Now consider the opposite situation, where you are uncertain about the quantity of a good you will need a month from now.
     
-    You need to at least $100$ units by the end of the month, and you are willing to pay $\operatorname{Rs.}40$ for each unit. You find someone who is willing to accept this deal, if you decide to execute it, but they ask for $\operatorname{Rs.}10$ to give you this option.
+    You need to at least $100$ units by the end of the month, and you are willing to pay $\operatorname{Rs.}40$ for each unit. You find someone who is willing to accept this deal, if you decide to execute it, but they ask for $\operatorname{Rs.}10$ to give you this <T k="derivatives">option</T>.
     
     Thus, for $\operatorname{Rs.}10$, you get the choice to buy a fixed quantity of the required good, at the fixed price. If you choose to execute this deal, you will have to pay the $\operatorname{Rs.}4000$ at the end of the month. If you don't execute this deal, you get nothing, and your $\operatorname{Rs.}10$ will not be refunded.
     
@@ -68,7 +69,7 @@ The value of such a contract lies in the fact that you are not obligated to exer
 
 ## Definitions
 
-- **Call Option:** A type of option contract that allows the holder to buy an asset at a specified price, known as the **strike price**, on a specified future date, known as the **expiration date**. The holder is not obligated to buy the asset; they have the right to do so.
+- **Call <T k="derivatives">Option</T>:** A type of option contract that allows the holder to buy an asset at a specified price, known as the **strike price**, on a specified future date, known as the **expiration date**. The holder is not obligated to buy the asset; they have the right to do so.
 - **Put Option:** A type of option contract that allows the holder to sell an asset at a **specified price** on a specified future date, known as the **expiration date**. Again, the holder is not obligated to sell the asset; they have the right to do so.
 
 (These are the European definitions. [American Options](https://www.investopedia.com/terms/a/americanoption.asp) are slightly different in that they allow you you to exercise the option any time before the expiration date.)

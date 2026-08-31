@@ -1,0 +1,22 @@
+---
+/**
+ * Site analytics. Lives in Shell so every page is counted — this was previously
+ * pasted into three [slug] templates, which left 55 of 80 pages untracked,
+ * including the homepage and the blog index.
+ *
+ * Both tools are cookieless and store no personal data, so no consent banner
+ * is required and nothing here identifies an individual reader. Who is
+ * actually reading comes from newsletter engagement, not from page counts.
+ *
+ * PROD only, so local development does not pollute the numbers.
+ */
+const GOATCOUNTER = "https://siddhants.goatcounter.com/count";
+const CF_TOKEN = "e709a605fa1c4a3895e2987e5a9ca9c6";
+---
+{import.meta.env.PROD && (
+  <>
+    <script data-goatcounter={GOATCOUNTER} async src="//gc.zgo.at/count.js"></script>
+    <script defer src="https://static.cloudflareinsights.com/beacon.min.js"
+      data-cf-beacon={`{"token": "${CF_TOKEN}"}`}></script>
+  </>
+)}

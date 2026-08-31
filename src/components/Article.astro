@@ -1,0 +1,312 @@
+---
+/**
+ * The reading page for every long piece — blog, research and projects.
+ * Replaces ContentPage's glass-card layout. Keeps everything that mattered:
+ * table of contents, series navigation, the thesis block, KaTeX, Shiki, and the
+ * inline <T> theme markers injected into MDX.
+ *
+ * Every width is relative. The reading column is capped in ch so the measure
+ * stays right at any viewport, and the TOC collapses into a <details> below the
+ * two-column breakpoint rather than being hidden or overflowing.
+ */
+import type { CollectionEntry } from "astro:content";
+import { marked } from "marked";
+import T from "@/components/T.astro";
+import { THEMES, AREAS, displayLabel } from "@/data/themes";
+import { themesFor } from "@/utils/themeIndex";
+import { fmtDate, readingMinutes } from "@/utils/feed";
+import Disclosure from "@/components/Disclosure.astro";
+import ReadDepth from "@/components/ReadDepth.astro";
+import Subscribe from "@/components/Subscribe.astro";
+
+type Blog = CollectionEntry<"blog">;
+interface Props {
+  type: "blog" | "project" | "research";
+  entry: any;
+  Content: any;
+  seriesArticles?: Blog[];
+  parentSeries?: Blog;
+  /** Series display name, for folders that have no parent post. */
+  seriesName?: string;
+  prevArticle?: Blog;
+  nextArticle?: Blog;
+}
+const { type, entry, Content, seriesArticles, parentSeries, prevArticle, nextArticle, seriesName } = Astro.props;
+
+// A sub-article should say what it is part of, at the top, whether or not the
+// series happens to have a home page.
+const partOf = seriesName ?? parentSeries?.data.title;
+const partNo = entry.data.articleNumber;
+const partCount = seriesArticles?.length;
+const isPart = Boolean(partOf && partNo);
+
+const slug = (id: string) => id.replace(/\.(md|mdx)$/, "").toLowerCase();
+const base = type === "blog" ? "blog" : type === "research" ? "research" : "projects";
+const thesisHtml = entry.data.thesis ? await marked.parse(entry.data.thesis) : null;
+const words = entry.body.split(/\s+/).length;
+
+// themes this piece actually invokes, ordered by how often
+// Anything touching a named issuer or a tradeable asset gets the asterisk at
+// the headline, not just a footer line.
+const FINANCIAL = new Set(["accounting","valuation","unit-economics","market-structure",
+  "derivatives","systematic-trading","equity-research","financial-modelling",
+  "tokenization","stablecoins","staking","onchain-infrastructure",
+  "crypto-market-structure","composability","defi"]);
+
+const themes = [...themesFor(entry)]
+  .filter(([s]) => THEMES[s])
+  .sort((a, b) => b[1] - a[1]);
+
+const needsDisclosure = themes.some(([slug]) => FINANCIAL.has(slug));
+
+/* The raw area colours are tuned for graphics and are too dark for 12px text —
+   Technology (#2F6FE8) only reaches 4.28:1. Lift each toward white here, in the
+   build, rather than with color-mix(): color-mix() against an *unregistered*
+   custom property computes to black in Chromium, which made the chips invisible. */
+const lift = ([r, g, b]: [number, number, number], k = 0.3): string =>
+  `rgb(${Math.round(r + (234 - r) * k)},${Math.round(g + (243 - g) * k)},${Math.round(b + (245 - b) * k)})`;
+---
+<article class="page">
+  <div class="shell">
+    <div class="rail"></div>
+    <header class="col">
+    {(parentSeries || isPart) && (
+      <p class="eyebrow series">
+        {parentSeries
+          ? <a href={`/blog/${slug(parentSeries.id)}/`}>← {parentSeries.data.title}</a>
+          : <a href="#series">{partOf}</a>}
+        {partNo != null && partCount ? <span>Part {partNo} of {partCount}</span> : null}
+      </p>
+    )}
+    <h1 class="h1 title">{entry.data.title}{needsDisclosure && <Disclosure variant="mark" />}</h1>
+    {entry.data.description && <p class="lede">{entry.data.description}</p>}
+    <p class="meta">
+      <span>{fmtDate(entry.data.publishedAt)}</span>
+      <span>{readingMinutes(words)} min</span>
+      {entry.data.publication && <span>{entry.data.publication}</span>}
+      {entry.data.authors?.length ? <span>{entry.data.authors.join(", ")}</span> : null}
+    </p>
+    {themes.length > 0 && (
+      <p class="themes">
+        {themes.map(([s]) => (
+          <a href={`/themes/${s}/`}
+            style={`--tc: rgb(${AREAS[THEMES[s].area].rgb.join(",")}); --tct: ${lift(AREAS[THEMES[s].area].rgb)}`}>
+            {displayLabel(THEMES[s].label)}
+          </a>
+        ))}
+      </p>
+    )}
+  </header>
+
+  {(entry.data.doi || entry.data.pdfUrl) && (
+    <p class="col cite">
+      {entry.data.publication && <span class="venue">{entry.data.publication}</span>}
+      {entry.data.doi && (
+        <a href={`https://doi.org/${entry.data.doi}`} rel="noopener">
+          doi:{entry.data.doi}
+        </a>
+      )}
+      {entry.data.pdfUrl && !entry.data.doi && (
+        <a href={entry.data.pdfUrl} rel="noopener">Read the paper ↗</a>
+      )}
+    </p>
+  )}
+
+  {thesisHtml && (
+    <aside class="col thesis">
+      <p class="eyebrow">The short version</p>
+      <div set:html={thesisHtml} />
+    </aside>
+  )}
+
+  <details class="toc" id="toc">
+      <summary>Contents</summary>
+      <nav id="tocNav"></nav>
+    </details>
+
+    {entry.data.demonstrative && <div class="col"><Disclosure variant="exercise" /></div>}
+
+    <div class="prose col" id="prose">
+      <Content components={{ T }} />
+    </div>
+
+  {(prevArticle || nextArticle) && (
+    <nav class="col pager">
+      {prevArticle
+        ? <a class="p prev" href={`/blog/${slug(prevArticle.id)}/`}><span>Previous</span>{prevArticle.data.title}</a>
+        : <span />}
+      {nextArticle
+        ? <a class="p next" href={`/blog/${slug(nextArticle.id)}/`}><span>Next</span>{nextArticle.data.title}</a>
+        : <span />}
+    </nav>
+  )}
+
+  {seriesArticles && seriesArticles.length > 0 && (
+    <section class="col series-list" id="series">
+      <p class="eyebrow">In this series</p>
+      <ul class="feed">
+        {seriesArticles.map((a) => (
+          <li class={a.id === entry.id ? "here" : undefined}>
+            <a class="row" href={`/blog/${slug(a.id)}/`} aria-current={a.id === entry.id ? "page" : undefined}>
+              <span class="m"><span>Part {a.data.articleNumber ?? "—"}</span></span>
+              <span class="t">{a.data.title}</span>
+              {a.data.description && <span class="d">{a.data.description}</span>}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </section>
+  )}
+
+    {needsDisclosure && <div class="col"><Disclosure /></div>}
+
+    <div class="col endsub"><Subscribe /></div>
+
+    <p class="col back"><a href={`/${base}/`}>← All {base === "blog" ? "writing" : base}</a></p>
+  </div>
+  <ReadDepth words={words} />
+</article>
+
+<style>
+  .page{ padding-block: calc(var(--hdr-h) + clamp(28px,6vw,72px)) clamp(48px,9vw,120px); }
+
+  /* one column for everything the reader reads; the TOC sits beside it */
+  .shell{
+    display:grid;
+    grid-template-columns:minmax(0,1fr);
+    width:100%;
+    max-width:min(1180px, 100% - clamp(32px,8vw,160px));
+    margin-inline:auto;
+    row-gap:0;
+  }
+  .rail{ display:none; }
+  .col{ grid-column:1;max-width:68ch;width:100%; }
+  @media (min-width:1080px){
+    .shell{ grid-template-columns:minmax(180px,236px) minmax(0,1fr);column-gap:clamp(30px,4vw,64px); }
+    .col{ grid-column:2; }
+    .rail{ display:block;grid-column:1;grid-row:1 / -1; }
+    .toc{
+      grid-column:1;grid-row:1 / -1;align-self:start;
+      position:sticky;top:calc(var(--hdr-h) + 26px);
+      max-height:calc(100svh - var(--hdr-h) - 52px);overflow:auto;
+    }
+  }
+  .title{ text-wrap:balance; }
+  .series{ display:flex;flex-wrap:wrap;gap:6px 16px;align-items:baseline; }
+  .series a{ color:var(--peacock);text-decoration:none; }
+  .series a:hover{ color:var(--glow); }
+  .meta{
+    font-family:var(--sans);font-size:clamp(11.5px,1.2vw,13px);color:var(--text-3);
+    display:flex;flex-wrap:wrap;gap:6px clamp(12px,2vw,20px);margin:0 0 clamp(14px,2vw,20px);
+  }
+  .themes{ display:flex;flex-wrap:wrap;gap:8px;margin:0; }
+  .themes a{
+    /* the raw area colour is tuned for graphics; Technology (#2F6FE8) only
+       reaches 4.28:1 at this size, so lift it toward white for text use */
+    font-family:var(--sans);font-size:12.5px;text-decoration:none;color:var(--tct);
+    border:1px solid color-mix(in srgb, var(--tc) 38%, transparent);
+    border-radius:var(--r-pill);padding:5px 12px;transition:background .25s;
+  }
+  .themes a:hover{ background:color-mix(in srgb, var(--tc) 16%, transparent); }
+
+  .cite{
+    display:flex;flex-wrap:wrap;gap:6px clamp(12px,2vw,18px);align-items:baseline;
+    margin:clamp(14px,2vw,20px) 0 0;font-family:var(--sans);
+    font-size:clamp(12.5px,1.2vw,13.5px);color:var(--text-3);
+  }
+  .cite .venue{ font-style:italic; }
+  .cite a{ color:var(--glow);text-decoration:none;border-bottom:1px solid var(--glow-line); }
+  .thesis{
+    margin-top:clamp(26px,4vw,42px);padding:clamp(18px,2.6vw,28px);
+    border:1px solid var(--rule);border-radius:var(--r-md);background:var(--surface-1);
+  }
+  .thesis :global(p){ margin:0 0 .7em;color:var(--text-2);font-size:clamp(16px,1.15vw,17.5px);line-height:1.66; }
+  .thesis :global(p:last-child){ margin-bottom:0; }
+
+  /* two columns only when there is genuinely room; otherwise the TOC collapses */
+  .endsub{ margin-top:clamp(34px,5vw,58px);padding-top:clamp(28px,4vw,44px);
+    border-top:1px solid var(--rule); }
+  .body{ margin-top:clamp(30px,5vw,54px);display:grid;gap:clamp(24px,4vw,52px); }
+  @media (min-width:1080px){
+    .body{ grid-template-columns:minmax(190px,240px) minmax(0,1fr);align-items:start; }
+    .toc{ position:sticky;top:calc(var(--hdr-h) + 24px);max-height:calc(100svh - var(--hdr-h) - 48px);overflow:auto; }
+    .toc summary{ display:none; }
+    /* A closed <details> hides its non-summary children, so the nav has to be
+       forced visible once the summary is gone. It must stay a flex column —
+       "display:block" here silently un-stacked the links and ran every heading
+       together into one paragraph. */
+    .toc nav{ display:flex !important; }
+  }
+  .toc{ border:1px solid var(--rule);border-radius:var(--r-md);padding:clamp(12px,1.6vw,16px);min-width:0; }
+  @media (min-width:1080px){ .toc{ border:0;padding:0;border-radius:0; } }
+  .toc summary{ font-family:var(--sans);font-size:13px;color:var(--text-2);cursor:pointer;letter-spacing:.04em; }
+  .toc nav{ display:flex;flex-direction:column;gap:7px;margin-top:12px; }
+  /* A single rail runs the length of the contents; the segment beside the
+     current section lights up. Previously there were two lines — the container
+     border plus a per-link border that only appeared on hover. */
+  .toc nav{ position:relative;border-left:1.5px solid var(--rule); }
+  .toc :global(a){
+    display:block;position:relative;
+    font-family:var(--sans);font-size:13px;line-height:1.4;color:var(--text-3);
+    text-decoration:none;transition:color .2s;
+    padding:2px 0 2px 12px;
+  }
+  .toc :global(a)::before{
+    content:"";position:absolute;left:-1.5px;top:0;bottom:0;width:1.5px;
+    background:var(--peacock);opacity:0;transition:opacity .25s;
+  }
+  .toc :global(a:hover){ color:var(--text-2); }
+  .toc :global(a.on){ color:var(--glow); }
+  .toc :global(a.on)::before{ opacity:1; }
+  .toc :global(a.lvl3){ padding-inline-start:12px;font-size:12.3px; }
+  .prose{ min-width:0;margin-top:clamp(26px,4vw,44px); }
+
+  .pager{
+    margin-top:clamp(40px,6vw,72px);display:grid;gap:14px;
+    grid-template-columns:1fr;border-top:1px solid var(--rule);padding-top:clamp(18px,2.6vw,28px);
+  }
+  @media (min-width:720px){ .pager{ grid-template-columns:1fr 1fr; } .pager .next{ text-align:right; } }
+  .pager .p{ text-decoration:none;display:grid;gap:4px;font-size:clamp(15px,1.7vw,18px);line-height:1.3; }
+  .pager .p span{ font-family:var(--sans);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--text-3); }
+  .pager .p:hover{ color:var(--glow); }
+  .series-list{ margin-top:clamp(40px,6vw,72px);scroll-margin-top:calc(var(--hdr-h) + 20px); }
+  .series-list .here .t{ color:var(--glow); }
+  .series-list .here{ position:relative; }
+  .series-list .here::before{
+    content:"";position:absolute;left:-14px;top:50%;translate:0 -50%;
+    width:3px;height:26px;border-radius:2px;background:var(--peacock);
+  }
+  .back{ margin-top:clamp(34px,5vw,60px);font-family:var(--sans);font-size:14px; }
+  .back a{ color:var(--glow);text-decoration:none; }
+</style>
+
+<script>
+  // Build the table of contents from the rendered headings.
+  const prose = document.getElementById('prose');
+  const nav = document.getElementById('tocNav');
+  const toc = document.getElementById('toc') as HTMLDetailsElement | null;
+  if (prose && nav && toc) {
+    const hs = [...prose.querySelectorAll('h2, h3')] as HTMLElement[];
+    if (hs.length < 2) { toc.style.display = 'none'; }
+    else {
+      hs.forEach((h, i) => {
+        if (!h.id) h.id = (h.textContent || '').trim().toLowerCase()
+          .replace(/[^\w\s-]/g, '').replace(/\s+/g, '-').slice(0, 60) || `h-${i}`;
+        const a = document.createElement('a');
+        a.href = `#${h.id}`;
+        a.textContent = h.textContent;
+        if (h.tagName === 'H3') a.className = 'lvl3';
+        nav.append(a);
+      });
+      const links = [...nav.querySelectorAll('a')];
+      const io = new IntersectionObserver((es) => {
+        for (const e of es) {
+          if (!e.isIntersecting) continue;
+          links.forEach((l) => l.classList.toggle('on', l.getAttribute('href') === `#${e.target.id}`));
+        }
+      }, { rootMargin: '-15% 0px -70% 0px' });
+      hs.forEach((h) => io.observe(h));
+      if (matchMedia('(min-width:1080px)').matches) toc.open = true;
+    }
+  }
+</script>

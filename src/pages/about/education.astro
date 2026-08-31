@@ -1,0 +1,103 @@
+---
+import Shell from "@/layouts/Shell.astro";
+import BreadcrumbSchema from "@/components/seo/BreadcrumbSchema.astro";
+import Entry from "@/components/Entry.astro";
+import formatDateFromJSON from "@/utils/formatDateFromJSON";
+import courses from "@/content/education/courses.json";
+---
+<Shell title="Education | Siddhant Shah" description="Degrees, and the courses I took because I wanted to." canonical="/about/education/">
+  <BreadcrumbSchema slot="head" items={[{ name: "Home", url: "/" }, { name: "About", url: "/about/" }, { name: "Education" }]} />
+  <div class="page">
+    <div class="wrap wrap--narrow">
+      <p class="eyebrow crumb"><a href="/about/">About</a> <span>/</span> Education</p>
+      <h1 class="h1">Education.</h1>
+      <p class="lede">Degrees, and the courses I took because I wanted to.</p>
+      <ul class="entries"><Entry
+    title="Master of Science - Applied Data Analytics"
+    organization="Boston University"
+    organizationUrl="https://www.bu.edu"
+    dateRange="Boston | January 2026"
+    items={[
+      "Analytics and Data Visualization in R",
+      "Advanced Machine Learning",
+      "Big Data Analytics",
+      "Web Mining & Graph Analytics"
+    ]}
+  />
+
+  <Entry
+    title="Bachelor of Science (Honors) - Mathematics and Computer Science"
+    organization="Chennai Mathematical Institute"
+    organizationUrl="https://www.cmi.ac.in"
+    dateRange="Chennai | July 2024"
+    items={[
+      "Linear Algebra",
+      "Fourier Analysis",
+      "Data Structures and Algorithms",
+      "Probability Theory & Statistics",
+      "Stochastic Processes",
+      "Statistical Inference",
+      "Financial Modelling",
+      "Economics"
+    ]}
+  />
+
+  <Entry
+    title="Grade 12 (Maharashtra HSC) - Science"
+    organization="PACE Junior Science College"
+    dateRange="Mumbai | September 2021"
+    items={[
+      "Percentage: 94.5% (12th Grade, HSC Maharashtra Board)",
+      "JEE Mains (All India Rank 5274) & Advanced (All India Rank 4690)"
+    ]}
+  />
+
+      </ul>
+
+      <section class="courses">
+        <h2 class="eyebrow">Courses &amp; workshops</h2>
+        <ul class="clist">
+          {courses.map((course) => (
+            <li>
+              <span class="ct">{course.title}</span>
+              <span class="cm">{course.offeredBy} · {formatDateFromJSON(course.completedOn)}</span>
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      <p class="back"><a href="/about/">← Back to About</a></p>
+    </div>
+  </div>
+</Shell>
+
+<style>
+  .entries{ list-style:none;margin:0;padding:0;border-top:1px solid var(--rule); }
+  .courses{ margin-top:clamp(38px,5vw,64px); }
+  .clist{ list-style:none;margin:0;padding:0;border-top:1px solid var(--rule); }
+  /* stacked by default; two columns only when there is room. The provider/date
+     line had white-space:nowrap, which forced a 591px document inside a 320px
+     viewport. */
+  .clist li{
+    display:grid;gap:3px;
+    padding:clamp(13px,1.8vw,17px) 0;border-bottom:1px solid var(--rule);
+  }
+  @media (min-width:620px){
+    .clist li{
+      grid-template-columns:minmax(0,1fr) auto;gap:4px clamp(14px,2vw,22px);
+      align-items:baseline;
+    }
+    .cm{ text-align:right; }
+  }
+  .ct{ font-size:clamp(16px,1.7vw,18px);line-height:1.32;color:var(--text); }
+  .cm{
+    font-family:var(--sans);font-size:clamp(12px,1.2vw,13px);color:var(--text-3);
+    letter-spacing:.02em;
+  }
+  .back{ margin-top:clamp(28px,4vw,48px);font-family:var(--sans);font-size:14px; }
+  .crumb{ display:flex;flex-wrap:wrap;gap:8px;align-items:baseline; }
+  .crumb a{ color:var(--peacock);text-decoration:none; }
+  .crumb a:hover{ color:var(--glow); }
+  .crumb span{ color:var(--text-3); }
+  .back a{ color:var(--glow);text-decoration:none; }
+</style>

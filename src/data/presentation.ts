@@ -17,7 +17,7 @@ const presentation: Presentation = {
   title: "Hi, I'm Siddhant",
   // profile: "/profile.webp",
   description:
-    'I develop systematic approaches to investment challenges—designing momentum strategies, optimizing sector portfolios, and building institutional AI platforms that integrate research, risk, and portfolio governance in real time. My work spans quantitative research, financial modeling, emerging markets, and AI/ML in capital markets, bridging precision analytics with business insight. Skilled in *Python, SQL, Bloomberg*, and advanced portfolio modeling, I craft data-driven solutions that accelerate smarter investment decisions.',
+    'Siddhant Shah is an Equity Research Associate at Rosenblatt Securities in New York, covering cryptocurrency, FinTech and HPC infrastructure. He writes here about how those companies actually make money and what they are worth — and about whatever else has his attention. Previously quantitative research at Boston University, published in Stocks & Commodities and MDPI journals. Written in a personal capacity.',
   socials: [
     {
       label: "Email",
@@ -28,20 +28,8 @@ const presentation: Presentation = {
       link: "https://www.linkedin.com/in/shah-siddhant/",
     },
     {
-      label: "Github",
+      label: "GitHub",
       link: "https://github.com/SidShah2953",
-    },
-    {
-      label: "Medium",
-      link: "https://medium.com/@siddhantshah29",
-    },
-    {
-      label: "Paragraph",
-      link: "https://paragraph.com/@siddhantshah29",
-    },
-    {
-      label: "Resume",
-      link: "/Resume.pdf",
     },
   ],
 };
