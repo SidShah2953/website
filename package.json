@@ -9,7 +9,9 @@
     "preview": "astro preview",
     "check": "astro check",
     "check:readdepth": "node scripts/checks/readdepth.mjs",
-    "astro": "astro"
+    "astro": "astro",
+    "newsletter": "node scripts/newsletter.mjs",
+    "newsletter:dry": "node scripts/newsletter.mjs --dry-run"
   },
   "dependencies": {
     "@astrojs/mdx": "^4.3.14",
