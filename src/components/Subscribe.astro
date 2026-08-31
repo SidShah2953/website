@@ -110,9 +110,9 @@ if (ready && !/\/forms\/[^/]+\/subscriptions\/?$/.test(action)) {
         status.textContent = 'Thanks — check your inbox to confirm.';
         status.hidden = false;
       } catch {
-        // let the browser do it the old-fashioned way
-        form.removeEventListener('submit', () => {});
-        (form as HTMLFormElement).submit();
+        // Network or CORS failure — let the browser post it the ordinary way.
+        // form.submit() does not fire a submit event, so this cannot recurse.
+        form.submit();
       } finally {
         btn.disabled = false;
         btn.textContent = original;
