@@ -33,10 +33,27 @@ export default defineConfig({
   redirects: {
     '/experience': '/about/experience/',
     '/education': '/about/education/',
-    // The COIN series home was renamed 202602 -> 202603, which 404'd two URLs
-    // that are live and indexed. The eight parts still live under 202602/.
+    // The COIN series was renamed 202602 -> 202603. Both the series home and
+    // all eight parts were live and indexed under the old slug, so every one
+    // needs a redirect, not just the home.
     '/blog/coin-research-202602': '/blog/coin-research-202603/',
     '/posts/coin-research-202602': '/blog/coin-research-202603/',
+    '/blog/coin-research-202602/asc350-gaap-loss': '/blog/coin-research-202603/asc350-gaap-loss/',
+    '/posts/coin-research-202602/asc350-gaap-loss': '/blog/coin-research-202603/asc350-gaap-loss/',
+    '/blog/coin-research-202602/base-chain': '/blog/coin-research-202603/base-chain/',
+    '/posts/coin-research-202602/base-chain': '/blog/coin-research-202603/base-chain/',
+    '/blog/coin-research-202602/coinbase-one': '/blog/coin-research-202603/coinbase-one/',
+    '/posts/coin-research-202602/coinbase-one': '/blog/coin-research-202603/coinbase-one/',
+    '/blog/coin-research-202602/deribit': '/blog/coin-research-202603/deribit/',
+    '/posts/coin-research-202602/deribit': '/blog/coin-research-202603/deribit/',
+    '/blog/coin-research-202602/developer-platform': '/blog/coin-research-202603/developer-platform/',
+    '/posts/coin-research-202602/developer-platform': '/blog/coin-research-202603/developer-platform/',
+    '/blog/coin-research-202602/eth-staking': '/blog/coin-research-202603/eth-staking/',
+    '/posts/coin-research-202602/eth-staking': '/blog/coin-research-202603/eth-staking/',
+    '/blog/coin-research-202602/model-walkthrough': '/blog/coin-research-202603/model-walkthrough/',
+    '/posts/coin-research-202602/model-walkthrough': '/blog/coin-research-202603/model-walkthrough/',
+    '/blog/coin-research-202602/usdc-stablecoin': '/blog/coin-research-202603/usdc-stablecoin/',
+    '/posts/coin-research-202602/usdc-stablecoin': '/blog/coin-research-202603/usdc-stablecoin/',
   },
   vite: {
     server: {

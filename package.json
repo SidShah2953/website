@@ -11,7 +11,8 @@
     "check:readdepth": "node scripts/checks/readdepth.mjs",
     "astro": "astro",
     "newsletter": "node scripts/newsletter.mjs",
-    "newsletter:dry": "node scripts/newsletter.mjs --dry-run"
+    "newsletter:dry": "node scripts/newsletter.mjs --dry-run",
+    "check:links": "node scripts/checks/links.mjs"
   },
   "dependencies": {
     "@astrojs/mdx": "^4.3.14",
