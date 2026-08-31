@@ -1,24 +1,27 @@
-name: Deploy to GitHub Pages
+name: CI
+
+# siddhants.com is built and served by Cloudflare Pages, which builds this repo
+# on its own when main changes. This workflow does NOT deploy: it exists so a
+# type error or a broken link fails somewhere visible, because Cloudflare Pages
+# runs none of these checks before publishing.
+#
+# A red run here does not stop Cloudflare from shipping. Treat a failure as
+# "roll back or push a fix", not as "the deploy was blocked".
 
 on:
   push:
     branches: [main]
+  pull_request:
   workflow_dispatch:
 
-# Allow only one concurrent deployment
 concurrency:
-  group: pages
-  cancel-in-progress: false
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
 
 permissions:
   contents: read
-  pages: write
-  id-token: write
 
 jobs:
-  # Gate the deploy on type checking. astro check is clean as of this commit, so
-  # a new type error fails here rather than shipping. Delete this job (and the
-  # `needs: check` below) if it ever gets in the way.
   check:
     runs-on: ubuntu-latest
     steps:
@@ -30,41 +33,24 @@ jobs:
       - run: npm ci
       - run: npm run check
       - run: npm run build
+        env:
+          # Kept so CI builds the same HTML Cloudflare publishes. The value that
+          # actually reaches production is the one set in the Cloudflare Pages
+          # project, not this one.
+          PUBLIC_NEWSLETTER_ACTION: ${{ vars.PUBLIC_NEWSLETTER_ACTION }}
       - run: npm run check:links
 
-  build:
-    needs: check
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Install, build, and upload site
-        uses: withastro/action@v3
-        with:
-          node-version: 24
-        env:
-          # Repository variable, not a secret — it ends up in the built HTML
-          # anyway as the form's action URL.
-          PUBLIC_NEWSLETTER_ACTION: ${{ vars.PUBLIC_NEWSLETTER_ACTION }}
-
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
-
   # Drafts a Kit broadcast for anything newly marked `newsletter: true`.
-  # Creates drafts only — sending stays a human decision, and an email cannot
-  # be unsent. Runs after deploy so the links it mails are already live.
+  # Drafts only — sending stays a human decision, and an email cannot be unsent.
   # Skipped entirely when KIT_API_KEY is absent.
+  #
+  # Gated on `check` rather than on a deploy, since the deploy now happens on
+  # Cloudflare's side where this workflow cannot see it. The draft may therefore
+  # be created a minute or two before the page is live; that is harmless,
+  # because nothing is sent until you press send.
   newsletter:
-    needs: deploy
+    needs: check
+    if: github.event_name == 'push'
     runs-on: ubuntu-latest
     # Job-level, because a step's own `env:` is not in scope for that step's
     # own `if:` — the guard below would always see an empty string.
