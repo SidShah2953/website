@@ -16,6 +16,8 @@ import { THEMES, AREAS, displayLabel } from "@/data/themes";
 import { themesFor } from "@/utils/themeIndex";
 import { fmtDate, readingMinutes } from "@/utils/feed";
 import Disclosure from "@/components/Disclosure.astro";
+import ReadDepth from "@/components/ReadDepth.astro";
+import Subscribe from "@/components/Subscribe.astro";
 
 type Blog = CollectionEntry<"blog">;
 interface Props {
@@ -158,8 +160,11 @@ const lift = ([r, g, b]: [number, number, number], k = 0.3): string =>
 
     {needsDisclosure && <div class="col"><Disclosure /></div>}
 
+    <div class="col endsub"><Subscribe /></div>
+
     <p class="col back"><a href={`/${base}/`}>← All {base === "blog" ? "writing" : base}</a></p>
   </div>
+  <ReadDepth words={words} />
 </article>
 
 <style>
@@ -219,6 +224,8 @@ const lift = ([r, g, b]: [number, number, number], k = 0.3): string =>
   .thesis :global(p:last-child){ margin-bottom:0; }
 
   /* two columns only when there is genuinely room; otherwise the TOC collapses */
+  .endsub{ margin-top:clamp(34px,5vw,58px);padding-top:clamp(28px,4vw,44px);
+    border-top:1px solid var(--rule); }
   .body{ margin-top:clamp(30px,5vw,54px);display:grid;gap:clamp(24px,4vw,52px); }
   @media (min-width:1080px){
     .body{ grid-template-columns:minmax(190px,240px) minmax(0,1fr);align-items:start; }
