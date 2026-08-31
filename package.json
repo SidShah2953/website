@@ -12,7 +12,8 @@
     "astro": "astro",
     "newsletter": "node scripts/newsletter.mjs",
     "newsletter:dry": "node scripts/newsletter.mjs --dry-run",
-    "check:links": "node scripts/checks/links.mjs"
+    "check:links": "node scripts/checks/links.mjs",
+    "favicon": "node scripts/favicon.mjs"
   },
   "dependencies": {
     "@astrojs/mdx": "^4.3.14",
