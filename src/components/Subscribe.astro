@@ -13,7 +13,14 @@
  * Works without JavaScript: the plain form POST lands on Kit's own confirmation
  * page. With JavaScript it posts in the background and confirms inline.
  */
-const action = import.meta.env.PUBLIC_NEWSLETTER_ACTION ?? "";
+// The Kit form endpoint is not a secret — it ships in this page's HTML as the
+// form action, and anyone can read it with View Source. Holding it in an env
+// var bought nothing and cost a week: the value has to exist in whichever
+// pipeline builds, and the site is built by Cloudflare Pages while the
+// variable was set in GitHub. Default to the real endpoint; the env var still
+// overrides, so a fork or a staging list can point somewhere else.
+const DEFAULT_ACTION = "https://app.kit.com/forms/9863560/subscriptions";
+const action = import.meta.env.PUBLIC_NEWSLETTER_ACTION || DEFAULT_ACTION;
 const ready = Boolean(action);
 
 if (ready && !/\/forms\/[^/]+\/subscriptions\/?$/.test(action)) {
