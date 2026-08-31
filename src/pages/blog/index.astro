@@ -171,6 +171,14 @@ const usedThemes = [...new Set(feed.flatMap(themesOf))]
   .chips button:focus-visible{ outline:2px solid var(--glow);outline-offset:2px; }
   .chips select{
     appearance:none;cursor:pointer;margin-inline-start:auto;
+    /* A select is as wide as its widest option, which here is a long theme
+       name — 197px, enough to push this row onto a second line. An explicit
+       min-width also overrides min-width:auto, which is what otherwise stops
+       a flex item shrinking below its content. A small flex-basis keeps the
+       line from wrapping at all — with wrap enabled the browser wraps rather
+       than shrinks, so flex-shrink alone does nothing — and flex-grow then
+       spends whatever space is left on the row. */
+    flex:1 1 11ch;min-width:11ch;max-width:22ch;text-overflow:ellipsis;
     background:var(--surface-1);border:1px solid var(--rule);border-radius:var(--r-pill);
     padding:7px 32px 7px 14px;color:var(--text-2);
     font-family:var(--sans);font-size:13px;line-height:1;
