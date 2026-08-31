@@ -26,3 +26,6 @@ pnpm-debug.log*
 
 # iCloud sync conflict duplicates ("file 2.ts", "file 3.md")
 *[[:space:]][0-9].*
+
+# Editor state — machine-specific, not project config
+.idea/
