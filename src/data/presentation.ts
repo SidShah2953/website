@@ -17,7 +17,7 @@ const presentation: Presentation = {
   title: "Hi, I'm Siddhant",
   // profile: "/profile.webp",
   description:
-    'Siddhant Shah is an Equity Research Associate at Rosenblatt Securities in New York, covering cryptocurrency, FinTech and HPC infrastructure. He writes here about how those companies make money — and about whatever else he has been working through. Previously quantitative research at Boston University, published in Stocks & Commodities and MDPI journals. Written in a personal capacity.',
+    'Siddhant Shah is an Equity Research Associate at Rosenblatt Securities in New York, He writes here about the things he is building and trying to understand, mostly technology. Previously quantitative research at Boston University, published in Stocks & Commodities and MDPI journals. Written in a personal capacity.',
   socials: [
     {
       label: "Email",
