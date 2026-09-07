@@ -141,7 +141,7 @@ const laid = placed.map((p, i) => ({
 <style>
   .wm{
     container-type:size;
-    position:relative;width:100%;aspect-ratio:1000/640;max-height:62svh;min-height:300px;
+    position:relative;width:100%;aspect-ratio:1000/640;max-height:52svh;min-height:300px;
     border-radius:var(--r-lg);overflow:hidden;
     background:radial-gradient(88% 78% at 50% 46%,var(--peacock-wash),transparent 72%);
   }
@@ -167,8 +167,11 @@ const laid = placed.map((p, i) => ({
   }
   /* On short viewports the whole slide must still fit the screen, or mandatory
      scroll-snap traps the reader inside a section taller than their window. */
-  @media (max-height: 820px){ .wm{max-height:46svh} }
-  @media (max-height: 700px){ .wm{max-height:40svh} }
+  /* Sized so the slide fits the viewport: the scroll-snap gate turns itself
+     off if any slide overflows, and at 62svh this one overran a 900px
+     viewport by 77px, silently disabling snap on the most common laptop. */
+  @media (max-height: 820px){ .wm{max-height:44svh} }
+  @media (max-height: 700px){ .wm{max-height:38svh} }
 
   /* a narrow map cannot carry 18 labels legibly — drop the least-used */
   @container (max-width: 700px){
