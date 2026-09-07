@@ -9,6 +9,10 @@
  * The pairing matters: a disclaimer only buried in the footer is easy to argue
  * nobody saw. An asterisk at the point of the claim, resolving to a statement
  * on the same page, is the form regulators and compliance teams expect.
+ *
+ * The wording of the `full` statement is the author's own approved language and
+ * is reproduced verbatim. Do not reword, condense or 'improve' it — only the
+ * emphasis on 'not investment advice' is presentational.
  */
 interface Props { variant?: "mark" | "full" | "exercise"; id?: string }
 const { variant = "full", id = "disclosure" } = Astro.props;
@@ -35,19 +39,12 @@ const year = new Date().getFullYear();
 ) : (
   <aside class="disclosure" id={id} role="note" aria-label="Disclosure">
     <p class="h">Disclosure</p>
+
     <p>
-      Written in a personal capacity. Everything here is my own opinion and not
-      that of Rosenblatt Securities or any employer, and it is
-      <strong>not investment advice</strong>, not
-      a recommendation, and not an offer or solicitation to buy or sell any
-      security. Nothing here is research prepared for, or distributed on behalf
-      of, any firm.
-    </p>
-    <p>
-      I may hold positions in securities or assets discussed. Figures are drawn
-      from public filings and public sources and may be wrong, stale, or
-      restated; do your own work before acting on anything. Nothing on this site
-      creates a client relationship.
+      The views expressed here are my own personal opinions. This is
+      <strong>not investment advice</strong> and should not be relied upon as
+      such. Nothing here is connected to, endorsed by, or written on behalf of
+      Rosenblatt Securities.
     </p>
     <p class="c">© {year} Siddhant Shah</p>
   </aside>
