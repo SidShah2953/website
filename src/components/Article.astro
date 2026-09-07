@@ -158,7 +158,11 @@ const lift = ([r, g, b]: [number, number, number], k = 0.3): string =>
     </section>
   )}
 
-    {needsDisclosure && <div class="col"><Disclosure /></div>}
+    {/* Every post carries the disclosure, not only the finance-themed ones:
+        it is a standing condition, and a post can be read on its own. The
+        asterisk at first mention stays gated, since that marks a specific
+        claim rather than the page. */}
+    <div class="col"><Disclosure /></div>
 
     <div class="col endsub"><Subscribe /></div>
 

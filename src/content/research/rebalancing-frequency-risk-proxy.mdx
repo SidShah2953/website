@@ -1,0 +1,52 @@
+---
+title: "Rebalancing Frequency Dominates Risk Proxy Choice: A Comparison of Mean–Variance, MAD, and Quantile-Constrained Portfolios of U.S. Sector ETFs"
+publishedAt: 2026-09-01T00:00:00Z
+description: "A comparison of variance, MAD, IQR and a wider central-quantile risk proxy in constrained portfolio construction across nine U.S. sector ETFs and 27 years, finding that rebalancing cadence matters more than the risk measure."
+authors: ["Siddhant Shah", "Aishwarya Malhotra", "Gourav Salotra", "Eugene Pinsky"]
+publication: "Risks (MDPI) — accepted, in press"
+tags: ["Portfolio Construction", "Risk"]
+themes: []
+isPublished: true
+thesis: |
+  Practitioners argue about which risk measure to optimise against. The comparison
+  suggests they are arguing about the wrong decision: once realistic constraints are
+  imposed, how often you rebalance moves outcomes more than whether you constrain
+  variance, mean absolute deviation, interquartile range or a wider central quantile.
+doi: ""
+---
+
+Portfolio construction offers a choice of risk proxy — variance, <T k="financial-modelling">mean
+absolute deviation</T> (MAD), interquartile range (IQR), or a wider central-quantile
+measure (P95). The practical question is whether that choice actually changes
+outcomes, or whether it gets swamped by the other decisions involved in running a
+portfolio.
+
+## The setup
+
+Nine U.S. sector ETFs over **27 years**. Every strategy shares the same constraints —
+long-only, fully invested, a maximum allocation cap and an explicit cash sleeve — and
+each is evaluated across a range of annualised risk budgets and rebalancing schedules
+under a **strict no-look-ahead timeline**.
+
+Holding the constraints fixed is what makes the comparison mean anything. Risk proxies
+are usually compared in isolation, where implementation differences are free to
+masquerade as differences between the measures themselves.
+
+## The finding
+
+**Rebalancing frequency dominates the choice of risk proxy.** Once the constraints are
+imposed, performance differences across rebalancing schedules are typically larger than
+differences across variance, MAD, IQR or P95.
+
+The robust proxies are feasible to implement, and they are not a free lunch: at longer
+rebalance intervals in particular, they converge toward similar allocations and similar
+realised outcomes as variance-based optimisation.
+
+## Why it matters
+
+The implication is a reordering of priorities. Operational decisions — how often the
+portfolio is actually traded — may deserve more attention than the selection of the
+risk metric, which is where much of the methodological argument has gone.
+
+*Accepted at Risks (MDPI) and in pre-publication review. The DOI and the published
+version will be linked here once they issue.*

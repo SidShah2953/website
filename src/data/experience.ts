@@ -9,10 +9,33 @@ export type Role = {
 
 export const ROLES: Role[] = [
   {
+    organization: "Rosenblatt Securities",
+    organizationUrl: "https://www.rblt.com",
+    subtitle: "Equity Research Associate",
+    dateRange: "Mar 2026 - Present",
+    location: "New York, NY",
+    skills: "Equity Research, Financial Modelling, Valuation, Financial Statement Analysis",
+    items: [
+      "Support FinTech, digital assets and high-performance-computing infrastructure coverage, reporting to the senior analyst on the franchise.",
+    ],
+  },
+  {
+    organization: "Boston University, Metropolitan College",
+    organizationUrl: "https://www.bu.edu",
+    subtitle: "Visiting Researcher",
+    dateRange: "Feb 2026 - Mar 2026",
+    location: "Boston, MA",
+    skills: "Python, Market Microstructure, Event Studies, Research",
+    items: [
+      "Studied the market microstructure of decentralised-finance perpetual futures, building a multi-exchange dataset of 17 crypto, tokenised-equity and tokenised-commodity perpetuals and an endogenous event-detection method for markets with no opening bell. Published in the International Journal of Financial Studies (DOI:10.3390/ijfs14070178).",
+      "Compared robust risk proxies in constrained portfolio construction across nine U.S. sector ETFs and 27 years of data. Accepted at Risks (MDPI).",
+    ],
+  },
+  {
     organization: "Boston University, Department of Computer Science",
     organizationUrl: "https://www.bu.edu",
     subtitle: "Research Assistant",
-    dateRange: "Oct 2024 - Present",
+    dateRange: "Oct 2024 - Jan 2026",
     location: "Boston, MA",
     skills: "Python, scikit-learn, Pandas, NumPy, PyTorch, TensorFlow, R, SQL, Git, Back-testing, Research",
     items: [
