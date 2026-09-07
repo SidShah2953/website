@@ -17,7 +17,7 @@ const presentation: Presentation = {
   title: "Hi, I'm Siddhant",
   // profile: "/profile.webp",
   description:
-    'Siddhant Shah is an Equity Research Associate at Rosenblatt Securities in New York, He writes here about the things he is building and trying to understand, mostly technology. Previously quantitative research at Boston University, published in Stocks & Commodities and MDPI journals. Written in a personal capacity.',
+    'Siddhant Shah researches and analyses financial technology and digital-asset market infrastructure — and has built the systems he now covers: the datasets, models and pipelines behind the analysis. Equity Research Associate at Rosenblatt Securities in New York. Published in the International Journal of Financial Studies and Risks. Written in a personal capacity.',
   socials: [
     {
       label: "Email",
@@ -30,6 +30,10 @@ const presentation: Presentation = {
     {
       label: "GitHub",
       link: "https://github.com/SidShah2953",
+    },
+    {
+      label: "ORCID",
+      link: "https://orcid.org/0009-0008-1161-3001",
     },
   ],
 };
