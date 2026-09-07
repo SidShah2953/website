@@ -26,7 +26,7 @@ const papersWord = WORDS[papers] ?? String(papers);
 
 const email = presentation.mail;
 const desc =
-  "Siddhant Shah researches financial technology and digital-asset market infrastructure, and has built the systems he covers. Equity Research Associate at Rosenblatt Securities. This is where he writes about what he is building and thinking about.";
+  "Siddhant Shah does quantitative and computational research on financial markets, focused on financial technology and digital-asset market infrastructure. Equity Research Associate at Rosenblatt Securities. This is where he writes about what he is building and thinking about.";
 ---
 <Shell title="Siddhant Shah" description={desc} canonical="/" transparentHeader snap atmosphere="surface" footer={false}>
   <PersonSchema slot="head" />
@@ -42,10 +42,11 @@ const desc =
     <p class="kicker">Hi — I'm</p>
     <h1>Siddhant Shah</h1>
     <p class="line">
-      I research <em>financial technology and digital-asset market
+      I do quantitative and computational research on financial markets, with a
+      focus on <em>financial technology and digital-asset market
       infrastructure</em> — and I have built the systems I cover. Equity
-      Research Associate at Rosenblatt Securities in New York. This is where
-      I write about what I'm building and thinking about.
+      Research Associate at Rosenblatt Securities in New York. This is where I
+      write about what I'm building and thinking about.
     </p>
     </div>
     <div class="scroll-cue" aria-hidden="true"><span></span></div>
@@ -213,6 +214,12 @@ const desc =
   @media(min-width:860px){.two{grid-template-columns:1.15fr .85fr;align-items:start}}
   .big{font-size:clamp(23px,3.1vw,38px);line-height:1.28;margin:0;color:var(--text)}
   .facts{color:var(--text-2);font-size:16px;margin:0 0 14px}
+  /* On a short viewport this column is what pushes the slide past the fold,
+     and an overflowing slide switches scroll-snap off for the whole page.
+     Tightening it here is cheaper than dropping a fact. */
+  @media (max-height: 800px){
+    .facts{font-size:15px;line-height:1.55}
+  }
   .facts em{font-style:italic}
   .lede{color:var(--text-2);max-width:62ch;font-size:17px;margin:0 0 34px}
 

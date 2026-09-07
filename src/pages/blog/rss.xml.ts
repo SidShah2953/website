@@ -25,7 +25,7 @@ export async function GET() {
   return rss({
     title: "Siddhant Shah",
     description:
-      "Notes and essays on financial technology, digital assets and the infrastructure underneath them.",
+      "Notes and essays on financial markets, financial technology and digital assets — and whatever else is being built.",
     site: SITE_URL,
     items,
     customData: "<language>en-us</language>",

@@ -17,7 +17,7 @@ const presentation: Presentation = {
   title: "Hi, I'm Siddhant",
   // profile: "/profile.webp",
   description:
-    'Siddhant Shah researches and analyses financial technology and digital-asset market infrastructure — and has built the systems he now covers: the datasets, models and pipelines behind the analysis. Equity Research Associate at Rosenblatt Securities in New York. Published in the International Journal of Financial Studies and Risks. Written in a personal capacity.',
+    'Siddhant Shah does quantitative and computational research on financial markets, with a focus on financial technology and digital-asset market infrastructure — and has built the systems he now covers: the datasets, models and pipelines behind the analysis. Equity Research Associate at Rosenblatt Securities in New York. Published in the International Journal of Financial Studies and Risks. Written in a personal capacity.',
   socials: [
     {
       label: "Email",
