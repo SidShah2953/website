@@ -35,6 +35,10 @@ const presentation: Presentation = {
       label: "ORCID",
       link: "https://orcid.org/0009-0008-1161-3001",
     },
+    {
+      label: "Google Scholar",
+      link: "https://scholar.google.com/citations?user=4-hYQRAAAAAJ",
+    },
   ],
 };
 
