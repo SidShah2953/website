@@ -37,6 +37,9 @@ const blog = defineCollection({
     newsletter: z.boolean().default(false),
     readingTimeMinutes: z.number().optional(), // injected at build
     canonical: z.string().url().optional(),
+    // A shorter headline for the <title> tag and social cards, for posts whose
+    // on-page title runs past the ~60 characters a search result shows.
+    seoTitle: z.string().max(60).optional(),
     ogImage: z.string().optional(),
     thesis: z.string().optional(),
     articleNumber: z.number().optional(), // sub-articles: sort order within series

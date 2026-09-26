@@ -13,11 +13,16 @@ const { src, alt, caption, class: className, ...rest } = Astro.props;
 // An imported asset carries its own dimensions; a plain string src does not, so
 // Astro requires them to be supplied or inferred.
 const isImported = typeof src !== "string";
+// Figures sit in the ~720px reading column but the sources are 1920-2970px
+// wide, so every reader downloaded the full-size file. A srcset lets a phone
+// take the 480px rendition and a retina laptop the 1440px one.
+const WIDTHS = [480, 720, 1080, 1440];
+const SIZES = "(min-width: 800px) 720px, calc(100vw - 32px)";
 ---
 <figure class={`fig ${className ?? ""}`}>
   {isImported
-    ? <Image src={src as ImageMetadata} alt={alt} {...rest} />
-    : <Image src={src as string} alt={alt} inferSize {...rest} />}
+    ? <Image src={src as ImageMetadata} alt={alt} widths={WIDTHS} sizes={SIZES} {...rest} />
+    : <Image src={src as string} alt={alt} inferSize widths={WIDTHS} sizes={SIZES} {...rest} />}
   {caption && <figcaption>{caption}</figcaption>}
 </figure>
 

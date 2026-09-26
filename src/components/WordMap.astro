@@ -133,7 +133,7 @@ const laid = placed.map((p, i) => ({
       data-ph={t.phase} data-amp={t.amp} data-rank={t.rank}
       style={`left:${t.left.toFixed(3)}%;top:${t.top.toFixed(3)}%;color:rgb(${t.rgb.join(",")});--s:${t.size.toFixed(1)};font-weight:${t.weight};text-shadow:0 0 ${Math.round(t.size * .6)}px rgba(${t.rgb.join(",")},.28)`}
       data-label={displayLabel(t.label)}
-      data-meta={`${(Object.keys(AREAS) as AreaId[]).filter((a) => (t.blend[a] ?? 0) > .02).map((a) => `${AREAS[a].label} ${Math.round((t.blend[a] ?? 0) * 100)}%`).join("  ·  ")} — ${t.count} mention${t.count === 1 ? "" : "s"} across ${t.pieces} piece${t.pieces === 1 ? "" : "s"}`}
+      data-meta={`${(Object.keys(AREAS) as AreaId[]).filter((a) => (t.blend[a] ?? 0) > .02).map((a) => `${AREAS[a].label} ${Math.round((t.blend[a] ?? 0) * 100)}%`).join("  ·  ")}; ${t.count} mention${t.count === 1 ? "" : "s"} across ${t.pieces} piece${t.pieces === 1 ? "" : "s"}`}
     >{displayLabel(t.label)}</a>
   ))}
 </div>

@@ -3,6 +3,7 @@ import Shell from "@/layouts/Shell.astro";
 import { getCollection } from "astro:content";
 import { fmtDate, excerpt, firstSentence } from "@/utils/feed";
 import T from "@/components/T.astro";
+import { seoTitle } from "@/utils/seoTitle";
 
 export async function getStaticPaths() {
   const notes = await getCollection("notes");
@@ -20,7 +21,7 @@ const slug = entry.id.replace(/\.(md|mdx)$/, "").toLowerCase();
 const heading = entry.data.title ?? firstSentence(entry.body);
 const desc = excerpt(entry.body);
 ---
-<Shell title={`${heading} | Siddhant Shah`}
+<Shell title={seoTitle(heading)}
   description={desc}
   canonical={`/notes/${slug}/`}
   og={{ type: "article", title: heading, description: desc }}>

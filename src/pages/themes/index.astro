@@ -15,7 +15,7 @@ const byArea = (Object.keys(AREAS) as AreaId[]).map((a) => ({
 const total = index.reduce((n, t) => n + t.pieces, 0);
 ---
 <Shell title="Themes | Siddhant Shah"
-  description="Every theme I write about, grouped by area — from accounting and valuation to tokenization, inference and the things I measure for fun."
+  description="Every theme I write about, grouped by area, from accounting and valuation to tokenization, inference and the things I measure for fun."
   canonical="/themes/">
   <BreadcrumbSchema slot="head" items={[{ name: "Home", url: "/" }, { name: "Writing", url: "/blog/" }, { name: "Themes" }]} />
   <div class="page">
@@ -24,7 +24,7 @@ const total = index.reduce((n, t) => n + t.pieces, 0);
       <h1 class="h1">What I keep coming back to.</h1>
       <p class="lede">
         Marked inline in the writing itself, so a theme's weight is how often I
-        actually reach for it — {index.length} themes across {total} appearances.
+        actually reach for it: {index.length} themes across {total} appearances.
       </p>
 
       {byArea.map((g) => (

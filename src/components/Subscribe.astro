@@ -52,7 +52,7 @@ if (ready && !/\/forms\/[^/]+\/subscriptions\/?$/.test(action)) {
         <input id="sub-email" type="email" placeholder="you@example.com" disabled />
         <button type="button" disabled>Subscribe</button>
       </form>
-      <p class="warn">Not connected yet — set <code>PUBLIC_NEWSLETTER_ACTION</code> to your Kit form endpoint.</p>
+      <p class="warn">Not connected yet: set <code>PUBLIC_NEWSLETTER_ACTION</code> to your Kit form endpoint.</p>
     </>
   )}
 </div>
@@ -114,7 +114,7 @@ if (ready && !/\/forms\/[^/]+\/subscriptions\/?$/.test(action)) {
         });
         if (!res.ok) throw new Error(String(res.status));
         form.reset();
-        status.textContent = 'Thanks — check your inbox to confirm.';
+        status.textContent = 'Thanks. Check your inbox to confirm.';
         status.hidden = false;
       } catch {
         // Network or CORS failure — let the browser post it the ordinary way.

@@ -4,6 +4,7 @@ import Shell from "@/layouts/Shell.astro";
 import { themesFor } from "@/utils/themeIndex";
 import { THEMES, displayLabel } from "@/data/themes";
 import Article from "@/components/Article.astro";
+import { seoTitle } from "@/utils/seoTitle";
 import ScholarlyArticleSchema from "@/components/seo/ScholarlyArticleSchema.astro";
 import BreadcrumbSchema from "@/components/seo/BreadcrumbSchema.astro";
 
@@ -26,14 +27,13 @@ const { Content } = await entry.render();
 ---
 
 <Shell
-  title={`${entry.data.title} | Research`}
+  title={seoTitle(entry.data.title)}
   description={entry.data.description}
   canonical={`/research/${entry.slug}/`}
   og={{
     title: entry.data.title,
     type: "article",
     description: entry.data.description,
-    alt: entry.data.title
   }}
 >
 
