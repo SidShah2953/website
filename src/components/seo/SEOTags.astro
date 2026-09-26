@@ -7,7 +7,7 @@ import { readFileSync } from "node:fs";
 
 type Props = HeadTags;
 
-const { title, noindex, canonical, og } = Astro.props;
+const { title, noindex, canonical, og, markdown } = Astro.props;
 // Front matter descriptions carry Markdown (`USDC`, *emphasis*). The marks
 // are noise in a search snippet, so strip them from the meta text only.
 const plain = (s?: string) => s?.replace(/[*`]/g, "");
@@ -101,6 +101,8 @@ const openGraph = {
         // without this the feed is undiscoverable — no reader or browser can find it
         { rel: "alternate", type: "application/rss+xml",
           title: "Siddhant Shah: Writing", href: "/blog/rss.xml" },
+        // the same page as plain Markdown, for AI agents (llmstxt.org convention)
+        ...(markdown ? [{ rel: "alternate", type: "text/markdown", href: markdown }] : []),
       ],
       meta: [
         { name: "viewport", content: "width=device-width, initial-scale=1" },

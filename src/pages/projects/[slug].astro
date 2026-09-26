@@ -30,6 +30,7 @@ const { Content } = await entry.render();
   title={seoTitle(entry.data.title)}
   description={entry.data.description}
   canonical={`/projects/${entry.slug}/`}
+  markdown={`/projects/${entry.slug}.md`}
   og={{
     title: entry.data.title,
     type: "article",

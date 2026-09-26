@@ -87,6 +87,7 @@ const headline = entry.data.seoTitle ?? entry.data.title;
   title={seoTitle(headline)}
   description={entry.data.description}
   canonical={canonicalUrl}
+  markdown={hidden ? undefined : `/blog/${entrySlug}.md`}
   og={{
     title: headline,
     type: "article",

@@ -1,6 +1,7 @@
 ---
 import Shell from "@/layouts/Shell.astro";
 import PersonSchema from "@/components/seo/PersonSchema.astro";
+import WebSiteSchema from "@/components/seo/WebSiteSchema.astro";
 import WordMap from "@/components/WordMap.astro";
 import Surface from "@/components/Surface.astro";
 import Subscribe from "@/components/Subscribe.astro";
@@ -21,8 +22,9 @@ const email = presentation.mail;
 const desc =
   "Siddhant Shah, Equity Research Associate at Rosenblatt Securities in New York, supporting FinTech and Digital Assets coverage. Notes on markets, maths and code.";
 ---
-<Shell title="Siddhant Shah, Equity Research Associate at Rosenblatt" description={desc} canonical="/" transparentHeader snap atmosphere="surface" footer={false}>
+<Shell title="Siddhant Shah, Equity Research Associate at Rosenblatt" description={desc} canonical="/" markdown="/llms.txt" transparentHeader snap atmosphere="surface" footer={false}>
   <PersonSchema slot="head" />
+  <WebSiteSchema slot="head" />
 
   <!-- 1 · the opening -->
   <Surface />

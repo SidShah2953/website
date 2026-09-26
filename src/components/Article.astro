@@ -81,7 +81,11 @@ const lift = ([r, g, b]: [number, number, number], k = 0.3): string =>
     <h1 class="h1 title">{entry.data.title}{needsDisclosure && <Disclosure variant="mark" />}</h1>
     {entry.data.description && <p class="lede">{entry.data.description}</p>}
     <p class="meta">
-      <span>{fmtDate(entry.data.publishedAt)}</span>
+      {/* A visible byline and machine-readable dates: answer engines weigh
+          who wrote a page and when, and read both from the page itself. */}
+      {entry.data.authors?.length ? null : <span><a href="/about/" rel="author">Siddhant Shah</a></span>}
+      <span><time datetime={entry.data.publishedAt.toISOString()}>{fmtDate(entry.data.publishedAt)}</time></span>
+      {entry.data.updatedAt && <span>Updated <time datetime={entry.data.updatedAt.toISOString()}>{fmtDate(entry.data.updatedAt)}</time></span>}
       <span>{readingMinutes(words)} min</span>
       {entry.data.publication && <span>{entry.data.publication}</span>}
       {entry.data.authors?.length ? <span>{entry.data.authors.join(", ")}</span> : null}
@@ -203,6 +207,8 @@ const lift = ([r, g, b]: [number, number, number], k = 0.3): string =>
     font-family:var(--sans);font-size:clamp(11.5px,1.2vw,13px);color:var(--text-3);
     display:flex;flex-wrap:wrap;gap:6px clamp(12px,2vw,20px);margin:0 0 clamp(14px,2vw,20px);
   }
+  .meta a{ color:inherit;text-decoration:none;transition:color .25s; }
+  .meta a:hover{ color:var(--glow); }
   .themes{ display:flex;flex-wrap:wrap;gap:8px;margin:0; }
   .themes a{
     /* the raw area colour is tuned for graphics; Technology (#2F6FE8) only

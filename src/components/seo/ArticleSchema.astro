@@ -52,6 +52,7 @@ const schema = {
     "@id": articleUrl
   },
   "url": articleUrl,
+  "isPartOf": { "@id": `${SITE_URL}/#website` },
   ...(tags.length > 0 && { "keywords": tags.join(", ") })
 };
 ---
