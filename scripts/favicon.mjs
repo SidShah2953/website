@@ -72,8 +72,8 @@ await Promise.all([
 writeFileSync('public/site.webmanifest', JSON.stringify({
   name: 'Siddhant Shah', short_name: 'Siddhant',
   icons: [
-    { src: '/icon-192.png', sizes: '192x192', type: 'image/png' },
-    { src: '/icon-512.png', sizes: '512x512', type: 'image/png' },
+    { src: '/icon-192.png?v=2', sizes: '192x192', type: 'image/png' },
+    { src: '/icon-512.png?v=2', sizes: '512x512', type: 'image/png' },
   ],
   theme_color: GROUND, background_color: GROUND, display: 'standalone', start_url: '/',
 }, null, 2) + '\n');

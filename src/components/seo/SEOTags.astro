@@ -90,11 +90,13 @@ const openGraph = {
         // SVG first for browsers that take it; a PNG fallback for those that
         // do not; .ico because crawlers request that path by name. iOS ignores
         // SVG for the home-screen icon, so apple-touch-icon must be a PNG.
-        { rel: "icon", href: "/favicon.svg", type: "image/svg+xml" },
-        { rel: "icon", href: "/favicon-32.png", sizes: "32x32", type: "image/png" },
-        { rel: "icon", href: "/favicon-16.png", sizes: "16x16", type: "image/png" },
-        { rel: "apple-touch-icon", href: "/apple-touch-icon.png", sizes: "180x180" },
-        { rel: "manifest", href: "/site.webmanifest" },
+        // ?v=2 busts the browser favicon cache: /favicon.svg was the Astro logo
+        // until 2026-08-30, and browsers keep favicons by URL for months.
+        { rel: "icon", href: "/favicon.svg?v=2", type: "image/svg+xml" },
+        { rel: "icon", href: "/favicon-32.png?v=2", sizes: "32x32", type: "image/png" },
+        { rel: "icon", href: "/favicon-16.png?v=2", sizes: "16x16", type: "image/png" },
+        { rel: "apple-touch-icon", href: "/apple-touch-icon.png?v=2", sizes: "180x180" },
+        { rel: "manifest", href: "/site.webmanifest?v=2" },
         { rel: "sitemap", href: "/sitemap-index.xml" },
         // without this the feed is undiscoverable — no reader or browser can find it
         { rel: "alternate", type: "application/rss+xml",
