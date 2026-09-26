@@ -32,7 +32,7 @@ export const ROLES: Role[] = [
     ],
   },
   {
-    organization: "Boston University, Department of Computer Science",
+    organization: "Boston University, Metropolitan College",
     organizationUrl: "https://www.bu.edu",
     subtitle: "Research Assistant",
     dateRange: "Oct 2024 - Jan 2026",
