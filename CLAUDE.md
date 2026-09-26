@@ -63,3 +63,15 @@ Consequences that have already caused real bugs:
 `scripts/checks/` — contrast (against real rendered pixels; computed
 `background-color` is useless over gradients), responsive, snap, readdepth,
 links. `.claude/skills/site-design/SKILL.md` is the design brief.
+
+## Search and AI visibility (SEO / AEO)
+
+The runbook lives in the Obsidian vault: `Projects/Website/SEO & Visibility.md`. Things code changes must not break:
+
+- `llms.txt`, `llms-full.txt` and the `.md` renditions are generated from the content collections (`src/utils/agentIndex.ts`, `agentMarkdown.ts`). A new collection or page type needs adding there.
+- `dist/_headers` is written by `astro.config.mjs`; Cloudflare caps it at 100 rules and the build warns at 90.
+- robots.txt is generated in `astro.config.mjs`: keep `/private/` disallowed; `ALLOW_AI_TRAINING` is the single training switch.
+- One Person entity, `https://siddhants.com/#person` (`src/utils/personSchema.ts`); reuse the `@id`, never a second Person.
+- Titles 60 characters max (`seoTitle` front matter), descriptions 160 max, no em dashes in site copy.
+- Favicon URLs are versioned (`?v=2`); bump on any icon change.
+- Cloudflare: keep Bot Fight Mode, AI Labyrinth and Bot Preference Sync (managed robots.txt) **off**.
