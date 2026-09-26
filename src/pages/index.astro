@@ -17,16 +17,9 @@ const themes = buildIndex(pieces.map((p) => ({ entry: p.entry, areas: p.areas })
 // nested rather than filling this list
 const latest = (await getFeed()).slice(0, 3);
 
-// counted, not typed — the previous copy said "four" and had been wrong since
-// the IJFS paper went live
-const papers = pieces.filter((p) => p.kind === "research").length;
-// spelled out: a sentence should not open with a numeral
-const WORDS = ["No", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten"];
-const papersWord = WORDS[papers] ?? String(papers);
-
 const email = presentation.mail;
 const desc =
-  "Siddhant Shah does quantitative and computational research on financial markets, focused on financial technology and digital-asset market infrastructure. Equity Research Associate at Rosenblatt Securities. This is where he writes about what he is building and thinking about.";
+  "Siddhant Shah is an Equity Research Associate at Rosenblatt Securities in New York, supporting FinTech and Digital Assets coverage. This is where he writes about what he is building and thinking about.";
 ---
 <Shell title="Siddhant Shah" description={desc} canonical="/" transparentHeader snap atmosphere="surface" footer={false}>
   <PersonSchema slot="head" />
@@ -39,14 +32,13 @@ const desc =
 
   <section class="slide hero">
     <div class="hero-copy">
-    <p class="kicker">Hi — I'm</p>
+    <p class="kicker">Hi, I'm</p>
     <h1>Siddhant Shah</h1>
     <p class="line">
-      I do quantitative and computational research on financial markets, with a
-      focus on <em>financial technology and digital-asset market
-      infrastructure</em> — and I have built the systems I cover. Equity
-      Research Associate at Rosenblatt Securities in New York. This is where I
-      write about what I'm building and thinking about.
+      Equity Research Associate at Rosenblatt Securities in New York,
+      supporting <em>FinTech and Digital Assets</em> coverage. I came to
+      markets from mathematics and data, and this is where I write about what
+      I'm building and thinking about.
     </p>
     </div>
     <div class="scroll-cue" aria-hidden="true"><span></span></div>
@@ -57,16 +49,16 @@ const desc =
     <div class="band"><h2 class="eyebrow">Who I am</h2>
     <div class="two">
       <p class="big">
-        I came to markets from mathematics. The research — Bayesian inference,
-        ensemble methods, a great deal of time with messy data — all happened
-        during my years in Boston, and it is still the toolkit. For four years I
+        I came to markets from mathematics. Bayesian inference, ensemble
+        methods and a great deal of time with messy data all came from my years
+        in Boston, and they are still the toolkit. For four years I
         taught maths and physics to olympiad students in India, which did more
         for how I explain things than anything since.
       </p>
       <div class="facts">
-        <p>Equity Research Associate at Rosenblatt Securities, covering financial technology, digital assets and high-performance-computing infrastructure. Before that, quantitative research at Boston University — most recently as a Visiting Researcher, on the market microstructure of DeFi perpetual futures.</p>
+        <p>Equity Research Associate at Rosenblatt Securities, supporting the FinTech and Digital Assets coverage. Before that, part-time quantitative work at Boston University alongside my master's.</p>
         <p>MS in Applied Data Analytics from Boston University and CFA Level&nbsp;I, both January 2026; BS (Honours) in Mathematics and Computer Science from Chennai Mathematical Institute. Series&nbsp;7 and Series&nbsp;63. Python, R, SQL and a great deal of Excel.</p>
-        <p>{papersWord} peer-reviewed papers, in <em>Stocks &amp; Commodities</em> and MDPI journals: momentum in crude oil, the link between overnight silver and Bitcoin, and most recently the structure of perpetual contracts and the macro factors moving them.</p>
+        <p>That academic work led to papers in MDPI journals and articles in <em>Stocks &amp; Commodities</em>, on DeFi perpetual futures, portfolio construction, and trading strategies in crude oil and Bitcoin.</p>
         <p>Four years spent designing and teaching advanced maths and physics for students preparing for the International Junior Science Olympiad in India. Teaching is still the thing I am most enthusiastic about, along with motorsport.</p>
         <p><a class="ln" href="/about">The longer version →</a></p>
       </div>
@@ -78,7 +70,7 @@ const desc =
   <section class="slide rise">
     <div class="band"><h2 class="eyebrow">What I'm thinking about</h2>
     <p class="big">
-      Whatever has hold of my attention — something I'm building, or something
+      Whatever has hold of my attention: something I'm building, or something
       I want to understand properly. Some of it is code, some of it is maths,
       and some of it is a question I couldn't put down.
     </p>
