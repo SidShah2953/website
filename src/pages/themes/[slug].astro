@@ -36,8 +36,8 @@ const rgb = area.rgb.join(",");
 const href = (p: any) =>
   `/${p.kind === "blog" ? "blog" : p.kind}/${p.entry.id.replace(/\.(md|mdx)$/, "").toLowerCase()}/`;
 ---
-<Shell title={`${theme.label} | Siddhant Shah`}
-  description={`Everything I've written on ${theme.label}.`}
+<Shell title={`${displayLabel(theme.label)} | Siddhant Shah`}
+  description={`Everything Siddhant Shah has written on ${theme.label}, part of ${area.label}: ${used.length} ${used.length === 1 ? "piece" : "pieces"} across essays, research, projects and notes.`}
   canonical={`/themes/${slug}/`}>
   <BreadcrumbSchema slot="head" items={[{ name: "Home", url: "/" }, { name: "Writing", url: "/blog/" }, { name: displayLabel(theme.label) }]} />
   <div class="page">

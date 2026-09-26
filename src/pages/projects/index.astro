@@ -9,7 +9,7 @@ const projects = live(await getCollection("projects"))
   .sort((a, b) => +b.data.publishedAt - +a.data.publishedAt);
 ---
 <Shell title="Projects | Siddhant Shah"
-  description="Things I've built and measured — lap times, query engines, fertility data."
+  description="Projects by Siddhant Shah: F1 lap time prediction, a PySpark vs KDB+/q benchmark, fertility data analysis and more, each built and measured."
   canonical="/projects/">
   <BreadcrumbSchema slot="head" items={[{ name: "Home", url: "/" }, { name: "Projects" }]} />
   <div class="page">

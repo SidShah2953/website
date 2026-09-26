@@ -1,8 +1,13 @@
 ---
+// KaTeX styles are bundled from the same version rehype-katex renders with.
+// The jsdelivr stylesheet was a render-blocking third-party request, and it
+// was pinned to 0.15.2 while the markup came from 0.16.
+import "katex/dist/katex.min.css";
 import type { CollectionEntry } from "astro:content";
 import { getCollection } from "astro:content";
 import Shell from "@/layouts/Shell.astro";
 import Article from "@/components/Article.astro";
+import { seoTitle } from "@/utils/seoTitle";
 import BreadcrumbSchema from "@/components/seo/BreadcrumbSchema.astro";
 
 export async function getStaticPaths() {
@@ -22,23 +27,15 @@ const { entry } = Astro.props;
 const { Content } = await entry.render();
 ---
 <Shell
-  title={`${entry.data.title} | Projects`}
+  title={seoTitle(entry.data.title)}
   description={entry.data.description}
   canonical={`/projects/${entry.slug}/`}
   og={{
     title: entry.data.title,
     type: "article",
     description: entry.data.description,
-    alt: entry.data.title
   }}
 >
-  <link
-    slot="head"
-    rel="stylesheet"
-    href="https://cdn.jsdelivr.net/npm/katex@0.15.2/dist/katex.min.css"
-    integrity="sha384-MlJdn/WNKDGXveldHDdyRP1R4CTHr3FeuDNfhsLPYrq2t0UBkUdK2jyTnXPEK1NQ"
-    crossorigin="anonymous"
-  />
 
   <BreadcrumbSchema
     slot="head"

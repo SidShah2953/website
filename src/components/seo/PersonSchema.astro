@@ -3,13 +3,22 @@ import JsonLd from "./JsonLd.astro";
 import { SITE_URL } from "@/data/config";
 import presentation from "@/data/presentation";
 
-const socialLinks = presentation.socials
-  .filter(s => s.link.startsWith('http'))
-  .map(s => s.link);
+// Profiles the site links visibly, plus ones kept in structured data only.
+const schemaOnlyProfiles = ["https://x.com/SiddhantShah29_"];
+
+const socialLinks = [
+  ...new Set([
+    ...presentation.socials
+      .filter(s => s.link.startsWith('http'))
+      .map(s => s.link),
+    ...schemaOnlyProfiles
+  ])
+];
 
 const schema = {
   "@context": "https://schema.org",
   "@type": "Person",
+  "@id": `${SITE_URL}/#person`,
   "name": presentation.name,
   "url": SITE_URL,
   "email": presentation.mail,
@@ -28,16 +37,21 @@ const schema = {
     },
     {
       "@type": "CollegeOrUniversity",
-      "name": "Chennai Mathematical Institute"
+      "name": "Chennai Mathematical Institute",
+      "sameAs": "https://www.cmi.ac.in"
     }
   ],
   "knowsAbout": [
-    "Machine Learning",
+    "Equity Research",
+    "Financial Technology",
+    "Digital Assets",
+    "Financial Modelling",
+    "Valuation",
     "Quantitative Finance",
-    "Data Analytics",
-    "Python",
     "Portfolio Optimization",
-    "Trading Strategies"
+    "Data Analytics",
+    "Machine Learning",
+    "Python"
   ],
   "sameAs": socialLinks
 };

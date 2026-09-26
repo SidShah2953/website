@@ -28,11 +28,20 @@ const {
 
 const articleUrl = `${SITE_URL}/research/${slug}/`;
 
+// Matches the @id declared in PersonSchema.astro so every page resolves to one entity.
+const personId = `${SITE_URL}/#person`;
+
 const authorObjects = authors.map(name => ({
   "@type": "Person",
   "name": name,
-  ...(name === "Siddhant Shah" && { "url": SITE_URL })
+  ...(name === "Siddhant Shah" && { "@id": personId, "url": SITE_URL })
 }));
+
+const cleanDoi = doi?.trim().replace(/^https?:\/\/(dx\.)?doi\.org\//, '');
+const identifiers = [
+  ...(cleanDoi ? [{ "@type": "PropertyValue", "propertyID": "DOI", "value": cleanDoi }] : []),
+  ...(arxiv ? [{ "@type": "PropertyValue", "propertyID": "arXiv", "value": arxiv }] : [])
+];
 
 const schema = {
   "@context": "https://schema.org",
@@ -51,12 +60,8 @@ const schema = {
     "@type": "Periodical",
     "name": publication
   }}),
-  ...(doi && { "sameAs": `https://doi.org/${doi}` }),
-  ...(arxiv && { "identifier": {
-    "@type": "PropertyValue",
-    "propertyID": "arXiv",
-    "value": arxiv
-  }}),
+  ...(cleanDoi && { "sameAs": `https://doi.org/${cleanDoi}` }),
+  ...(identifiers.length > 0 && { "identifier": identifiers.length === 1 ? identifiers[0] : identifiers }),
   ...(tags.length > 0 && { "keywords": tags.join(", ") })
 };
 ---

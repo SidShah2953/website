@@ -3,10 +3,15 @@ import { SEO } from "astro-seo";
 import { SITE_URL } from "@/data/config";
 import type { HeadTags } from "@/utils/types/HeadTags";
 import presentation from "@/data/presentation";
+import { readFileSync } from "node:fs";
 
 type Props = HeadTags;
 
-const { title, description, noindex, canonical, og } = Astro.props;
+const { title, noindex, canonical, og } = Astro.props;
+// Front matter descriptions carry Markdown (`USDC`, *emphasis*). The marks
+// are noise in a search snippet, so strip them from the meta text only.
+const plain = (s?: string) => s?.replace(/[*`]/g, "");
+const description = plain(Astro.props.description);
 
 const DEFAULT_TITLE_PAGE = "Siddhant Shah";
 const DEFAULT_DESCRIPTION_PAGE = presentation.description.replace(/\*/g, '');
@@ -21,13 +26,29 @@ const ogImage = og?.image
   ? (og.image.startsWith('http') ? og.image : `${SITE_URL}${og.image}`)
   : `${SITE_URL}/social-prev.png`;
 
+// og:image:width/height let Facebook, LinkedIn and Slack lay out the card on
+// the first scrape instead of fetching the image first. Read straight from the
+// PNG header in public/, so a replaced image can never disagree with its tags.
+const pngSize = (url: string) => {
+  if (!url.startsWith(SITE_URL) || !url.endsWith(".png")) return undefined;
+  try {
+    const buf = readFileSync(`./public${decodeURI(url.slice(SITE_URL.length))}`);
+    return { width: buf.readUInt32BE(16), height: buf.readUInt32BE(20) };
+  } catch {
+    return undefined;
+  }
+};
+const ogSize = pngSize(ogImage);
+const DEFAULT_ALT =
+  "Siddhant Shah, Equity Research Associate at Rosenblatt Securities";
+
 const openGraph = {
   title: og?.title || title || "Hello! I'm Siddhant.",
   type: og?.type || "website",
   image: ogImage,
-  alt: og?.alt || "Siddhant Shah",
+  alt: og?.alt || DEFAULT_ALT,
   url: canonicalUrl,
-  description: og?.description || description || DEFAULT_DESCRIPTION_PAGE,
+  description: plain(og?.description) || description || DEFAULT_DESCRIPTION_PAGE,
 };
 ---
 
@@ -47,9 +68,14 @@ const openGraph = {
       },
       optional: {
         description: openGraph.description,
+        siteName: "Siddhant Shah",
+        locale: "en_US",
       },
       image: {
         alt: openGraph.alt,
+        type: ogImage.endsWith(".png") ? "image/png" : undefined,
+        width: ogSize?.width,
+        height: ogSize?.height,
       },
     }}
     twitter={{
@@ -57,6 +83,7 @@ const openGraph = {
       title: openGraph.title,
       description: openGraph.description,
       image: openGraph.image,
+      imageAlt: openGraph.alt,
     }}
     extend={{
       link: [
@@ -71,7 +98,7 @@ const openGraph = {
         { rel: "sitemap", href: "/sitemap-index.xml" },
         // without this the feed is undiscoverable — no reader or browser can find it
         { rel: "alternate", type: "application/rss+xml",
-          title: "Siddhant Shah — Writing", href: "/blog/rss.xml" },
+          title: "Siddhant Shah: Writing", href: "/blog/rss.xml" },
       ],
       meta: [
         { name: "viewport", content: "width=device-width, initial-scale=1" },
