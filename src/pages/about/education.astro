@@ -4,6 +4,7 @@ import BreadcrumbSchema from "@/components/seo/BreadcrumbSchema.astro";
 import Entry from "@/components/Entry.astro";
 import formatDateFromJSON from "@/utils/formatDateFromJSON";
 import courses from "@/content/education/courses.json";
+import { DEGREES, LICENSES } from "@/data/education";
 ---
 <Shell title="Education | Siddhant Shah" description="Degrees, and the courses I took because I wanted to." canonical="/about/education/">
   <BreadcrumbSchema slot="head" items={[{ name: "Home", url: "/" }, { name: "About", url: "/about/" }, { name: "Education" }]} />
@@ -12,53 +13,16 @@ import courses from "@/content/education/courses.json";
       <p class="eyebrow crumb"><a href="/about/">About</a> <span>/</span> Education</p>
       <h1 class="h1">Education.</h1>
       <p class="lede">Degrees, and the courses I took because I wanted to.</p>
-      <ul class="entries"><Entry
-    title="Master of Science - Applied Data Analytics"
-    organization="Boston University"
-    organizationUrl="https://www.bu.edu"
-    dateRange="Boston | January 2026"
-    items={[
-      "Analytics and Data Visualization in R",
-      "Advanced Machine Learning",
-      "Big Data Analytics",
-      "Web Mining & Graph Analytics"
-    ]}
-  />
-
-  <Entry
-    title="Bachelor of Science (Honors) - Mathematics and Computer Science"
-    organization="Chennai Mathematical Institute"
-    organizationUrl="https://www.cmi.ac.in"
-    dateRange="Chennai | July 2024"
-    items={[
-      "Linear Algebra",
-      "Fourier Analysis",
-      "Data Structures and Algorithms",
-      "Probability Theory & Statistics",
-      "Stochastic Processes",
-      "Statistical Inference",
-      "Financial Modelling",
-      "Economics"
-    ]}
-  />
-
-  <Entry
-    title="Grade 12 (Maharashtra HSC) - Science"
-    organization="PACE Junior Science College"
-    dateRange="Mumbai | September 2021"
-    items={[
-      "Percentage: 94.5% (12th Grade, HSC Maharashtra Board)",
-      "JEE Mains (All India Rank 5274) & Advanced (All India Rank 4690)"
-    ]}
-  />
-
+      <ul class="entries">
+        {DEGREES.map((d) => <Entry {...d} />)}
       </ul>
 
       <section class="courses">
         <h2 class="eyebrow">Licenses</h2>
         <ul class="clist">
-          <li><span class="ct">Series 7: General Securities Representative</span><span class="cm">FINRA</span></li>
-          <li><span class="ct">Series 63: Uniform Securities Agent State Law</span><span class="cm">FINRA</span></li>
+          {LICENSES.map((l) => (
+            <li><span class="ct">{l.title}</span><span class="cm">{l.issuer}</span></li>
+          ))}
         </ul>
       </section>
 

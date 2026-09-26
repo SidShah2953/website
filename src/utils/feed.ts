@@ -110,8 +110,11 @@ export async function getFeed(): Promise<FeedItem[]> {
   return [...p, ...n].sort((a, b) => +b.date - +a.date);
 }
 
+// Front-matter dates are UTC midnight. Format in UTC so the visible date matches
+// the ISO date in <time datetime> and the JSON-LD whatever the build machine's
+// timezone (a US-timezone build showed 4 Feb as 3 Feb).
 export const fmtDate = (d: Date) =>
-  d.toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });
+  d.toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" });
 
 export const readingMinutes = (words: number) => Math.max(1, Math.round(words / 220));
 

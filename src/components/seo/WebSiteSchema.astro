@@ -1,0 +1,25 @@
+---
+/**
+ * WebSite node for the homepage: gives the site its name in search results and
+ * ties it to the Person. No SearchAction: the site has no search to point at.
+ */
+import JsonLd from "./JsonLd.astro";
+import { SITE_URL } from "@/data/config";
+import presentation from "@/data/presentation";
+import { PERSON_ID, WEBSITE_ID } from "@/utils/personSchema";
+
+const schema = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "@id": WEBSITE_ID,
+  "url": `${SITE_URL}/`,
+  "name": presentation.name,
+  "alternateName": "siddhants.com",
+  "description": presentation.description.replace(/\*/g, ""),
+  "inLanguage": "en",
+  "author": { "@id": PERSON_ID },
+  "publisher": { "@id": PERSON_ID },
+};
+---
+
+<JsonLd schema={schema} />

@@ -1,0 +1,24 @@
+---
+/**
+ * ProfilePage for /about, with the Person nested as its mainEntity (the shape
+ * Google documents for profile pages). Same @id as everywhere else, so this is
+ * the same entity the articles name as author, not a second one.
+ */
+import JsonLd from "./JsonLd.astro";
+import { SITE_URL } from "@/data/config";
+import { personSchema, WEBSITE_ID } from "@/utils/personSchema";
+
+const { "@context": _ctx, ...person } = personSchema;
+
+const schema = {
+  "@context": "https://schema.org",
+  "@type": "ProfilePage",
+  "@id": `${SITE_URL}/about/`,
+  "url": `${SITE_URL}/about/`,
+  "name": "About Siddhant Shah",
+  "isPartOf": { "@id": WEBSITE_ID },
+  "mainEntity": person,
+};
+---
+
+<JsonLd schema={schema} />
