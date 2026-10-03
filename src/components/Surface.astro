@@ -25,6 +25,10 @@
 <style>
   .surface{
     position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none;
+    /* Sized to the large viewport, not inset:0's current one. Otherwise every
+       time a mobile address bar slides in or out the canvas is reallocated and
+       the scene rescales mid-scroll, which reads as a jump or stretch. */
+    bottom:auto;height:100vh;height:100lvh;
     /* fallback that shows if WebGL never initialises */
     background:
       radial-gradient(60% 50% at 22% 28%, rgba(23,145,158,.30), transparent 70%),
@@ -39,7 +43,7 @@
 <script>
 const host = document.getElementById('surface') as HTMLElement | null;
 const cv = document.getElementById('sfc') as HTMLCanvasElement | null;
-const gl = cv?.getContext('webgl2', { antialias:false, alpha:true, powerPreference:'high-performance' });
+const gl = cv?.getContext('webgl2', { antialias:false, alpha:true, premultipliedAlpha:true, powerPreference:'high-performance' });
 
 if (host && cv && gl) {
   const VS = `#version 300 es
@@ -55,7 +59,17 @@ if (host && cv && gl) {
 
   const float PI = 3.14159265;
 
-  float hash(vec2 p){ return fract(sin(dot(p, vec2(127.1,311.7))) * 43758.5453); }
+  // Not the usual fract(sin(dot(p,k))*43758.5) one-liner. That relies on sin()
+  // staying accurate at arguments in the thousands, which only desktop GPUs do;
+  // mobile GPUs range-reduce sin cheaply, so the "noise" collapses into blocks
+  // and stripes, and every vendor draws a different pattern. This hash (Dave
+  // Hoskins, "Hash without Sine") fract()s first, so every intermediate stays
+  // small and the result is the same on every GPU.
+  float hash(vec2 p){
+    vec3 p3 = fract(vec3(p.xyx) * .1031);
+    p3 += dot(p3, p3.yzx + 33.33);
+    return fract((p3.x + p3.y) * p3.z);
+  }
   float noise(vec2 p){
     vec2 i = floor(p), f = fract(p);
     vec2 u = f*f*(3.-2.*f);
@@ -85,7 +99,16 @@ if (host && cv && gl) {
   }
 
   void main(){
-    vec2 uv = (gl_FragCoord.xy - .5*uRes) / uRes.y;
+    // Dividing by height alone fixes the vertical field of view, so the
+    // horizontal one shrinks with the aspect ratio: a portrait phone saw a
+    // quarter of the width a laptop does, zoomed into one blurred swell.
+    // Below a 4:5 aspect, hold the horizontal view instead. Landscape is unchanged.
+    vec2 uv = (gl_FragCoord.xy - .5*uRes) / min(uRes.y, uRes.x / .8);
+
+    // keepOut (below) is exactly zero above this line, so the top of the frame
+    // is always fully transparent. It used to be ray-marched and lit anyway and
+    // then multiplied by zero: roughly 40% of the GPU work, thrown away.
+    if (uv.y >= .10) { outColor = vec4(0.); return; }
 
     // camera drifts with the pointer and sinks as the page scrolls
     // camera sinks toward the surface and levels off as the page scrolls
@@ -99,6 +122,10 @@ if (host && cv && gl) {
     // march down onto the heightfield
     float t = 0., hit = 0.;
     vec3 pos = ro;
+    // The heightfield never rises above HMAX (fbm tops out at .836, so
+    // (1.4*.836 - .62)*.95 = .523). A ray above it pointing up can never hit.
+    const float HMAX = .53;
+    if (!(rd.y >= 0. && ro.y > HMAX))
     for(int i=0;i<58;i++){
       pos = ro + rd*t;
       float d = pos.y - height(pos.xz);
@@ -123,6 +150,11 @@ if (host && cv && gl) {
       // film thickness drifts with depth, so the hue travels down the page
       float thick = 300. + 240.*fbm(pos.xz*.85 + uTime*.03) + 130.*n.y + s*190.;
       vec3 film = filmColour(max(dot(n, v), 0.), thick);
+      // Real thin films pass through gold and olive bands too. Keep the blue
+      // channel from falling far below the others, so the hue stays in the
+      // peacock-to-iris family by construction instead of depending on which
+      // noise values the GPU happens to produce.
+      film.b = max(film.b, .75 * max(film.r, film.g));
 
       // pull the interference toward the peacock / azure / iris family
       vec3 peacock = vec3(.125,.557,.773);
@@ -160,9 +192,32 @@ if (host && cv && gl) {
     col *= 0.92;
     col = pow(col, vec3(.4545));                  // gamma
 
-    float a = clamp(max(max(col.r,col.g),col.b)*1.7, 0., 1.) * keepOut;
-    outColor = vec4(col, a*.92);
+    // The canvas is premultiplied-alpha, so rgb must never exceed alpha. Writing
+    // straight colour and blending it over the cleared buffer broke that wherever
+    // keepOut < 1, and browsers disagree about what an invalid premultiplied
+    // pixel looks like (overbright fringes in one, clamped in another).
+    float a = clamp(max(max(col.r,col.g),col.b)*1.7, 0., 1.) * keepOut * .92;
+    outColor = vec4(col * a, a);
   }`;
+
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)');
+
+  // Quality is resolution: canvas pixels per CSS pixel. Tier 0 is the display's
+  // native density (capped at 2x). The old ladder multiplied that by as little
+  // as 0.45, which on a 1x laptop is 45% of the screen, and it only ever went
+  // down: a 1366x768 laptop on battery ended up drawing 615x346 and stretching
+  // it. Now the scale never drops below FLOOR CSS pixels, and it can climb back.
+  const MAXDPR = 2, FLOOR = .75;
+  const TIERS = [1, .8, .65, .5];
+  let tier = 0;
+  const scaleAt = (k:number) => Math.max(FLOOR, Math.min(devicePixelRatio || 1, MAXDPR) * TIERS[k]);
+
+  // Everything that lives on the GPU. Mobile browsers drop WebGL contexts when
+  // memory is tight or the tab is backgrounded; without rebuilding this the
+  // canvas stays blank until a reload.
+  let uRes:WebGLUniformLocation|null = null, uTime:WebGLUniformLocation|null = null,
+      uMouse:WebGLUniformLocation|null = null, uScroll:WebGLUniformLocation|null = null;
+  let ready = false;
 
   const mk = (type:number, src:string) => {
     const s = gl.createShader(type)!;
@@ -172,11 +227,14 @@ if (host && cv && gl) {
     }
     return s;
   };
-  const vs = mk(gl.VERTEX_SHADER, VS), fs = mk(gl.FRAGMENT_SHADER, FS);
-
-  if (vs && fs) {
+  const setup = () => {
+    const vs = mk(gl.VERTEX_SHADER, VS), fs = mk(gl.FRAGMENT_SHADER, FS);
+    if (!vs || !fs) return false;
     const prog = gl.createProgram()!;
     gl.attachShader(prog, vs); gl.attachShader(prog, fs); gl.linkProgram(prog);
+    if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) {
+      console.error('[surface]', gl.getProgramInfoLog(prog)); return false;
+    }
     gl.useProgram(prog);
 
     const buf = gl.createBuffer();
@@ -185,80 +243,128 @@ if (host && cv && gl) {
     const loc = gl.getAttribLocation(prog, 'p');
     gl.enableVertexAttribArray(loc);
     gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
-    gl.enable(gl.BLEND);
-    gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+    // Every pixel is written each frame with premultiplied output: no blending.
+    gl.disable(gl.BLEND);
 
-    const uRes = gl.getUniformLocation(prog,'uRes');
-    const uTime = gl.getUniformLocation(prog,'uTime');
-    const uMouse = gl.getUniformLocation(prog,'uMouse');
-    const uScroll = gl.getUniformLocation(prog,'uScroll');
+    uRes = gl.getUniformLocation(prog,'uRes');
+    uTime = gl.getUniformLocation(prog,'uTime');
+    uMouse = gl.getUniformLocation(prog,'uMouse');
+    uScroll = gl.getUniformLocation(prog,'uScroll');
+    gl.viewport(0, 0, cv.width, cv.height);
+    return true;
+  };
 
-    // Raymarching is fill-rate bound. The old fixed 0.62 x capped-1.5 DPR meant
-    // rendering ~22% of the pixels of a Retina surface and upscaling — which is
-    // exactly what the visible pixelation was. Start at native and step down
-    // only if the device actually cannot hold frame rate.
-    const MAXDPR = 2;
-    const TIERS = [1, 0.78, 0.6, 0.45];
-    let tier = 0;
-    const resize = () => {
-      const dpr = Math.min(devicePixelRatio || 1, MAXDPR) * TIERS[tier];
-      const w = Math.max(1, Math.floor(host.clientWidth * dpr));
-      const h = Math.max(1, Math.floor(host.clientHeight * dpr));
-      if (cv.width !== w || cv.height !== h) { cv.width = w; cv.height = h; gl.viewport(0,0,w,h); }
-    };
-    resize();
-    addEventListener('resize', resize, { passive:true });
+  const resize = () => {
+    const k = scaleAt(tier);
+    const w = Math.max(1, Math.round(host.clientWidth * k));
+    const h = Math.max(1, Math.round(host.clientHeight * k));
+    if (cv.width !== w || cv.height !== h) {
+      cv.width = w; cv.height = h; gl.viewport(0,0,w,h);
+      cv.dataset.res = `${w}x${h}`;           // inspectable on any device
+      cv.dataset.tier = String(tier);
+      return true;
+    }
+    return false;
+  };
 
-    const reduce = matchMedia('(prefers-reduced-motion: reduce)');
-    const m = { x:0, y:0 }, target = { x:0, y:0 };
-    addEventListener('pointermove', (e) => {
-      target.x = (e.clientX / innerWidth) * 2 - 1;
-      target.y = (e.clientY / innerHeight) * 2 - 1;
-    }, { passive:true });
+  const m = { x:0, y:0 }, target = { x:0, y:0 };
+  addEventListener('pointermove', (e) => {
+    target.x = (e.clientX / innerWidth) * 2 - 1;
+    target.y = (e.clientY / innerHeight) * 2 - 1;
+  }, { passive:true });
 
-    let scroll = 0;
-    const onScroll = () => {
-      // progress through the entire page, not just the hero — the surface
-      // travels with the reader rather than scrolling away behind them
-      const max = Math.max(1, document.documentElement.scrollHeight - innerHeight);
-      scroll = Math.min(1, Math.max(0, scrollY / max));
-    };
-    onScroll();
-    addEventListener('scroll', onScroll, { passive:true });
+  let scroll = 0;
+  const onScroll = () => {
+    // progress through the entire page, not just the hero — the surface
+    // travels with the reader rather than scrolling away behind them
+    const max = Math.max(1, document.documentElement.scrollHeight - innerHeight);
+    scroll = Math.min(1, Math.max(0, scrollY / max));
+  };
+  onScroll();
+  addEventListener('scroll', onScroll, { passive:true });
 
-    let visible = true, raf = 0;
-    // it is fixed and always on screen; only a hidden tab should stop the loop
-    visible = true;
-    document.addEventListener('visibilitychange', () => { if (!document.hidden) start(); });
-
-    // rolling frame-cost measurement, so quality adapts instead of being guessed
-    let last = 0, slow = 0, samples = 0;
-    const t0 = performance.now();
-    const frame = (now:number) => {
-      raf = 0;
-      if (!visible || document.hidden) return;           // stop entirely when unseen
-      if (last) {
-        const dt = now - last;
-        if (samples++ > 12 && tier < TIERS.length - 1) {
-          if (dt > 24) slow++; else slow = Math.max(0, slow - 1);
-          if (slow > 20) { tier++; slow = 0; samples = 0; resize(); }
-        }
+  // Frame-cost measurement, so quality adapts instead of being guessed.
+  //
+  // Two things the old version got wrong. It judged single frames against 24 ms,
+  // and every 30 fps-capped browser fails that while idle: Chrome's Energy Saver
+  // on battery, iOS Low Power Mode, Windows battery saver. And a burst of jank
+  // from scrolling, page load or GC counted the same as a slow GPU.
+  //
+  // Now: take the median frame time over a window of WINDOW frames, and only
+  // call it slow below 25 fps (a 30 fps cap reads ~33 ms and passes). After a
+  // drop, wait, then probe one tier back up; if the probe is also slow, drop
+  // again and stay there for the rest of the visit.
+  const SLOW_MS = 40, WINDOW = 90, WARMUP = 30, PROBE_AFTER = 15000;
+  let raf = 0, last = 0, frames = 0, probing = false, locked = false, probeAt = 0;
+  const dts:number[] = [];
+  const setTier = (k:number) => {
+    tier = k; dts.length = 0;
+    if (resize()) console.info('[surface] quality tier', tier, cv.dataset.res);
+  };
+  const judge = (now:number) => {
+    const med = dts.sort((a, b) => a - b)[dts.length >> 1];
+    dts.length = 0;
+    if (med > SLOW_MS) {
+      if (probing) locked = true;               // the higher tier failed twice
+      probing = false;
+      if (tier < TIERS.length - 1 && scaleAt(tier + 1) < scaleAt(tier)) {
+        setTier(tier + 1); probeAt = now + PROBE_AFTER;
       }
-      last = now;
-      resize();
-      m.x += (target.x - m.x) * .045;
-      m.y += (target.y - m.y) * .045;
-      gl.uniform2f(uRes, cv.width, cv.height);
-      gl.uniform1f(uTime, (now - t0) / 1000);
-      gl.uniform2f(uMouse, m.x, m.y);
-      gl.uniform1f(uScroll, scroll);
-      gl.drawArrays(gl.TRIANGLES, 0, 3);
-      if (!reduce.matches) start();
-    };
-    function start(){ if (!raf && visible && !document.hidden) raf = requestAnimationFrame(frame); }
+    } else if (probing) {
+      probing = false; probeAt = now + PROBE_AFTER;   // held: may try higher still
+    } else if (tier > 0 && !locked && now > probeAt) {
+      probing = true; setTier(tier - 1);
+    }
+  };
+  const t0 = performance.now();
 
-    cv.classList.add('on');
-    start();
-  }
+  const draw = (now:number) => {
+    m.x += (target.x - m.x) * .045;
+    m.y += (target.y - m.y) * .045;
+    gl.uniform2f(uRes, cv.width, cv.height);
+    gl.uniform1f(uTime, (now - t0) / 1000);
+    gl.uniform2f(uMouse, m.x, m.y);
+    gl.uniform1f(uScroll, scroll);
+    gl.drawArrays(gl.TRIANGLES, 0, 3);
+  };
+
+  const frame = (now:number) => {
+    raf = 0;
+    if (!ready || document.hidden) { last = 0; return; }   // stop entirely when unseen
+    if (last) {
+      const dt = now - last;
+      // ignore stalls (tab switch, a hidden-then-shown page): not GPU cost
+      if (dt < 250 && ++frames > WARMUP) {
+        dts.push(dt);
+        if (dts.length >= WINDOW) judge(now);
+      }
+    }
+    last = now;
+    resize();
+    draw(now);
+    if (!reduce.matches) start();
+  };
+  function start(){ if (!raf && ready && !document.hidden) raf = requestAnimationFrame(frame); }
+
+  // Resizing a canvas clears it. With reduced motion there is no loop to repaint
+  // it, so the single static frame used to vanish on rotate or window resize.
+  addEventListener('resize', () => { if (resize() && reduce.matches) start(); }, { passive:true });
+  reduce.addEventListener?.('change', start);
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) start(); });
+
+  cv.addEventListener('webglcontextlost', (e) => {
+    e.preventDefault();                     // tells the browser we will restore
+    ready = false;
+    if (raf) { cancelAnimationFrame(raf); raf = 0; }
+    cv.classList.remove('on');              // fall back to the CSS gradient
+  });
+  cv.addEventListener('webglcontextrestored', () => {
+    ready = setup();
+    if (ready) { cv.classList.add('on'); last = 0; start(); }
+  });
+
+  resize();
+  ready = setup();
+  if (ready) { cv.classList.add('on'); start(); }
 }
 </script>
