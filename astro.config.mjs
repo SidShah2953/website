@@ -133,6 +133,19 @@ import mdx from "@astrojs/mdx";
 import rehypeKatex from 'rehype-katex';
 import remarkMath from 'remark-math';
 
+// KaTeX reads a comma in math as punctuation and puts a space after it, so
+// $3,193.7$ renders as "3, 193.7". Wrapping thousands separators as {,} keeps
+// them tight. Runs on the math elements just before rehype-katex, so posts can
+// keep writing numbers the natural way.
+const tightThousands = () => (tree) => {
+  const walk = (n, inMath) => {
+    const math = inMath || /\bmath-(inline|display)\b/.test(String(n.properties?.className ?? ''));
+    if (math && n.type === 'text') n.value = n.value.replace(/(\d),(?=\d{3}(?!\d))/g, '$1{,}');
+    n.children?.forEach((c) => walk(c, math));
+  };
+  walk(tree, false);
+};
+
 
 // https://astro.build/config
 export default defineConfig({
@@ -189,6 +202,7 @@ export default defineConfig({
         remarkMath,
       ], // For Latex Integration
 			rehypePlugins: [
+        tightThousands,
         rehypeKatex,
       ] // For Latex Integration
 		})],
