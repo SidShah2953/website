@@ -12,8 +12,8 @@
     // Filled in once Cloudflare Access protects the hostname: the team name
     // (<team>.cloudflareaccess.com) and the application's Audience (AUD) tag.
     // Until both are set, /api refuses every request.
-    "ACCESS_TEAM": "",
-    "ACCESS_AUD": ""
+    "ACCESS_TEAM": "damp-field-419d",
+    "ACCESS_AUD": "d75a430925b740f795c91f8cbfcc545f3bac83f3265be887e1bc720a4c894438"
   }
   // Secrets (wrangler secret put ...): GOATCOUNTER_TOKEN, KIT_API_KEY, CF_API_TOKEN
 }
