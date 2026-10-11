@@ -15,12 +15,12 @@
 
 @page {
   size: A4; margin: 17mm 17mm 19mm;
-  @bottom-right { content: counter(page) " / " counter(pages); font: 7.5pt "Schibsted Grotesk Variable", Arial, sans-serif; color: #56676C; }
+  @bottom-right { content: counter(page) " / " counter(pages); font: 7.5pt "Schibsted Grotesk", Arial, sans-serif; color: #56676C; }
 }
 /* The dark export paints the whole sheet, margins included. */
 @page dark {
   margin: 15mm 17mm 17mm; background: #050C0F;
-  @bottom-right { content: counter(page) " / " counter(pages); font: 7.5pt "Schibsted Grotesk Variable", Arial, sans-serif; color: #8CA2A6; }
+  @bottom-right { content: counter(page) " / " counter(pages); font: 7.5pt "Schibsted Grotesk", Arial, sans-serif; color: #8CA2A6; }
 }
 
 @media print {
@@ -33,6 +33,13 @@
     transition: none !important;
   }
   html, body { background: var(--ground) !important; }
+  /* Static faces, not the variable ones: see the font imports in Shell.astro.
+     Same typefaces, so the page looks the same; the PDF text stays crisp. */
+  /* html:root outranks the :root that declares these in Shell.astro */
+  html:root {
+    --serif: "Newsreader", Georgia, "Times New Roman", serif;
+    --sans: "Schibsted Grotesk", "Helvetica Neue", Arial, sans-serif;
+  }
   body { font-size: 10.5pt; line-height: 1.55; }
 
   /* Things that only make sense on a screen. The flow lines are position:fixed,
@@ -72,7 +79,7 @@
   body > footer { display: none !important; }
 
   /* Tokens Shell.astro declares as themselves, which resolve to nothing. */
-  html { --surface-3: rgba(255,255,255,.06); --code-bg: #0B151A; }
+  html:root { --surface-3: rgba(255,255,255,.06); --code-bg: #0B151A; }
 }
 
 /* ---------------------------------------------------------------- light */

@@ -55,6 +55,10 @@ try {
       }
     }, SITE);
     await page.emulateMedia({ media: 'print' });
+    // Print switches to the static faces; make sure they are in before rendering.
+    await page.evaluate(() => Promise.all(['300 1em Newsreader', 'italic 300 1em Newsreader', '400 1em Newsreader',
+      '600 1em Newsreader', '700 1em Newsreader', '400 1em "Schibsted Grotesk"', '500 1em "Schibsted Grotesk"',
+      '600 1em "Schibsted Grotesk"'].map((f) => document.fonts.load(f))));
     await page.evaluate(() => document.fonts.ready);
     // print-only images (the video poster) were display:none until now
     await page.evaluate(() => Promise.all([...document.images].map((i) => i.complete ? 0 : new Promise((r) => { i.onload = i.onerror = r; }))));

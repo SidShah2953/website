@@ -40,7 +40,7 @@ const watchText = watchUrl.replace(/^https?:\/\//, "");
   <a class="print-alt" href={watchUrl}>
     <img class="print-poster" src={poster} alt="" loading="eager" />
     <span class="print-card">
-      <span class="print-glyph" aria-hidden="true">&#9654;</span>
+      <span class="print-glyph" aria-hidden="true"><svg viewBox="0 0 10 10" width="8" height="8"><path d="M3 1.8v6.4L8.4 5z" fill="currentColor"/></svg></span>
       <span class="print-text">Video. Watch it at <span class="print-url">{watchText}</span></span>
     </span>
   </a>
@@ -79,7 +79,7 @@ const watchText = watchUrl.replace(/^https?:\/\//, "");
     .print-card{ display:flex; align-items:center; gap:10px; margin-top:8px;
       font-family:var(--sans); font-size:9.5pt; color:var(--text-2); }
     .print-glyph{ display:inline-grid; place-items:center; width:22px; height:22px; border-radius:50%;
-      border:1px solid var(--peacock); color:var(--peacock); font-size:8px; padding-left:2px; }
+      border:1px solid var(--peacock); color:var(--peacock); padding-left:1px; }
     .print-url{ color:var(--glow); }
     /* Light print: no dark frame on white paper, just the card in a box. */
     :global(html:not([data-print="dark"])) .print-poster{ display:none; }

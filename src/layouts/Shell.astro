@@ -6,6 +6,19 @@ import type { HeadTags } from "@/utils/types/HeadTags";
 // Self-hosted variable fonts — no third-party request, one file per family.
 import "@fontsource-variable/newsreader";
 import "@fontsource-variable/schibsted-grotesk";
+// Static instances of the same two faces, for print and PDF only. Chrome embeds
+// a *variable* font in a PDF as Type 3 glyphs, which every viewer renders soft
+// and blotchy; static fonts embed as ordinary TrueType. Declaring them costs no
+// download on screen: a browser only fetches a face something actually uses.
+import "@fontsource/newsreader/300.css";
+import "@fontsource/newsreader/300-italic.css";
+import "@fontsource/newsreader/400.css";
+import "@fontsource/newsreader/400-italic.css";
+import "@fontsource/newsreader/600.css";
+import "@fontsource/newsreader/700.css";
+import "@fontsource/schibsted-grotesk/400.css";
+import "@fontsource/schibsted-grotesk/500.css";
+import "@fontsource/schibsted-grotesk/600.css";
 // Print and PDF export: light by default, dark for "Export" (html[data-print="dark"]).
 import "@/styles/print.css";
 export type Props = HeadTags & {

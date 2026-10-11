@@ -323,7 +323,13 @@ const lift = ([r, g, b]: [number, number, number], k = 0.3): string =>
       root.dataset.print = btn.dataset.mode;
       const reset = () => { delete root.dataset.print; removeEventListener('afterprint', reset); };
       addEventListener('afterprint', reset);
-      window.print();
+      // The print stylesheet switches to static fonts (crisp in PDFs). Fetch
+      // them first, or the dialog snapshots the page with a fallback face.
+      const faces = ['300 1em Newsreader', 'italic 300 1em Newsreader', '400 1em Newsreader',
+        '600 1em Newsreader', '700 1em Newsreader', '400 1em "Schibsted Grotesk"',
+        '500 1em "Schibsted Grotesk"', '600 1em "Schibsted Grotesk"'];
+      Promise.all(faces.map((f) => document.fonts.load(f).catch(() => null)))
+        .finally(() => window.print());
     });
   }
 
