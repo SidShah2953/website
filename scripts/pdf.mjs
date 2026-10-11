@@ -54,9 +54,12 @@ async function sitePages() {
  * What the PDF depends on. Astro emits the per-component <style> blocks in an
  * order that varies between builds, so they are sorted before hashing; the
  * Export/Print links are dropped, since they point at the PDFs themselves.
- * Every local file the page loads is hashed by content (images under public/
- * keep their names when they change; built assets have hashed names anyway).
+ * Every local file that shapes the render is hashed by content (images under
+ * public/ keep their names when they change). Only render inputs count: the
+ * <head> also links the RSS feed and llms.txt, which list every post, so
+ * hashing those would re-render every PDF whenever any post changed.
  */
+const RENDER_INPUTS = new Set(['.css', '.js', '.mjs', '.png', '.jpg', '.jpeg', '.webp', '.avif', '.gif', '.svg', '.woff', '.woff2']);
 async function fingerprint(path, self) {
   let html = await readFile(join(DIST, path, 'index.html'), 'utf8');
   const styles = [];
@@ -68,7 +71,7 @@ async function fingerprint(path, self) {
   for (const m of html.matchAll(/srcset="([^"]+)"/g))
     for (const part of m[1].split(',')) { const u = part.trim().split(/\s+/)[0]; if (u.startsWith('/')) refs.add(u); }
   for (const u of [...refs].sort()) {
-    if (u.startsWith('//') || u.startsWith('/pdf/') || !extname(u) || extname(u) === '.html') continue;
+    if (u.startsWith('//') || !RENDER_INPUTS.has(extname(u).toLowerCase())) continue;
     const f = join(DIST, decodeURIComponent(u));
     if (existsSync(f)) h.update(u).update(await readFile(f));
   }
