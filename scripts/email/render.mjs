@@ -63,6 +63,16 @@ export const videoMeta = (root, videoPath) => {
   return { dir: '/' + dir, duration: meta.duration ?? null };
 };
 
+/** utm_source=newsletter, utm_medium=email, utm_campaign=<slug>. */
+export const withUtm = (url) => {
+  const u = new URL(url);
+  const slug = u.pathname.replace(/\/$/, '').split('/').pop() || 'home';
+  u.searchParams.set('utm_source', 'newsletter');
+  u.searchParams.set('utm_medium', 'email');
+  u.searchParams.set('utm_campaign', slug);
+  return u.toString();
+};
+
 /**
  * @param {object} p
  * @param {'post'|'note'} p.kind
@@ -73,7 +83,11 @@ export const videoMeta = (root, videoPath) => {
  * @param {number} [p.minutes]
  * @param {{dir:string,duration:number|null}|null} [p.video]
  */
-export const renderContent = (p) => {
+export const renderContent = (input) => {
+  // Every link back to the site carries UTM tags, so each email's traffic
+  // shows up as its own source on the readership dashboard (GoatCounter reads
+  // utm_source as the referrer, utm_campaign as the campaign).
+  const p = { ...input, url: withUtm(input.url) };
   const pad = 'padding-left:44px;padding-right:44px;';
   const rows = [];
 
@@ -110,7 +124,7 @@ export const renderContent = (p) => {
   }
 
   if (p.video) {
-    const watch = `${p.url}#video`;
+    const watch = `${p.url}#video`;   // p.url already carries the UTM tags
     const dur = p.video.duration ? `in ${mmss(p.video.duration)}` : 'as a short video';
     rows.push(`<tr><td class="px" style="${pad}padding-top:34px;">
       <a href="${watch}" target="_blank" style="display:block;text-decoration:none;">

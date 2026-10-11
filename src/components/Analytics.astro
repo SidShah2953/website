@@ -20,3 +20,18 @@ const CF_TOKEN = "e709a605fa1c4a3895e2987e5a9ca9c6";
       data-cf-beacon={`{"token": "${CF_TOKEN}"}`}></script>
   </>
 )}
+
+<script>
+  // Outbound clicks, site-wide: out/<hostname>. Which sources readers follow.
+  import { track } from '@/scripts/track';
+  addEventListener('click', (e) => {
+    const a = (e.target as HTMLElement | null)?.closest?.('a[href]') as HTMLAnchorElement | null;
+    if (!a) return;
+    try {
+      const u = new URL(a.href, location.href);
+      if (/^https?:$/.test(u.protocol) && u.hostname.replace(/^www\./, '') !== location.hostname.replace(/^www\./, '')) {
+        track('out', `/${u.hostname.replace(/^www\./, '')}`);
+      }
+    } catch {}
+  }, { capture: true });
+</script>

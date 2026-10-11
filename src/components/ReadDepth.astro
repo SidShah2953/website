@@ -6,11 +6,17 @@
  * article body a visitor actually got, and — more usefully — how many of them
  * plausibly *read* it rather than scrolling to the bottom in three seconds.
  *
- * Two kinds of event are sent, both keyed by pathname so depth is per article:
+ * Three kinds of event are sent, all keyed by pathname so they are per article
+ * (helper and naming: src/scripts/track.ts):
  *
  *   depth-25|50|75|100<path>   the scroll funnel, each fired at most once
  *   read<path>                 a qualified read: reached >=90% of the body AND
  *                              stayed long enough to have read it
+ *   time-15s|30s|1m|2m|5m|10m|20m<path>
+ *                              engaged time, the clock running only while the
+ *                              tab is visible and the reader has scrolled,
+ *                              moved, touched or typed in the last 30 seconds.
+ *                              A tab left open in the background does not count.
  *
  * The qualifying dwell is 35% of the estimated reading time. A 3,000-word piece
  * (~14 min at 220wpm) needs ~4:47 before it counts. That threshold is
@@ -37,28 +43,15 @@ const dwellNeeded = Math.max(15, Math.round(((words / WPM) * 60) * QUALIFY));
 <div data-readdepth data-target={target} data-dwell={dwellNeeded} hidden></div>
 
 <script>
+  import { track } from '@/scripts/track';
+
   const el = document.querySelector<HTMLElement>('[data-readdepth]');
   const body = el && document.querySelector<HTMLElement>(el.dataset.target || '#prose');
 
-  // No body, or the visitor asked not to be measured — do nothing at all.
-  if (el && body && !navigator.doNotTrack?.match(/^1|yes$/i)) {
+  if (el && body) {
     const dwellNeeded = Number(el.dataset.dwell) || 15;
-    const path = location.pathname.replace(/\/$/, '') || '/';
     const start = Date.now();
-    const sent = new Set<string>();
     let deepest = 0;
-
-    const send = (name: string) => {
-      if (sent.has(name)) return;
-      // count.js is loaded async, so a fast scroller can cross a milestone
-      // before it exists. Only mark the event as sent once it has actually
-      // been handed over — otherwise the next measure() retries it, rather
-      // than the event being silently swallowed.
-      const count = (window as any).goatcounter?.count;
-      if (typeof count !== 'function') return;
-      sent.add(name);
-      count({ path: `${name}${path}`, event: true });
-    };
 
     const measure = () => {
       const box = body.getBoundingClientRect();
@@ -70,9 +63,9 @@ const dwellNeeded = Math.max(15, Math.round(((words / WPM) * 60) * QUALIFY));
       const pct = Math.round(seen * 100);
       if (pct > deepest) deepest = pct;
 
-      for (const m of [25, 50, 75, 100]) if (deepest >= m) send(`depth-${m}`);
+      for (const m of [25, 50, 75, 100]) if (deepest >= m) track(`depth-${m}`);
 
-      if (deepest >= 90 && (Date.now() - start) / 1000 >= dwellNeeded) send('read');
+      if (deepest >= 90 && (Date.now() - start) / 1000 >= dwellNeeded) track('read');
     };
 
     let queued = false;
@@ -89,5 +82,22 @@ const dwellNeeded = Math.max(15, Math.round(((words / WPM) * 60) * QUALIFY));
     addEventListener('visibilitychange', () => { if (document.hidden) measure(); });
     addEventListener('pagehide', measure);
     measure();
+
+    // Engaged time: one tick a second while the tab is visible and the
+    // reader did something in the last 30 seconds. Reading is mostly still,
+    // so 30s of grace covers a long paragraph without counting an idle tab.
+    const MARKS: [number, string][] = [[15, '15s'], [30, '30s'], [60, '1m'], [120, '2m'], [300, '5m'], [600, '10m'], [1200, '20m']];
+    let engaged = 0;
+    let lastActive = Date.now();
+    const active = () => { lastActive = Date.now(); };
+    for (const ev of ['scroll', 'pointermove', 'pointerdown', 'keydown', 'touchstart', 'wheel']) {
+      addEventListener(ev, active, { passive: true });
+    }
+    const timer = setInterval(() => {
+      if (document.hidden || Date.now() - lastActive > 30000) return;
+      engaged++;
+      for (const [t, label] of MARKS) if (engaged === t) track(`time-${label}`);
+      if (engaged >= MARKS[MARKS.length - 1][0]) clearInterval(timer);
+    }, 1000);
   }
 </script>

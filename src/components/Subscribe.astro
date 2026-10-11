@@ -12,6 +12,12 @@
  *
  * Works without JavaScript: the plain form POST lands on Kit's own confirmation
  * page. With JavaScript it posts in the background and confirms inline.
+ *
+ * Attribution: the hidden `referrer` field carries the page URL (with any UTM
+ * tags) to Kit, which stores it on the subscriber, so each signup records the
+ * post it came from. Two anonymous events go to GoatCounter for the funnel:
+ * signup-seen<path> when the form scrolls into view, subscribe<path> on a
+ * successful signup (src/scripts/track.ts).
  */
 // The Kit form endpoint is not a secret — it ships in this page's HTML as the
 // form action, and anyone can read it with View Source. Holding it in an env
@@ -41,6 +47,7 @@ if (ready && !/\/forms\/[^/]+\/subscriptions\/?$/.test(action)) {
         <label class="sr" for="sub-email">Email address</label>
         <input id="sub-email" type="email" name="email_address" required
           placeholder="you@example.com" autocomplete="email" />
+        <input type="hidden" name="referrer" value="" data-referrer />
         <button type="submit">Subscribe</button>
       </form>
       <p class="status" data-status role="status" aria-live="polite" hidden></p>
@@ -86,10 +93,20 @@ if (ready && !/\/forms\/[^/]+\/subscriptions\/?$/.test(action)) {
 </style>
 
 <script>
+  import { track } from '@/scripts/track';
+
   for (const root of document.querySelectorAll<HTMLElement>('[data-subscribe]')) {
     const form = root.querySelector<HTMLFormElement>('[data-form]');
     const status = root.querySelector<HTMLElement>('[data-status]');
     if (!form || !status) continue;
+
+    const ref = form.querySelector<HTMLInputElement>('[data-referrer]');
+    if (ref) ref.value = location.href;
+
+    // The form was actually on screen: the denominator for signup rate.
+    new IntersectionObserver((entries, obs) => {
+      if (entries.some((e) => e.isIntersecting)) { track('signup-seen'); obs.disconnect(); }
+    }, { threshold: 0.6 }).observe(form);
 
     form.addEventListener('submit', async (e) => {
       const btn = form.querySelector('button')!;
@@ -114,11 +131,14 @@ if (ready && !/\/forms\/[^/]+\/subscriptions\/?$/.test(action)) {
         });
         if (!res.ok) throw new Error(String(res.status));
         form.reset();
+        if (ref) ref.value = location.href;
+        track('subscribe');
         status.textContent = 'Thanks. Check your inbox to confirm.';
         status.hidden = false;
       } catch {
         // Network or CORS failure — let the browser post it the ordinary way.
         // form.submit() does not fire a submit event, so this cannot recurse.
+        track('subscribe');
         form.submit();
       } finally {
         btn.disabled = false;

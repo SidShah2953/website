@@ -100,8 +100,8 @@ const lift = ([r, g, b]: [number, number, number], k = 0.3): string =>
            (scripts/pdf.mjs --site). Export is the site's dark design; Print is
            the light, paper version, opened in a tab to print from. */
         <span class="tools" data-tools>
-          <a href={`/pdf/${pdfName}-dark.pdf`} download={`${fileTitle} (dark).pdf`} title="Download the PDF, as it looks on the site">Export</a>
-          <a href={`/pdf/${pdfName}.pdf`} target="_blank" rel="noopener" title="Print-friendly, light PDF">Print</a>
+          <a href={`/pdf/${pdfName}-dark.pdf`} download={`${fileTitle} (dark).pdf`} title="Download the PDF, as it looks on the site" data-track="pdf-dark">Export</a>
+          <a href={`/pdf/${pdfName}.pdf`} target="_blank" rel="noopener" title="Print-friendly, light PDF" data-track="pdf-print">Print</a>
         </span>
       )}
       {entry.data.publication && <span>{entry.data.publication}</span>}
@@ -316,6 +316,11 @@ const lift = ([r, g, b]: [number, number, number], k = 0.3): string =>
 </style>
 
 <script>
+  import { track } from '@/scripts/track';
+  for (const a of document.querySelectorAll<HTMLElement>('[data-track]')) {
+    a.addEventListener('click', () => track(a.dataset.track!));
+  }
+
   // Build the table of contents from the rendered headings.
   const prose = document.getElementById('prose');
   const nav = document.getElementById('tocNav');

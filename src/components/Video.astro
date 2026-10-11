@@ -95,8 +95,14 @@ const watchText = watchUrl.replace(/^https?:\/\//, "");
 </style>
 
 <script>
+  import { track } from '@/scripts/track';
+
   for (const fig of document.querySelectorAll<HTMLElement>('[data-video]')) {
     const v = fig.querySelector('video')!;
+    // Anonymous, once per page view: started, got halfway, finished.
+    v.addEventListener('play', () => track('video-play'));
+    v.addEventListener('timeupdate', () => { if (v.duration && v.currentTime / v.duration >= 0.5) track('video-50'); });
+    v.addEventListener('ended', () => track('video-complete'));
     const btn = fig.querySelector<HTMLButtonElement>('.play')!;
     // Only take over the controls once the replacement button is in place.
     v.controls = false;
