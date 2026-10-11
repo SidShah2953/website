@@ -139,7 +139,7 @@ function lineChart(el, series) {
   const levels = Number.isInteger(nice / 2) ? [0, nice / 2, nice] : [0, nice];
   const ticks = levels.map((v) => `<line x1="${pad.l}" x2="${W - pad.r}" y1="${y(v)}" y2="${y(v)}"/>`).join('');
   const ylab = levels.map((v) => `<text x="${pad.l - 8}" y="${y(v) + 4}" text-anchor="end">${fmt.format(v)}</text>`).join('');
-  const every = Math.max(1, Math.ceil(n / 6));
+  const every = Math.max(1, Math.ceil(n / (W < 520 ? 3 : 6)));
   const xlab = series[0].points.map((p, i) => (i % every === 0 || i === n - 1) && !(i !== n - 1 && n - 1 - i < every / 2)
     ? `<text x="${x(i)}" y="${H - 6}" text-anchor="${i === 0 ? 'start' : i === n - 1 ? 'end' : 'middle'}">${dayLabel(p[0])}</text>` : '').join('');
 

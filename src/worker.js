@@ -22,6 +22,7 @@ const CF = 'https://api.cloudflare.com/client/v4';
 const SITE_HOST = 'siddhants.com';
 const CACHE_SECONDS = 600;
 const RANGES = new Set([7, 30, 90, 365]);
+const SIZE_NAMES = { phone: 'Phone', largephone: 'Large phone', tablet: 'Tablet', desktop: 'Desktop', desktophd: 'Large desktop', unknown: 'Unknown' };
 
 export default {
   async fetch(req, env, ctx) {
@@ -78,22 +79,29 @@ async function withViewer(res, who) {
 
 async function goatCounter(env, start, end, prevStart, prevEnd) {
   if (!env.GOATCOUNTER_TOKEN) throw new Error('GOATCOUNTER_TOKEN is not set');
+  // GoatCounter allows only a few requests a second: call it one at a time,
+  // and when it says "try again in N ms", wait and retry.
   const get = async (path, params) => {
-    const r = await fetch(`${GC}${path}?${new URLSearchParams(params)}`, {
-      headers: { Authorization: `Bearer ${env.GOATCOUNTER_TOKEN}`, 'Content-Type': 'application/json' },
-    });
-    if (!r.ok) throw new Error(`GoatCounter ${path}: ${r.status} ${(await r.text()).slice(0, 160)}`);
-    return r.json();
+    for (let attempt = 0; ; attempt++) {
+      const r = await fetch(`${GC}${path}?${new URLSearchParams(params)}`, {
+        headers: { Authorization: `Bearer ${env.GOATCOUNTER_TOKEN}`, 'Content-Type': 'application/json' },
+      });
+      if (r.status === 429 && attempt < 4) {
+        const ms = Number((await r.text()).match(/([\d.]+)ms/)?.[1] || 1000);
+        await new Promise((ok) => setTimeout(ok, Math.min(ms + 100, 3000)));
+        continue;
+      }
+      if (!r.ok) throw new Error(`GoatCounter ${path}: ${r.status} ${(await r.text()).slice(0, 160)}`);
+      return r.json();
+    }
   };
   const range = { start, end };
 
-  const [total, prev, refs, locations, sizes] = await Promise.all([
-    get('/stats/total', range),
-    get('/stats/total', { start: prevStart, end: prevEnd }),
-    get('/stats/toprefs', { ...range, limit: 12 }),
-    get('/stats/locations', { ...range, limit: 12 }),
-    get('/stats/sizes', { ...range, limit: 6 }),
-  ]);
+  const total = await get('/stats/total', range);
+  const prev = await get('/stats/total', { start: prevStart, end: prevEnd });
+  const refs = await get('/stats/toprefs', { ...range, limit: 12 });
+  const locations = await get('/stats/locations', { ...range, limit: 12 });
+  const sizes = await get('/stats/sizes', { ...range, limit: 6 });
 
   // Every path, pages and events alike; paged because the API caps a page.
   const hits = [];
@@ -131,7 +139,7 @@ async function goatCounter(env, start, end, prevStart, prevEnd) {
     posts: [...posts.values()].filter((p) => p.visits || p.reads).sort((a, b) => b.visits - a.visits),
     referrers: (refs.stats || []).map((s) => ({ name: s.name || '(direct or unknown)', count: s.count })),
     countries: (locations.stats || []).map((s) => ({ name: s.name || s.id || 'Unknown', count: s.count })),
-    devices: (sizes.stats || []).map((s) => ({ name: s.name || s.id || 'Unknown', count: s.count })),
+    devices: (sizes.stats || []).filter((s) => s.count).map((s) => ({ name: SIZE_NAMES[s.id] || s.name || s.id || 'Unknown', count: s.count })),
   };
 }
 
@@ -185,14 +193,23 @@ async function cloudflareStats(env, start, end, prevStart, prevEnd) {
   if (!env.CF_API_TOKEN) throw new Error('CF_API_TOKEN is not set');
   const auth = { Authorization: `Bearer ${env.CF_API_TOKEN}`, 'Content-Type': 'application/json' };
 
+  const gql = async (query, variables) => {
+    const r = await fetch(`${CF}/graphql`, { method: 'POST', headers: auth, body: JSON.stringify({ query, variables }) });
+    const j = await r.json();
+    if (j.errors?.length) throw new Error(`Cloudflare GraphQL: ${j.errors[0].message}`);
+    return j.data.viewer.accounts[0];
+  };
+
+  // The site has two Web Analytics tags (the beacon, and Pages' own automatic
+  // one). Use whichever recorded the most visits to siddhants.com, unless
+  // CF_SITE_TAG pins one.
   let siteTag = env.CF_SITE_TAG;
   if (!siteTag) {
-    const r = await fetch(`${CF}/accounts/${env.CF_ACCOUNT_ID}/rum/site_info/list?per_page=50`, { headers: auth });
-    const j = await r.json();
-    if (!j.success) throw new Error(`Cloudflare site list: ${JSON.stringify(j.errors).slice(0, 160)}`);
-    siteTag = (j.result || []).find((s) => s.ruleset?.zone_name === SITE_HOST || s.host === SITE_HOST)?.site_tag
-      ?? (j.result || [])[0]?.site_tag;
-    if (!siteTag) throw new Error('No Web Analytics site found for siddhants.com');
+    const a = await gql(`query($acct: string!, $s: Date!, $e: Date!) { viewer { accounts(filter: { accountTag: $acct }) {
+      rumPageloadEventsAdaptiveGroups(limit: 5, filter: { date_geq: $s, date_leq: $e, requestHost_in: ["${SITE_HOST}", "www.${SITE_HOST}"] }, orderBy: [sum_visits_DESC]) {
+        sum { visits } dimensions { siteTag } } } } }`, { acct: env.CF_ACCOUNT_ID, s: prevStart, e: end });
+    siteTag = a.rumPageloadEventsAdaptiveGroups[0]?.dimensions.siteTag;
+    if (!siteTag) throw new Error('No Web Analytics data for siddhants.com in this range');
   }
 
   const query = `query($acct: string!, $site: string!, $s: Date!, $e: Date!, $ps: Date!, $pe: Date!) {
@@ -204,13 +221,7 @@ async function cloudflareStats(env, start, end, prevStart, prevEnd) {
       paths: rumPageloadEventsAdaptiveGroups(limit: 15, filter: { siteTag: $site, date_geq: $s, date_leq: $e, bot: 0 }, orderBy: [sum_visits_DESC]) {
         count sum { visits } dimensions { requestPath } }
     } } }`;
-  const r = await fetch(`${CF}/graphql`, {
-    method: 'POST', headers: auth,
-    body: JSON.stringify({ query, variables: { acct: env.CF_ACCOUNT_ID, site: siteTag, s: start, e: end, ps: prevStart, pe: prevEnd } }),
-  });
-  const j = await r.json();
-  if (j.errors?.length) throw new Error(`Cloudflare GraphQL: ${j.errors[0].message}`);
-  const a = j.data.viewer.accounts[0];
+  const a = await gql(query, { acct: env.CF_ACCOUNT_ID, site: siteTag, s: start, e: end, ps: prevStart, pe: prevEnd });
   const daily = a.daily.map((d) => ({ day: d.dimensions.date, visits: d.sum.visits, pageviews: d.count }));
   return {
     visits: daily.reduce((n, d) => n + d.visits, 0),
