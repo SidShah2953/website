@@ -33,6 +33,11 @@ interface Props {
 }
 const { type, entry, Content, seriesArticles, parentSeries, prevArticle, nextArticle, seriesName } = Astro.props;
 
+// PDF names follow the page path under /blog/, with / as -. Must match
+// pdfName() in scripts/pdf.mjs.
+const pdfName = Astro.url.pathname.replace(/^\/blog\/|\/$/g, "").replaceAll("/", "-");
+const fileTitle = entry.data.title.replace(/[\\/:*?"<>|]/g, "").trim();
+
 // A sub-article should say what it is part of, at the top, whether or not the
 // series happens to have a home page.
 const partOf = seriesName ?? parentSeries?.data.title;
@@ -91,12 +96,12 @@ const lift = ([r, g, b]: [number, number, number], k = 0.3): string =>
       {entry.data.updatedAt && <span>Updated <time datetime={entry.data.updatedAt.toISOString()}>{fmtDate(entry.data.updatedAt)}</time></span>}
       <span>{readingMinutes(words)} min</span>
       {type === "blog" && (
-        /* Both run the browser's print. Export keeps the site's dark design
-           (html[data-print="dark"]); Print uses the light, paper stylesheet.
-           Hidden until the script below wires them, so no dead buttons. */
-        <span class="tools" data-tools hidden>
-          <button type="button" data-mode="dark" title="Save as PDF, as it looks on the site">Export</button>
-          <button type="button" data-mode="light" title="Print-friendly, light version">Print</button>
+        /* Pre-generated PDFs in public/pdf/, refreshed by the pre-commit hook
+           (scripts/pdf.mjs --site). Export is the site's dark design; Print is
+           the light, paper version, opened in a tab to print from. */
+        <span class="tools" data-tools>
+          <a href={`/pdf/${pdfName}-dark.pdf`} download={`${fileTitle} (dark).pdf`} title="Download the PDF, as it looks on the site">Export</a>
+          <a href={`/pdf/${pdfName}.pdf`} target="_blank" rel="noopener" title="Print-friendly, light PDF">Print</a>
         </span>
       )}
       {entry.data.publication && <span>{entry.data.publication}</span>}
@@ -222,13 +227,12 @@ const lift = ([r, g, b]: [number, number, number], k = 0.3): string =>
   .meta a{ color:inherit;text-decoration:none;transition:color .25s; }
   .meta a:hover{ color:var(--glow); }
   .tools{ display:inline-flex;gap:clamp(10px,1.6vw,16px); }
-  .tools[hidden]{ display:none; }
-  .tools button{
+  .tools a{
     all:unset;cursor:pointer;color:var(--text-3);font:inherit;
     border-bottom:1px solid var(--rule-strong);padding-bottom:1px;transition:color .25s,border-color .25s;
   }
-  .tools button:hover{ color:var(--glow);border-color:var(--glow-line); }
-  .tools button:focus-visible{ outline:2px solid var(--glow);outline-offset:3px;border-radius:2px; }
+  .meta .tools a:hover{ color:var(--glow);border-color:var(--glow-line); }
+  .tools a:focus-visible{ outline:2px solid var(--glow);outline-offset:3px;border-radius:2px; }
   .print-mast{ display:none; }
   .themes{ display:flex;flex-wrap:wrap;gap:8px;margin:0; }
   .themes a{
@@ -312,27 +316,6 @@ const lift = ([r, g, b]: [number, number, number], k = 0.3): string =>
 </style>
 
 <script>
-  // Export (dark, as on the site) and Print (light). Same print pipeline,
-  // different stylesheet branch; see src/styles/print.css.
-  for (const tools of document.querySelectorAll<HTMLElement>('[data-tools]')) {
-    tools.hidden = false;
-    tools.addEventListener('click', (e) => {
-      const btn = (e.target as HTMLElement).closest<HTMLButtonElement>('button[data-mode]');
-      if (!btn) return;
-      const root = document.documentElement;
-      root.dataset.print = btn.dataset.mode;
-      const reset = () => { delete root.dataset.print; removeEventListener('afterprint', reset); };
-      addEventListener('afterprint', reset);
-      // The print stylesheet switches to static fonts (crisp in PDFs). Fetch
-      // them first, or the dialog snapshots the page with a fallback face.
-      const faces = ['300 1em Newsreader', 'italic 300 1em Newsreader', '400 1em Newsreader',
-        '600 1em Newsreader', '700 1em Newsreader', '400 1em "Schibsted Grotesk"',
-        '500 1em "Schibsted Grotesk"', '600 1em "Schibsted Grotesk"'];
-      Promise.all(faces.map((f) => document.fonts.load(f).catch(() => null)))
-        .finally(() => window.print());
-    });
-  }
-
   // Build the table of contents from the rendered headings.
   const prose = document.getElementById('prose');
   const nav = document.getElementById('tocNav');

@@ -14,7 +14,9 @@
     "newsletter:dry": "node scripts/newsletter.mjs --dry-run",
     "check:links": "node scripts/checks/links.mjs",
     "favicon": "node scripts/favicon.mjs",
-    "pdf": "node scripts/pdf.mjs"
+    "pdf": "node scripts/pdf.mjs",
+    "prepare": "git config core.hooksPath .githooks 2>/dev/null || true",
+    "pdf:site": "node scripts/pdf.mjs --site"
   },
   "dependencies": {
     "@astrojs/mdx": "^4.3.14",

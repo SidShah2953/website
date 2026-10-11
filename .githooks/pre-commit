@@ -1,0 +1,35 @@
+#!/bin/sh
+# Keeps public/pdf/ (the files behind each post's Export and Print links) in
+# step with the site. On main only: rebuilds, re-renders the PDFs whose page
+# changed (scripts/pdf.mjs --site), and adds them to this same commit.
+#
+# Skip once with:  SKIP_PDF=1 git commit ...
+# Installed by `npm install` (the prepare script sets core.hooksPath).
+
+[ "$SKIP_PDF" = 1 ] && exit 0
+[ "$(git symbolic-ref --short HEAD 2>/dev/null)" = main ] || exit 0
+
+# Nothing staged that could change a page: done.
+git diff --cached --name-only | grep -qvE '^(public/pdf/|\.githooks/|\.github/|CLAUDE\.md$|README\.md$)' || exit 0
+
+# The PDFs are rendered from the working tree, so it must match what is being
+# committed, or they would show changes that are not in the commit.
+dirty=$( { git diff --name-only; git ls-files --others --exclude-standard; } \
+  | grep -E '^(src/|public/|astro\.config\.mjs$|package(-lock)?\.json$|scripts/pdf\.mjs$)' | grep -v '^public/pdf/')
+if [ -n "$dirty" ]; then
+  echo "pre-commit: these site files have changes that are not staged:" >&2
+  echo "$dirty" | sed 's/^/  /' >&2
+  echo "Stage them, stash them, or commit with SKIP_PDF=1 to skip the PDFs." >&2
+  exit 1
+fi
+
+echo "pre-commit: building the site for the PDFs..."
+log=$(mktemp)
+if ! npm run -s build >"$log" 2>&1; then
+  tail -30 "$log" >&2; rm -f "$log"
+  echo "pre-commit: build failed, commit stopped." >&2
+  exit 1
+fi
+rm -f "$log"
+node scripts/pdf.mjs --site || { echo "pre-commit: PDF render failed, commit stopped." >&2; exit 1; }
+git add -A public/pdf

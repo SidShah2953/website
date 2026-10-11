@@ -51,11 +51,21 @@ Consequences that have already caused real bugs:
 ## Print and PDF
 
 Blog posts carry **Export** (dark, as on screen) and **Print** (light, paper)
-buttons. Both use the browser's print; `src/styles/print.css` does the work,
-switching on `html[data-print="dark"]`. Figures are inline SVG/HTML drawn
-against the `--fig-*` tokens in `Shell.astro`, so they restyle with the page:
-**never hard-code a colour in a figure**, add a token instead. Render PDFs with
-`node scripts/pdf.mjs <slug>` after a build (writes `.pdf/`).
+links to pre-generated PDFs in `public/pdf/` (`<name>-dark.pdf`, `<name>.pdf`,
+where name is the path under /blog/ with / as -). `src/styles/print.css` does
+the styling, switching on `html[data-print="dark"]`; Ctrl+P on any page uses it
+too. Figures are inline SVG/HTML drawn against the `--fig-*` tokens in
+`Shell.astro`, so they restyle with the page: **never hard-code a colour in a
+figure**, add a token instead.
+
+The PDFs are made on this Mac, never in CI: `.githooks/pre-commit` (installed
+by `npm install` via `prepare`) runs on commits to main, builds, runs
+`node scripts/pdf.mjs --site`, and adds `public/pdf/` to the same commit. Only
+posts whose fingerprint changed (`public/pdf/manifest.json`) re-render, and
+PDFs of removed posts are deleted. The hook refuses to run with unstaged site
+changes, since the PDFs would not match the commit. `SKIP_PDF=1 git commit`
+skips it; `--force` re-renders all. One-off render: `node scripts/pdf.mjs
+<slug>` (writes `.pdf/`). The link check fails if a post's PDF is missing.
 
 ## Gotchas paid for already
 
