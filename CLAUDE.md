@@ -3,6 +3,11 @@
 Personal writing site. This is the primary professional identity online, not a
 side project — design quality is a feature.
 
+The owner-facing reference (what runs automatically, the publish / update /
+takedown / republish workflows, settings and secrets) is in the Obsidian vault
+at `Projects/Website/Website.md`; drafts live in `Projects/Website/Blog/`.
+Keep that note in step when a workflow here changes.
+
 ## Stack
 
 - **Astro 5**, `output: 'static'`. No SSR, no adapter, no React, no Tailwind.

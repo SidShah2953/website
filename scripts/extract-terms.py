@@ -1,5 +1,5 @@
 import re, os, glob, json, math, collections, sys
-ROOT = "/Users/sidshah/Library/Mobile Documents/iCloud~md~obsidian/Documents/Personal/Projects/Website/src/content"
+ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "src", "content")
 
 # WEIGHTED theme membership. Binary fin/da made 27% of terms an identical
 # 50/50 blend; weights reflect what each piece is actually *about*.
