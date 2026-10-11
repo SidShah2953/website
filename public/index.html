@@ -29,7 +29,7 @@
         <button role="tab" data-days="90">90 days</button>
         <button role="tab" data-days="365">1 year</button>
       </div>
-      <button class="refresh" id="refresh" title="Fetch fresh numbers (skips the 10-minute cache)">Refresh</button>
+      <button class="refresh" id="sync" title="Pull the latest from GoatCounter, Kit and Cloudflare now (it also runs on its own every 30 minutes)">Sync now</button>
     </div>
   </section>
   <p class="status" id="status">Loading...</p>
@@ -37,19 +37,45 @@
   <section class="tiles" id="tiles"></section>
 
   <section class="card">
+    <div class="card-h"><h2>Funnel</h2><p class="note">Every visitor in the range, then how many went further. Percentages are of visitors; the small figure is the step from the stage before.</p></div>
+    <ol class="funnel" id="funnel"></ol>
+  </section>
+
+  <section class="card">
     <div class="card-h"><h2>Visits per day</h2><div class="legend" id="visits-legend"></div></div>
     <div class="chart" id="visits-chart"></div>
   </section>
 
   <section class="card">
-    <div class="card-h"><h2>Posts</h2><p class="note">Visits from GoatCounter. Reached 50% and Read come from the site's read-depth events; Read means 90% scrolled and at least 35% of the estimated reading time spent.</p></div>
+    <div class="card-h"><h2>Posts</h2><p class="note">Time is engaged time: the tab visible and the reader active. Read means 90% scrolled and enough time to have read it. Rates are of the post's visitors.</p></div>
     <div class="table-wrap"><table class="posts" id="posts"></table></div>
+  </section>
+
+  <section class="grid2">
+    <div class="card">
+      <div class="card-h"><h2>Time on posts</h2><p class="note">Share of post visitors still engaged at each mark.</p></div>
+      <ol class="bars" id="time-dist"></ol>
+    </div>
+    <div class="card">
+      <div class="card-h"><h2>Where subscribers signed up</h2><p class="note">From the page each signup came from (Kit), all time.</p></div>
+      <ol class="bars" id="signup-pages"></ol>
+    </div>
   </section>
 
   <section class="grid3">
     <div class="card"><h2>Referrers</h2><ol class="bars" id="referrers"></ol></div>
+    <div class="card"><h2>Campaigns</h2><ol class="bars" id="campaigns"></ol></div>
+    <div class="card"><h2>Links readers followed</h2><ol class="bars" id="outbound"></ol></div>
+  </section>
+
+  <section class="grid3">
     <div class="card"><h2>Countries</h2><ol class="bars" id="countries"></ol></div>
-    <div class="card"><h2>Screens</h2><ol class="bars" id="devices"></ol></div>
+    <div class="card"><h2>Screens</h2><ol class="bars" id="screens"></ol></div>
+    <div class="card"><h2>Languages</h2><ol class="bars" id="languages"></ol></div>
+  </section>
+  <section class="grid2">
+    <div class="card"><h2>Browsers</h2><ol class="bars" id="browsers"></ol></div>
+    <div class="card"><h2>Systems</h2><ol class="bars" id="systems"></ol></div>
   </section>
 
   <section class="card">
@@ -58,13 +84,30 @@
   </section>
 
   <section class="card">
+    <h2>Subscribers</h2>
+    <div class="table-wrap"><table class="posts" id="subscribers"></table></div>
+  </section>
+
+  <section class="card">
     <h2>Sent emails</h2>
     <div class="table-wrap"><table class="posts" id="broadcasts"></table></div>
   </section>
 
   <section class="card" id="cf-card">
-    <div class="card-h"><h2>Top pages, Cloudflare</h2><p class="note">A second, independent count from the Cloudflare beacon. It counts differently from GoatCounter, so the two will not match exactly.</p></div>
+    <div class="card-h"><h2>Top pages, Cloudflare</h2><p class="note">A second, independent count from the Cloudflare beacon. It counts automated traffic GoatCounter filters out, so its numbers run several times higher. Compare trends, not totals.</p></div>
     <ol class="bars" id="cf-paths"></ol>
+  </section>
+
+  <section class="card about">
+    <h2>About these numbers</h2>
+    <ul>
+      <li><b>Visitors</b> are GoatCounter's: one per person per page per day, bots excluded. No cookies, nothing stored on the reader's device, so there is no way to recognise a returning reader, and nothing here identifies anyone except subscribers, who gave their email.</li>
+      <li><b>Engaged time</b> counts only while the tab is visible and the reader has scrolled, moved, touched or typed in the last 30 seconds. Averages are estimates from the marks reached (15s, 30s, 1m, 2m, 5m, 10m, 20m), so they slightly understate.</li>
+      <li><b>Read</b> means the reader reached 90% of the body and spent at least 35% of its estimated reading time.</li>
+      <li><b>Signup rate</b> is signups divided by visitors who actually had the form on screen.</li>
+      <li>Engaged time, signup views and signups, video, PDF and outbound clicks are tracked from 11 Oct 2026; scroll depth and reads from earlier. Newsletter clicks arrive tagged <code>utm_source=newsletter</code>.</li>
+      <li>Everything is cached in a database and synced every 30 minutes, so the page never waits on an outside service.</li>
+    </ul>
   </section>
 
   <footer class="foot">

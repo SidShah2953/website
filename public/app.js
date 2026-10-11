@@ -1,112 +1,183 @@
-// Draws the dashboard from /api/summary. No libraries: two line charts in SVG,
-// a few tables, a few bar lists.
+// Draws the dashboard from /api/summary, which reads only the D1 cache.
+// No libraries: SVG line charts, a funnel, tables and bar lists.
 
 const $ = (id) => document.getElementById(id);
 const fmt = new Intl.NumberFormat('en-US');
-const pct = (x) => (x == null || !isFinite(x) ? '–' : `${(x * 100).toFixed(x < 0.1 ? 1 : 0)}%`);
+const pct = (x) => (x == null || !isFinite(x) ? '–' : `${(x * 100).toFixed(x > 0 && x < 0.1 ? 1 : 0)}%`);
+const ratio = (a, b) => (b ? a / b : null);
 const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
-const dayLabel = (d) => new Date(`${d}T00:00:00Z`).toLocaleDateString('en-US', { month: 'short', day: 'numeric', timeZone: 'UTC' });
+const dayLabel = (d) => new Date(`${d.slice(0, 10)}T00:00:00Z`).toLocaleDateString('en-US', { month: 'short', day: 'numeric', timeZone: 'UTC' });
+const dur = (s) => (s == null ? '–' : s < 60 ? `${s}s` : `${Math.floor(s / 60)}m ${String(s % 60).padStart(2, '0')}s`);
+const ago = (iso) => {
+  if (!iso) return 'never';
+  const m = Math.round((Date.now() - new Date(iso)) / 60000);
+  return m < 1 ? 'just now' : m < 60 ? `${m} min ago` : `${Math.round(m / 60)} h ago`;
+};
 
 const COLORS = { gc: '#45B5ED', cf: '#8CA2A6', subs: '#45B5ED' };
+const TIME_MARKS = [['time-15s', '15s'], ['time-30s', '30s'], ['time-1m', '1 min'], ['time-2m', '2 min'], ['time-5m', '5 min'], ['time-10m', '10 min'], ['time-20m', '20 min']];
 
 let days = 30;
 try { days = Number(localStorage.getItem('days')) || 30; } catch {}
+let last = null;
 
-async function load(fresh = false) {
+async function load() {
   for (const b of $('range').querySelectorAll('button')) b.setAttribute('aria-selected', String(Number(b.dataset.days) === days));
-  $('status').textContent = 'Loading...';
-  let data;
   try {
-    const r = await fetch(`/api/summary?days=${days}${fresh ? '&fresh=1' : ''}`, { credentials: 'same-origin' });
-    data = await r.json();
+    const r = await fetch(`/api/summary?days=${days}`, { credentials: 'same-origin' });
+    const data = await r.json();
     if (!r.ok) throw new Error(data.error || r.status);
+    render(data);
   } catch (e) {
     $('status').innerHTML = `<span class="err">Could not load: ${esc(e.message)}</span>`;
-    return;
   }
-  render(data);
 }
 
-let last = null;
+async function syncNow() {
+  const btn = $('sync');
+  btn.disabled = true; btn.textContent = 'Syncing...';
+  try {
+    const r = await fetch(`/api/sync?budget=1&dims=${days}`, { method: 'POST', credentials: 'same-origin' });
+    if (!r.ok) throw new Error((await r.json()).error || r.status);
+    await load();
+  } catch (e) {
+    $('status').innerHTML = `<span class="err">Sync failed: ${esc(e.message)}</span>`;
+  } finally {
+    btn.disabled = false; btn.textContent = 'Sync now';
+  }
+}
 
 function render(d) {
   last = d;
-  const { goatcounter: gc, kit, cloudflare: cf } = d;
+  const f = d.funnel, k = d.kit;
   $('who').textContent = d.viewer ? `Signed in as ${d.viewer}` : '';
-  const errs = [['GoatCounter', gc], ['Kit', kit], ['Cloudflare', cf]].filter(([, s]) => s?.error);
-  const when = new Date(d.generated).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
-  $('status').innerHTML = `${dayLabel(d.range.start)} to ${dayLabel(d.range.end)}. Numbers as of ${when}.`
-    + errs.map(([n, s]) => ` <span class="err">${n}: ${esc(s.error)}.</span>`).join('');
+
+  // ---- status line: range, freshness, anything that failed or is still filling
+  const errs = Object.entries(d.sync.errors).filter(([, v]) => v);
+  const filling = [];
+  if (d.sync.history.goatcounter && !d.sync.complete.goatcounter) filling.push(`GoatCounter history loaded back to ${dayLabel(d.sync.history.goatcounter)}`);
+  $('status').innerHTML = `${dayLabel(d.range.start)} to ${dayLabel(d.range.end)}. Synced ${ago(d.sync.last)}.`
+    + (filling.length ? ` <span class="muted">${esc(filling.join('; '))}, still filling in.</span>` : '')
+    + errs.map(([n, v]) => ` <span class="err">${esc(n)}: ${esc(v.replace(/^\S+\s/, ''))}</span>`).join('');
 
   // ---- tiles
-  const reads = gc?.posts?.reduce((n, p) => n + p.reads, 0);
   const change = (now, before) => {
-    if (!before) return '';
+    if (before == null || !before) return '';
     const c = (now - before) / before;
     return `<span class="${c >= 0 ? 'up' : 'down'}">${c >= 0 ? '+' : ''}${(c * 100).toFixed(0)}%</span> vs previous ${d.range.days} days`;
   };
+  const postRows = d.posts.filter((p) => p.avgSeconds != null);
+  const weighted = postRows.reduce((n, p) => n + p.avgSeconds * p.visits, 0);
+  const weight = postRows.reduce((n, p) => n + p.visits, 0);
   const tile = (label, value, sub) => `<div class="tile"><div class="label">${label}</div><div class="value">${value}</div><div class="sub">${sub || '&nbsp;'}</div></div>`;
   $('tiles').innerHTML = [
-    tile('Visits, GoatCounter', gc?.error ? '–' : fmt.format(gc.visits), gc?.error ? '' : change(gc.visits, gc.previousVisits)),
-    tile('Visits, Cloudflare', cf?.error ? '–' : fmt.format(cf.visits), cf?.error ? 'not connected' : change(cf.visits, cf.previousVisits)),
-    tile('Full reads', gc?.error ? '–' : fmt.format(reads), gc?.error ? '' : 'read to the end, with time spent'),
-    tile('Subscribers', kit?.error ? '–' : fmt.format(kit.subscribers),
-      kit?.error ? '' : `${kit.newInRange >= 0 ? '+' : ''}${fmt.format(kit.newInRange)} in this range`),
+    tile('Visitors', fmt.format(f.visits), change(f.visits, f.previousVisits)),
+    tile('Full reads', fmt.format(f.reads), change(f.reads, f.previousReads) || `${pct(ratio(f.reads, f.visits))} of visitors`),
+    tile('Avg engaged time on posts', weight ? dur(Math.round(weighted / weight)) : '–', weight ? 'estimated, from time marks' : 'tracking from 11 Oct'),
+    tile('Subscribers', fmt.format(k.active), `${k.joinedInRange >= 0 ? '+' : ''}${k.joinedInRange} in this range${k.pending ? `, ${k.pending} unconfirmed` : ''}`),
+    tile('Signup rate', pct(ratio(f.subscribed, f.signupSeen)), f.signupSeen ? `${f.subscribed} of ${f.signupSeen} who saw the form` : 'tracking from 11 Oct'),
+    tile('Visits, Cloudflare', fmt.format(d.cloudflare.visits), change(d.cloudflare.visits, d.cloudflare.previousVisits) || 'includes automated traffic'),
   ].join('');
 
+  // ---- funnel
+  // Stages measured only since 11 Oct 2026 are flagged, and skipped as the
+  // base of the next step while they are still empty.
+  const NEW = new Set(['Engaged 30s+', 'Saw the signup form', 'Subscribed']);
+  const stages = [
+    ['Visited', f.visits], ['Engaged 30s+', f.engaged], ['Reached halfway', f.halfway],
+    ['Read it', f.reads], ['Saw the signup form', f.signupSeen], ['Subscribed', f.subscribed],
+  ];
+  const top = Math.max(1, f.visits);
+  let base = null;
+  $('funnel').innerHTML = stages.map(([label, n], i) => {
+    const step = base == null ? null : ratio(n, base);
+    if (n || !NEW.has(label)) base = n;
+    const tag = NEW.has(label) && d.range.start < '2026-10-11' ? '<small>tracked from 11 Oct</small>' : '';
+    return `<li><span class="fl">${label}${tag}</span><span class="fb"><b style="width:${Math.max(0.5, (n / top) * 100)}%"></b></span>
+      <span class="fn">${fmt.format(n)}</span><span class="fp">${pct(ratio(n, top))}${i && step != null ? `<small>${pct(step)} of previous</small>` : ''}</span></li>`;
+  }).join('');
+
   // ---- visits chart
-  const series = [];
-  if (gc && !gc.error) series.push({ name: 'GoatCounter', color: COLORS.gc, points: gc.daily.map((p) => [p.day, p.count]) });
-  if (cf && !cf.error) series.push({ name: 'Cloudflare', color: COLORS.cf, dash: '5 4', points: fillDays(d.range, cf.daily.map((p) => [p.day, p.visits])) });
+  const series = [{ name: 'GoatCounter', color: COLORS.gc, points: fillDays(d.range, d.daily.goatcounter) }];
+  if (d.daily.cloudflare.length) series.push({ name: 'Cloudflare', color: COLORS.cf, dash: '5 4', points: fillDays(d.range, d.daily.cloudflare) });
   $('visits-legend').innerHTML = series.length > 1
     ? series.map((s) => `<span><i style="border-color:${s.color};border-top-style:${s.dash ? 'dashed' : 'solid'}"></i>${s.name}</span>`).join('') : '';
   lineChart($('visits-chart'), series);
 
   // ---- posts
-  const posts = (gc?.posts || []).filter((p) => p.path.startsWith('/blog/') || p.reads);
-  $('posts').innerHTML = posts.length ? `<thead><tr><th>Post</th><th>Visits</th><th>Reached 50%</th><th>Read</th><th>Read rate</th></tr></thead><tbody>`
-    + posts.map((p) => {
-      const rate = p.visits ? p.reads / p.visits : null;
-      return `<tr><td>${esc(cleanTitle(p.title) || p.path)}<small>${esc(p.path)}</small></td>
-        <td>${fmt.format(p.visits)}</td><td>${fmt.format(p.d50)}</td><td>${fmt.format(p.reads)}</td>
-        <td><span class="rate"><b style="width:${Math.round(Math.min(rate || 0, 1) * 70)}px"></b><em>${pct(rate)}</em></span></td></tr>`;
-    }).join('') + '</tbody>'
-    : `<tbody><tr><td class="none">${gc?.error ? 'GoatCounter is not connected.' : 'No post visits in this range.'}</td></tr></tbody>`;
+  // Essays and projects only; tag, index and system pages would bury them.
+  const posts = d.posts.filter((p) => /^\/(blog|research|projects|notes)\/./.test(p.path) && (p.visits || p.reads)).slice(0, 30);
+  $('posts').innerHTML = posts.length ? `<thead><tr><th>Post</th><th>Visitors</th><th>Avg time</th><th>Median</th>
+      <th>Engaged 30s</th><th>Halfway</th><th>Read</th><th>Signups</th><th>Video</th><th>PDF</th></tr></thead><tbody>`
+    + posts.map((p) => `<tr><td>${esc(p.title || p.path)}<small>${esc(p.path)}</small></td>
+        <td>${fmt.format(p.visits)}</td><td>${dur(p.avgSeconds)}</td><td>${dur(p.medianSeconds)}</td>
+        <td>${rate(p.engaged30, p.visits)}</td><td>${rate(p.d50, p.visits)}</td><td>${rate(p.reads, p.visits)}</td>
+        <td>${p.subscribed ? `${p.subscribed}<small class="inline"> of ${p.seen} saw</small>` : (p.seen ? `0<small class="inline"> of ${p.seen}</small>` : '–')}</td>
+        <td>${p.videoPlays ? `${p.videoPlays}<small class="inline"> / ${p.videoDone} done</small>` : '–'}</td>
+        <td>${p.pdf || '–'}</td></tr>`).join('') + '</tbody>'
+    : '<tbody><tr><td class="none">No visits in this range.</td></tr></tbody>';
 
-  bars($('referrers'), gc?.referrers);
-  bars($('countries'), gc?.countries);
-  bars($('devices'), gc?.devices);
+  // ---- time distribution, across post visitors with time data
+  const tv = postRows.reduce((n, p) => n + p.visits, 0);
+  bars($('time-dist'), tv ? TIME_MARKS.map(([key, label]) => ({
+    name: `${label} or more`, count: postRows.reduce((n, p) => n + (p.time[key] || 0), 0), of: tv,
+  })) : [], { percent: true, empty: 'Starts filling in from 11 Oct as people read.' });
 
-  // ---- subscribers
-  if (kit && !kit.error) {
-    const pts = cumulative(kit.joined, d.range);
-    lineChart($('subs-chart'), [{ name: 'Subscribers', color: COLORS.subs, points: pts, area: true }]);
-    $('subs-note').textContent = `${fmt.format(kit.subscribers)} active${kit.cancellationsInRange ? `, ${kit.cancellationsInRange} unsubscribed in this range` : ''}. ${kit.drafts ? `${kit.drafts} draft${kit.drafts > 1 ? 's' : ''} waiting in Kit.` : ''}`;
-    $('broadcasts').innerHTML = kit.broadcasts.length
-      ? `<thead><tr><th>Email</th><th>Sent</th><th>Recipients</th><th>Opened</th><th>Clicked</th><th>Unsubscribed</th></tr></thead><tbody>`
-        + kit.broadcasts.map((b) => `<tr><td>${esc(b.subject)}</td><td>${b.sentAt ? dayLabel(b.sentAt.slice(0, 10)) : '–'}</td>
-          <td>${b.recipients == null ? '–' : fmt.format(b.recipients)}</td><td>${pct(b.openRate / (b.openRate > 1 ? 100 : 1))}</td>
-          <td>${pct(b.clickRate / (b.clickRate > 1 ? 100 : 1))}</td><td>${b.unsubscribes ?? '–'}</td></tr>`).join('') + '</tbody>'
-      : '<tbody><tr><td class="none">No emails sent yet. Drafts appear here once sent.</td></tr></tbody>';
-  } else {
-    $('subs-chart').innerHTML = '<div class="empty">Kit is not connected.</div>';
-    $('broadcasts').innerHTML = '';
+  // ---- where subscribers signed up
+  const byPage = new Map();
+  for (const s of k.subscribers.filter((x) => x.state === 'active')) {
+    const key = s.page || '(unknown: signed up before tracking)';
+    byPage.set(key, (byPage.get(key) || 0) + 1);
   }
+  bars($('signup-pages'), [...byPage].map(([name, count]) => ({ name, count })).sort((a, b) => b.count - a.count));
 
-  // ---- Cloudflare paths
-  $('cf-card').hidden = !cf || !!cf.error;
-  if (cf && !cf.error) bars($('cf-paths'), cf.paths.map((p) => ({ name: p.path, count: p.visits })));
+  bars($('referrers'), d.sources.referrers);
+  bars($('campaigns'), d.sources.campaigns, { empty: 'None yet. Newsletter links arrive as "newsletter".' });
+  bars($('outbound'), d.outbound, { empty: 'Tracked from 11 Oct.' });
+  bars($('countries'), d.audience.countries);
+  bars($('screens'), d.audience.screens);
+  bars($('languages'), d.audience.languages);
+  bars($('browsers'), d.audience.browsers);
+  bars($('systems'), d.audience.systems);
+
+  // ---- newsletter
+  lineChart($('subs-chart'), [{ name: 'Subscribers', color: COLORS.subs, points: cumulative(k.joined, d.range), area: true }]);
+  $('subs-note').textContent = `${fmt.format(k.active)} active, ${k.pending} unconfirmed, ${k.unsubscribed} unsubscribed.${k.drafts ? ` ${k.drafts} draft${k.drafts > 1 ? 's' : ''} waiting in Kit.` : ''}`;
+  $('subscribers').innerHTML = k.subscribers.length
+    ? `<thead><tr><th>Email</th><th>Joined</th><th>Status</th><th>Signed up on</th><th>Source</th></tr></thead><tbody>`
+      + k.subscribers.map((s) => `<tr><td>${esc(s.email)}${s.name ? `<small>${esc(s.name)}</small>` : ''}</td><td>${dayLabel(s.joined)}</td>
+        <td>${esc({ active: 'Active', inactive: 'Unconfirmed', cancelled: 'Unsubscribed', bounced: 'Bounced', complained: 'Complained' }[s.state] || s.state)}</td>
+        <td>${esc(s.page || '–')}</td><td>${esc([s.source, s.campaign].filter(Boolean).join(' / ') || '–')}</td></tr>`).join('') + '</tbody>'
+    : '<tbody><tr><td class="none">No subscribers yet.</td></tr></tbody>';
+  $('broadcasts').innerHTML = k.broadcasts.length
+    ? `<thead><tr><th>Email</th><th>Sent</th><th>Recipients</th><th>Opened</th><th>Clicked</th><th>Unsubscribed</th></tr></thead><tbody>`
+      + k.broadcasts.map((b) => `<tr><td>${esc(b.subject)}</td><td>${b.sent_at ? dayLabel(b.sent_at) : '–'}</td>
+        <td>${b.recipients == null ? '–' : fmt.format(b.recipients)}</td><td>${pct(norm(b.open_rate))}</td>
+        <td>${pct(norm(b.click_rate))}</td><td>${b.unsubscribes ?? '–'}</td></tr>`).join('') + '</tbody>'
+    : '<tbody><tr><td class="none">No emails sent yet. Drafts appear here once sent.</td></tr></tbody>';
+
+  $('cf-card').hidden = !d.cloudflare.paths.length;
+  bars($('cf-paths'), d.cloudflare.paths.map((p) => ({ name: p.path, count: p.v })));
 }
 
 // ------------------------------------------------------------------ pieces
 
-function cleanTitle(t) { return (t || '').replace(/\s*\|\s*Siddhant Shah\s*$/, ''); }
+const norm = (r) => (r == null ? null : r > 1 ? r / 100 : r);   // Kit reports 0-100 or 0-1
+function rate(n, of) {
+  if (!n) return '<span class="dim">0</span>';
+  const r = ratio(n, of);
+  return `<span class="rate"><b style="width:${Math.round(Math.min(r || 0, 1) * 44)}px"></b><em>${pct(r)}</em></span>`;
+}
 
-function bars(el, rows) {
-  if (!rows || !rows.length) { el.innerHTML = '<li class="none">Nothing yet.</li>'; return; }
-  const max = Math.max(...rows.map((r) => r.count));
-  el.innerHTML = rows.map((r) => `<li title="${esc(r.name)}: ${fmt.format(r.count)}"><span class="t">${esc(r.name)}</span><span class="n">${fmt.format(r.count)}</span>
-    <span class="b" style="width:${Math.max(2, (r.count / max) * 100)}%"></span></li>`).join('');
+function bars(el, rows, { percent = false, empty = 'Nothing yet.' } = {}) {
+  if (!rows || !rows.length || rows.every((r) => !r.count)) { el.innerHTML = `<li class="none">${esc(empty)}</li>`; return; }
+  const max = percent ? 1 : Math.max(...rows.map((r) => r.count));
+  el.innerHTML = rows.map((r) => {
+    const v = percent ? r.count / r.of : r.count;
+    return `<li title="${esc(r.name)}: ${fmt.format(r.count)}"><span class="t">${esc(r.name)}</span>
+      <span class="n">${percent ? `${pct(v)} <small>(${fmt.format(r.count)})</small>` : fmt.format(r.count)}</span>
+      <span class="b" style="width:${Math.max(1, (v / max) * 100)}%"></span></li>`;
+  }).join('');
 }
 
 function fillDays(range, pts) {
@@ -144,9 +215,9 @@ function lineChart(el, series) {
     ? `<text x="${x(i)}" y="${H - 6}" text-anchor="${i === 0 ? 'start' : i === n - 1 ? 'end' : 'middle'}">${dayLabel(p[0])}</text>` : '').join('');
 
   const paths = series.map((s) => {
-    const d = s.points.map((p, i) => `${i ? 'L' : 'M'}${x(i).toFixed(1)},${y(p[1]).toFixed(1)}`).join('');
-    const area = s.area ? `<path d="${d}L${x(n - 1)},${y(0)}L${x(0)},${y(0)}Z" fill="${s.color}" opacity=".08"/>` : '';
-    return `${area}<path d="${d}" fill="none" stroke="${s.color}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" ${s.dash ? `stroke-dasharray="${s.dash}"` : ''}/>`;
+    const dd = s.points.map((p, i) => `${i ? 'L' : 'M'}${x(i).toFixed(1)},${y(p[1]).toFixed(1)}`).join('');
+    const area = s.area ? `<path d="${dd}L${x(n - 1)},${y(0)}L${x(0)},${y(0)}Z" fill="${s.color}" opacity=".08"/>` : '';
+    return `${area}<path d="${dd}" fill="none" stroke="${s.color}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" ${s.dash ? `stroke-dasharray="${s.dash}"` : ''}/>`;
   }).join('');
 
   el.innerHTML = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(series.map((s) => s.name).join(' and '))} per day">
@@ -155,7 +226,6 @@ function lineChart(el, series) {
     <g class="dots"></g>
     <rect x="${pad.l}" y="0" width="${W - pad.l - pad.r}" height="${H}" fill="transparent"/></svg>`;
 
-  // Crosshair and tooltip
   const svg = el.querySelector('svg'), cross = svg.querySelector('.cross'), dots = svg.querySelector('.dots'), tip = $('tip');
   const move = (ev) => {
     const r = svg.getBoundingClientRect();
@@ -166,8 +236,8 @@ function lineChart(el, series) {
     tip.innerHTML = `<div class="d">${dayLabel(series[0].points[i][0])}</div>` + series.map((s) =>
       `<div class="r"><i style="border-color:${s.color};border-top-style:${s.dash ? 'dashed' : 'solid'}"></i>${s.name} <b>${fmt.format(s.points[i][1])}</b></div>`).join('');
     tip.hidden = false;
-    const tx = Math.min(ev.clientX + 14, innerWidth - tip.offsetWidth - 8);
-    tip.style.left = `${tx}px`; tip.style.top = `${ev.clientY - tip.offsetHeight - 12}px`;
+    tip.style.left = `${Math.min(ev.clientX + 14, innerWidth - tip.offsetWidth - 8)}px`;
+    tip.style.top = `${ev.clientY - tip.offsetHeight - 12}px`;
   };
   const leave = () => { cross.setAttribute('visibility', 'hidden'); dots.innerHTML = ''; tip.hidden = true; };
   svg.addEventListener('pointermove', move);
@@ -189,7 +259,7 @@ $('range').addEventListener('click', (e) => {
   try { localStorage.setItem('days', String(days)); } catch {}
   load();
 });
-$('refresh').addEventListener('click', () => load(true));
+$('sync').addEventListener('click', syncNow);
 let resizeT;
 addEventListener('resize', () => { clearTimeout(resizeT); resizeT = setTimeout(() => last && render(last), 150); });
 load();

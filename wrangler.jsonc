@@ -6,6 +6,12 @@
   "assets": { "directory": "./public", "binding": "ASSETS" },
   "routes": [{ "pattern": "analytics.siddhants.com", "custom_domain": true }],
   "workers_dev": false,
+  // The readership cache (schema.sql). The dashboard reads only from here.
+  "d1_databases": [
+    { "binding": "DB", "database_name": "siddhants-analytics", "database_id": "e7931a56-3a48-48b8-83eb-b2ab86a866d7" }
+  ],
+  // Sync every 30 minutes: recent days, Kit, and a slice of history each run.
+  "triggers": { "crons": ["*/30 * * * *"] },
   "preview_urls": false,
   "vars": {
     "CF_ACCOUNT_ID": "5e5bf3007aa0b1e48b46ed066d0b4bc3",
