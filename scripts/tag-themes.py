@@ -56,7 +56,6 @@ ASSIGN = {
  "cryptos-transparency-paradox":["crypto-market-structure","onchain-infrastructure"],
  "dcf-for-crypto":["valuation","financial-modelling"],
  "lego-fication-of-finance":["composability","tokenization","market-structure","defi"],
- "macos-apps":["tools","workflow"],
  "stems-2024-talk":["derivatives","teaching"],
  "svi-with-pyro":["bayesian-inference","statistics"],
  "bagged-ensemble-accuracy":["machine-learning","statistics"],

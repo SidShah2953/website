@@ -32,7 +32,6 @@ export const PIECE_AREAS: Record<string, Partial<Record<AreaId, number>>> = {
   "pyspark-vs-kdb":              { tech: .50, side: .50 },
   "greek-vase-volume-analysis":  { side: 1 },
   "hfea-data":                   { side: 1 },
-  "macos-apps":                  { side: 1 },
   "finlatics-baep":              { side: 1 },
 };
 

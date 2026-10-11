@@ -26,7 +26,6 @@ W = {
  'pyspark-vs-kdb':        {'tech':.50,'side':.50},
  'greek-vase-volume-analysis':{'side':1.0},
  'hfea-data':             {'side':1.0},
- 'macos-apps':            {'side':1.0},
  'finlatics-baep':        {'side':1.0},
 }
 THEMES=['fin','da','tech','side']
