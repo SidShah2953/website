@@ -1,0 +1,44 @@
+---
+/**
+ * A before/after figure: two panels side by side, stacked on a phone.
+ * Each panel takes an inline SVG (or anything) through a named slot, so a
+ * diagram is drawn at a fixed small viewBox and scales with its panel instead
+ * of shrinking a single wide drawing until its labels are unreadable.
+ */
+interface Props { left: string; right: string; caption?: string; label?: string }
+const { left, right, caption, label } = Astro.props;
+---
+<figure class="pair" aria-label={label ?? `${left} versus ${right}`}>
+  <div class="panels">
+    <div class="panel">
+      <p class="tag">{left}</p>
+      <slot name="left" />
+    </div>
+    <div class="panel accent">
+      <p class="tag">{right}</p>
+      <slot name="right" />
+    </div>
+  </div>
+  {caption && <figcaption>{caption}</figcaption>}
+</figure>
+
+<style>
+  .pair{ margin:clamp(30px,4.5vw,48px) 0; display:grid; gap:12px; }
+  .panels{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+  .panel{
+    border:1px solid var(--rule); border-radius:var(--r-md);
+    background:#08131A; padding:18px 18px 14px; min-width:0;
+  }
+  .panel.accent{ border-color:rgba(32,142,197,.32); background:#071823; }
+  .tag{
+    margin:0 0 10px; font-family:var(--sans); font-size:11px; font-weight:500;
+    letter-spacing:.16em; text-transform:uppercase; color:var(--text-3);
+  }
+  .accent .tag{ color:var(--glow); }
+  .panel :global(svg){ display:block; width:100%; height:auto; overflow:visible; }
+  figcaption{
+    font-family:var(--sans); font-size:clamp(12.5px,1.2vw,13.5px); line-height:1.55;
+    color:var(--text-3); padding-left:14px; border-left:1px solid var(--rule);
+  }
+  @media (max-width:640px){ .panels{ grid-template-columns:1fr; } }
+</style>
