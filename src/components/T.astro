@@ -26,14 +26,6 @@ if (!theme) {
 }
 const rgb = AREAS[theme.area].rgb.join(",");
 ---
-<a
-  href={`/themes/${k}/`}
-  class="theme-tag"
-  style={`--tc: rgb(${rgb})`}
-  data-theme={k}
-  title={`${displayLabel(theme.label)} · ${AREAS[theme.area].label}`}
-><slot /></a>
-
 <style>
   .theme-tag {
     color: inherit;
@@ -55,3 +47,13 @@ const rgb = AREAS[theme.area].rgb.join(",");
   }
   .theme-tag:focus-visible { box-shadow: 0 0 0 2px var(--tc); border-radius: 3px; }
 </style>
+
+{/* Must stay the last thing in the file, with no trailing newline: any
+    whitespace after </a> renders as a space before the next character. */}
+<a
+  href={`/themes/${k}/`}
+  class="theme-tag"
+  style={`--tc: rgb(${rgb})`}
+  data-theme={k}
+  title={`${displayLabel(theme.label)} · ${AREAS[theme.area].label}`}
+><slot /></a>

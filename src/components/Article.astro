@@ -44,6 +44,8 @@ const slug = (id: string) => id.replace(/\.(md|mdx)$/, "").toLowerCase();
 const base = type === "blog" ? "blog" : type === "research" ? "research" : "projects";
 const thesisHtml = entry.data.thesis ? await marked.parse(entry.data.thesis) : null;
 const words = entry.body.split(/\s+/).length;
+// Shown only on paper and in PDFs, where there is no site header or URL bar.
+const pageUrl = new URL(Astro.url.pathname, Astro.site ?? Astro.url).href.replace(/^https?:\/\//, "");
 
 // themes this piece actually invokes, ordered by how often
 // Anything touching a named issuer or a tradeable asset gets the asterisk at
@@ -70,6 +72,7 @@ const lift = ([r, g, b]: [number, number, number], k = 0.3): string =>
   <div class="shell">
     <div class="rail"></div>
     <header class="col">
+    <p class="print-mast" aria-hidden="true"><span>Siddhant Shah</span><span>{pageUrl}</span></p>
     {(parentSeries || isPart) && (
       <p class="eyebrow series">
         {parentSeries
@@ -87,6 +90,15 @@ const lift = ([r, g, b]: [number, number, number], k = 0.3): string =>
       <span><time datetime={entry.data.publishedAt.toISOString()}>{fmtDate(entry.data.publishedAt)}</time></span>
       {entry.data.updatedAt && <span>Updated <time datetime={entry.data.updatedAt.toISOString()}>{fmtDate(entry.data.updatedAt)}</time></span>}
       <span>{readingMinutes(words)} min</span>
+      {type === "blog" && (
+        /* Both run the browser's print. Export keeps the site's dark design
+           (html[data-print="dark"]); Print uses the light, paper stylesheet.
+           Hidden until the script below wires them, so no dead buttons. */
+        <span class="tools" data-tools hidden>
+          <button type="button" data-mode="dark" title="Save as PDF, as it looks on the site">Export</button>
+          <button type="button" data-mode="light" title="Print-friendly, light version">Print</button>
+        </span>
+      )}
       {entry.data.publication && <span>{entry.data.publication}</span>}
       {entry.data.authors?.length ? <span>{entry.data.authors.join(", ")}</span> : null}
     </p>
@@ -209,6 +221,15 @@ const lift = ([r, g, b]: [number, number, number], k = 0.3): string =>
   }
   .meta a{ color:inherit;text-decoration:none;transition:color .25s; }
   .meta a:hover{ color:var(--glow); }
+  .tools{ display:inline-flex;gap:clamp(10px,1.6vw,16px); }
+  .tools[hidden]{ display:none; }
+  .tools button{
+    all:unset;cursor:pointer;color:var(--text-3);font:inherit;
+    border-bottom:1px solid var(--rule-strong);padding-bottom:1px;transition:color .25s,border-color .25s;
+  }
+  .tools button:hover{ color:var(--glow);border-color:var(--glow-line); }
+  .tools button:focus-visible{ outline:2px solid var(--glow);outline-offset:3px;border-radius:2px; }
+  .print-mast{ display:none; }
   .themes{ display:flex;flex-wrap:wrap;gap:8px;margin:0; }
   .themes a{
     /* the raw area colour is tuned for graphics; Technology (#2F6FE8) only
@@ -291,6 +312,21 @@ const lift = ([r, g, b]: [number, number, number], k = 0.3): string =>
 </style>
 
 <script>
+  // Export (dark, as on the site) and Print (light). Same print pipeline,
+  // different stylesheet branch; see src/styles/print.css.
+  for (const tools of document.querySelectorAll<HTMLElement>('[data-tools]')) {
+    tools.hidden = false;
+    tools.addEventListener('click', (e) => {
+      const btn = (e.target as HTMLElement).closest<HTMLButtonElement>('button[data-mode]');
+      if (!btn) return;
+      const root = document.documentElement;
+      root.dataset.print = btn.dataset.mode;
+      const reset = () => { delete root.dataset.print; removeEventListener('afterprint', reset); };
+      addEventListener('afterprint', reset);
+      window.print();
+    });
+  }
+
   // Build the table of contents from the rendered headings.
   const prose = document.getElementById('prose');
   const nav = document.getElementById('tocNav');

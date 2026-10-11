@@ -37,7 +37,7 @@ const fmt = (n: number) => n.toLocaleString("en-US");
     margin:clamp(30px,4.5vw,48px) 0; display:grid; gap:12px;
   }
   .box{
-    border:1px solid var(--rule); border-radius:var(--r-md); background:#08131A;
+    border:1px solid var(--rule); border-radius:var(--r-md); background:var(--fig-panel);
     padding:18px 20px 6px;
   }
   .rows{ display:grid; }
@@ -53,7 +53,7 @@ const fmt = (n: number) => n.toLocaleString("en-US");
   .lane{ display:block; min-width:0; }
   .fill{
     display:block; height:10px; border-radius:2px 4px 4px 2px; min-width:4px;
-    background:rgba(140,162,166,.45);
+    background:var(--fig-muted);
   }
   .fill.accent{ background:var(--peacock); }
   .val{

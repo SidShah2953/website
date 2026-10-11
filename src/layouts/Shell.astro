@@ -6,6 +6,8 @@ import type { HeadTags } from "@/utils/types/HeadTags";
 // Self-hosted variable fonts — no third-party request, one file per family.
 import "@fontsource-variable/newsreader";
 import "@fontsource-variable/schibsted-grotesk";
+// Print and PDF export: light by default, dark for "Export" (html[data-print="dark"]).
+import "@/styles/print.css";
 export type Props = HeadTags & {
   transparentHeader?: boolean;
   snap?: boolean;
@@ -181,6 +183,21 @@ const nav = [
         --serif:"Newsreader Variable",Georgia,"Times New Roman",serif;
         --sans:"Schibsted Grotesk Variable","Helvetica Neue",Arial,sans-serif;
         --hdr-h:64px;
+
+        /* Figures (src/components/figures, posts/*): drawn as inline SVG/HTML
+           against these, so one stylesheet can restyle every figure. The print
+           stylesheet (src/styles/print.css) swaps them for a light set. */
+        --fig-panel:#08131A;                  /* panel ground */
+        --fig-panel-accent:#071823;           /* the "after" panel */
+        --fig-accent-line:rgba(32,142,197,.32);
+        --fig-cell:rgba(255,255,255,.025);    /* boxes inside a panel */
+        --fig-stroke:rgba(222,234,236,.16);
+        --fig-stroke-strong:rgba(222,234,236,.22);
+        --fig-tick:rgba(222,234,236,.22);
+        --fig-muted:rgba(140,162,166,.45);    /* the non-highlighted bar */
+        --fig-friction:rgba(224,168,143,.55); /* lines that mean "a person, a form, a wait" */
+        --fig-chord:rgba(69,181,237,.38);
+        --fig-slot:rgba(5,12,15,.6);
       }
       *{box-sizing:border-box}
       /* Grid and flex children default to min-width:auto, so one long unbreakable

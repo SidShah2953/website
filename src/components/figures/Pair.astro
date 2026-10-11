@@ -27,9 +27,9 @@ const { left, right, caption, label } = Astro.props;
   .panels{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
   .panel{
     border:1px solid var(--rule); border-radius:var(--r-md);
-    background:#08131A; padding:18px 18px 14px; min-width:0;
+    background:var(--fig-panel); padding:18px 18px 14px; min-width:0;
   }
-  .panel.accent{ border-color:rgba(32,142,197,.32); background:#071823; }
+  .panel.accent{ border-color:var(--fig-accent-line); background:var(--fig-panel-accent); }
   .tag{
     margin:0 0 10px; font-family:var(--sans); font-size:11px; font-weight:500;
     letter-spacing:.16em; text-transform:uppercase; color:var(--text-3);

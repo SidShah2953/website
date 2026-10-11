@@ -13,7 +13,8 @@
     "newsletter": "node scripts/newsletter.mjs",
     "newsletter:dry": "node scripts/newsletter.mjs --dry-run",
     "check:links": "node scripts/checks/links.mjs",
-    "favicon": "node scripts/favicon.mjs"
+    "favicon": "node scripts/favicon.mjs",
+    "pdf": "node scripts/pdf.mjs"
   },
   "dependencies": {
     "@astrojs/mdx": "^4.3.14",

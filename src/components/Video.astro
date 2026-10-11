@@ -24,6 +24,9 @@ interface Props {
 const { src, caption, id = "video" } = Astro.props;
 const poster = Astro.props.poster ?? src.replace(/[^/]+$/, "poster.jpg");
 const label = Astro.props.title ?? caption ?? "Video";
+// Paper cannot play video. Print and PDF show a link to this player instead.
+const watchUrl = new URL(`${Astro.url.pathname}#${id}`, Astro.site ?? Astro.url).href;
+const watchText = watchUrl.replace(/^https?:\/\//, "");
 ---
 <figure class="vid" id={id} data-video>
   <div class="frame">
@@ -32,6 +35,15 @@ const label = Astro.props.title ?? caption ?? "Video";
       <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z" fill="currentColor"/></svg>
     </button>
   </div>
+  {/* Print only. The dark export shows the poster frame; the light print shows
+      a plain card, since a dark video frame cannot be restyled for paper. */}
+  <a class="print-alt" href={watchUrl}>
+    <img class="print-poster" src={poster} alt="" loading="eager" />
+    <span class="print-card">
+      <span class="print-glyph" aria-hidden="true">&#9654;</span>
+      <span class="print-text">Video. Watch it at <span class="print-url">{watchText}</span></span>
+    </span>
+  </a>
   {caption && <figcaption>{caption}</figcaption>}
 </figure>
 
@@ -59,6 +71,23 @@ const label = Astro.props.title ?? caption ?? "Video";
   /* Arriving from the newsletter: a brief ring so the eye lands on it. */
   .vid:target .frame{ animation:arrive 1.6s ease-out 1; }
   @keyframes arrive{ 0%{ box-shadow:0 0 0 0 rgba(69,181,237,.5); } 100%{ box-shadow:0 0 0 14px rgba(69,181,237,0); } }
+  .print-alt{ display:none; }
+  @media print{
+    .frame{ display:none; }
+    .print-alt{ display:block; text-decoration:none; color:inherit; }
+    .print-poster{ display:block; width:100%; height:auto; border-radius:var(--r-md); border:1px solid var(--rule); }
+    .print-card{ display:flex; align-items:center; gap:10px; margin-top:8px;
+      font-family:var(--sans); font-size:9.5pt; color:var(--text-2); }
+    .print-glyph{ display:inline-grid; place-items:center; width:22px; height:22px; border-radius:50%;
+      border:1px solid var(--peacock); color:var(--peacock); font-size:8px; padding-left:2px; }
+    .print-url{ color:var(--glow); }
+    /* Light print: no dark frame on white paper, just the card in a box. */
+    :global(html:not([data-print="dark"])) .print-poster{ display:none; }
+    :global(html:not([data-print="dark"])) .print-card{
+      margin:0; padding:14px 16px; border:1px solid var(--rule-strong); border-radius:var(--r-md);
+      background:var(--surface-1);
+    }
+  }
   @media (prefers-reduced-motion: reduce){
     .play{ transition:none; } .play:hover{ transform:none; }
     .vid:target .frame{ animation:none; }

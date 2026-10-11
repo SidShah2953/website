@@ -48,6 +48,15 @@ Consequences that have already caused real bugs:
    for MDX-imported components. Serve `dist` with `npx serve dist` — *without*
    `-s`, which serves the homepage for every URL and hides 404s.
 
+## Print and PDF
+
+Blog posts carry **Export** (dark, as on screen) and **Print** (light, paper)
+buttons. Both use the browser's print; `src/styles/print.css` does the work,
+switching on `html[data-print="dark"]`. Figures are inline SVG/HTML drawn
+against the `--fig-*` tokens in `Shell.astro`, so they restyle with the page:
+**never hard-code a colour in a figure**, add a token instead. Render PDFs with
+`node scripts/pdf.mjs <slug>` after a build (writes `.pdf/`).
+
 ## Gotchas paid for already
 
 - `color-mix()` against an unregistered custom property computes to **black** in

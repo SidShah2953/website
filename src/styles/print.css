@@ -1,0 +1,127 @@
+/*
+ * Print and PDF.
+ *
+ * Two modes, one pipeline (the browser's print):
+ *   light  default. Print-friendly: white paper, dark ink, light figures.
+ *          What Ctrl+P and the "Print" button produce.
+ *   dark   html[data-print="dark"]. The site as it looks on screen, for the
+ *          "Export" button and for scripts/pdf.mjs --mode dark.
+ *
+ * Nothing here swaps images. Figures are inline SVG/HTML drawn against the
+ * --fig-* and colour tokens in Shell.astro, so redefining the tokens below
+ * restyles every figure. A raster image cannot follow, which is why the video
+ * prints as a link card in light mode instead of its dark poster frame.
+ */
+
+@page {
+  size: A4; margin: 17mm 17mm 19mm;
+  @bottom-right { content: counter(page) " / " counter(pages); font: 7.5pt "Schibsted Grotesk Variable", Arial, sans-serif; color: #56676C; }
+}
+/* The dark export paints the whole sheet, margins included. */
+@page dark {
+  margin: 15mm 17mm 17mm; background: #050C0F;
+  @bottom-right { content: counter(page) " / " counter(pages); font: 7.5pt "Schibsted Grotesk Variable", Arial, sans-serif; color: #8CA2A6; }
+}
+
+@media print {
+  /* Fills and tints are part of the design in both modes; without this the
+     browser drops every background to save ink. */
+  *, *::before, *::after {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    animation: none !important;
+    transition: none !important;
+  }
+  html, body { background: var(--ground) !important; }
+  body { font-size: 10.5pt; line-height: 1.55; }
+
+  /* Things that only make sense on a screen. The flow lines are position:fixed,
+     which Chrome repeats on every printed page. */
+  .hdr, .lines, .sky, .toc, .rail, .endsub, .back, .pager, [data-tools] { display: none !important; }
+  .rise { opacity: 1 !important; transform: none !important; }
+  main { z-index: auto; }
+
+  /* One column at paper width */
+  .page { padding: 0 !important; }
+  .shell { display: block !important; max-width: none !important; width: auto !important; margin: 0 !important; }
+  .col, .prose { max-width: none !important; }
+
+  .print-mast {
+    display: flex !important; justify-content: space-between; gap: 12pt;
+    font-family: var(--sans); font-size: 7.5pt; letter-spacing: .08em; text-transform: uppercase;
+    color: var(--text-3); border-bottom: 1px solid var(--rule-strong);
+    padding-bottom: 7pt; margin: 0 0 20pt;
+  }
+  .h1, .title { font-size: 27pt !important; line-height: 1.06 !important; }
+  .lede { font-size: 12.5pt !important; margin-bottom: 12pt !important; }
+  .meta { font-size: 8.5pt !important; }
+  .themes a { font-size: 8pt !important; padding: 3px 9px !important; }
+  .thesis { margin-top: 16pt !important; padding: 13pt 15pt !important; }
+  .thesis p { font-size: 10pt !important; line-height: 1.55 !important; }
+
+  .prose { font-size: 10.5pt !important; line-height: 1.6 !important; margin-top: 16pt !important; }
+  .prose h2 { font-size: 15pt !important; margin-top: 1.5em !important; }
+  .prose h2, .prose h3 { break-after: avoid; page-break-after: avoid; }
+  .prose p { orphans: 3; widows: 3; }
+  .prose a.print-alt { background-image: none; }
+  figure, .thesis, aside, .vid { break-inside: avoid; page-break-inside: avoid; }
+  figure figcaption { font-size: 8.5pt !important; }
+
+  /* The article's own Disclosure carries the same words, so the site footer
+     would print the disclaimer twice. */
+  body > footer { display: none !important; }
+
+  /* Tokens Shell.astro declares as themselves, which resolve to nothing. */
+  html { --surface-3: rgba(255,255,255,.06); --code-bg: #0B151A; }
+}
+
+/* ---------------------------------------------------------------- light */
+@media print {
+  html:not([data-print="dark"]) {
+    --ground: #FFFFFF;
+    --text: #111A1D;
+    --text-2: #2C3B40;
+    --text-3: #56676C;
+    --rule: rgba(17,26,29,.12);
+    --rule-strong: rgba(17,26,29,.22);
+    --surface-1: #F4F7F8;
+    --surface-2: #EDF2F4;
+    --surface-3: #EDF2F4;
+    --code-bg: #F4F7F8;
+    /* Accents darkened for white paper: links clear 5:1, lines stay visible
+       in greyscale. */
+    --peacock: #17709C;
+    --glow: #155F88;
+    --azure: #2453B8;
+    --peacock-wash: rgba(23,112,156,.07);
+    --peacock-line: rgba(23,112,156,.45);
+    --glow-line: rgba(21,95,136,.45);
+    --glow-line-soft: rgba(21,95,136,.28);
+    --on-accent: #FFFFFF;
+    --warn: #9C4A26;
+
+    --fig-panel: #F6F9FA;
+    --fig-panel-accent: #EEF5F9;
+    --fig-accent-line: rgba(23,112,156,.35);
+    --fig-cell: #FFFFFF;
+    --fig-stroke: rgba(17,26,29,.2);
+    --fig-stroke-strong: rgba(17,26,29,.3);
+    --fig-tick: rgba(17,26,29,.25);
+    --fig-muted: #A9B7BB;
+    --fig-friction: rgba(156,74,38,.6);
+    --fig-chord: rgba(23,112,156,.45);
+    --fig-slot: #FFFFFF;
+  }
+  /* Theme chips carry colours lifted toward white for the dark page. */
+  html:not([data-print="dark"]) .themes a {
+    color: var(--text-2) !important;
+    border-color: var(--rule-strong) !important;
+  }
+  /* The headline gradient and similar effects read as grey smears on paper. */
+  html:not([data-print="dark"]) .h1, html:not([data-print="dark"]) .title { color: var(--text) !important; }
+}
+
+/* ----------------------------------------------------------------- dark */
+@media print {
+  html[data-print="dark"] body { page: dark; }
+}
