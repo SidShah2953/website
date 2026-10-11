@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
+<head>
+<!--
+  siddhants.com newsletter: the Kit email template.
+
+  Paste this whole file into Kit once: Send > Email Templates > New > HTML.
+  Kit fills the message_content tag with what scripts/newsletter.mjs drafts,
+  and requires the unsubscribe_url and address tags or it will not send.
+  (They are written without braces here because Kit runs Liquid over
+  comments too.)
+  Then set the template's ID as KIT_EMAIL_TEMPLATE_ID (see scripts/email/README.md).
+
+  Phone sizes live in the <style> block below; everything else is inline,
+  because some clients drop <style> entirely and must still get a readable email.
+-->
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="x-apple-disable-message-reformatting">
+<meta name="format-detection" content="telephone=no,address=no,email=no,date=no,url=no">
+<!-- The email is dark by design. Declaring both schemes stops Apple Mail and
+     Outlook.com from auto-inverting the colours. -->
+<meta name="color-scheme" content="light dark">
+<meta name="supported-color-schemes" content="light dark">
+<title>Siddhant Shah</title>
+<!--[if !mso]><!-->
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;1,6..72,300;1,6..72,400&family=Schibsted+Grotesk:wght@400;500;600&display=swap" rel="stylesheet">
+<!--<![endif]-->
+<!--[if mso]>
+<noscript><xml><o:OfficeDocumentSettings><o:PixelsPerInch>96</o:PixelsPerInch></o:OfficeDocumentSettings></xml></noscript>
+<style>table,td,p,a,h1{font-family:Georgia,serif !important}</style>
+<![endif]-->
+<style>
+  :root{color-scheme:light dark;supported-color-schemes:light dark}
+  html,body{margin:0 !important;padding:0 !important;width:100% !important;background:#050C0F}
+  body{-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%}
+  table,td{mso-table-lspace:0;mso-table-rspace:0}
+  img{border:0;outline:none;-ms-interpolation-mode:bicubic}
+  a{color:#45B5ED}
+  a[x-apple-data-detectors]{color:inherit !important;text-decoration:none !important}
+  u + #body a{color:inherit;text-decoration:none}
+
+  /* Phones */
+  @media screen and (max-width:600px){
+    .shell{width:100% !important}
+    .gutter{padding-left:12px !important;padding-right:12px !important}
+    .px{padding-left:22px !important;padding-right:22px !important}
+    .hero{padding:34px 22px 110px !important;border-radius:16px !important}
+    .h1{font-size:32px !important;line-height:1.14 !important}
+    .lede{font-size:18px !important}
+    .prose{font-size:17.5px !important;line-height:1.6 !important}
+    .foot{font-size:12.5px !important}
+  }
+  @media screen and (max-width:380px){
+    .h1{font-size:28px !important}
+  }
+</style>
+</head>
+<body id="body" bgcolor="#050C0F" style="margin:0;padding:0;background-color:#050C0F;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#050C0F" style="background-color:#050C0F;">
+  <tr>
+    <td class="gutter" align="center" style="padding:28px 16px 36px;">
+      <!--[if mso]><table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0"><tr><td><![endif]-->
+      <table role="presentation" class="shell" width="600" cellpadding="0" cellspacing="0" border="0" style="width:100%;max-width:600px;border-collapse:collapse;">
+
+        <!-- Masthead: the name, as on every page of the site -->
+        <tr>
+          <td style="padding:0 6px 22px;">
+            <a href="https://siddhants.com" target="_blank" style="font-family:'Schibsted Grotesk','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:15px;line-height:1;font-weight:500;letter-spacing:-.01em;color:#DEEAEC;text-decoration:none;">Siddhant Shah</a>
+          </td>
+        </tr>
+
+        <!-- The piece -->
+        <tr>
+          <td style="padding:0;">
+            {{ message_content }}
+          </td>
+        </tr>
+
+        <!-- Footer -->
+        <tr>
+          <td style="padding:0 6px;">
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td style="border-top:1px solid #1B2427;font-size:0;line-height:0;height:1px;">&nbsp;</td></tr></table>
+          </td>
+        </tr>
+        <tr>
+          <td class="foot" style="padding:24px 6px 0;font-family:'Schibsted Grotesk','Helvetica Neue',Helvetica,Arial,sans-serif;font-size:13px;line-height:1.6;color:#8CA2A6;">
+            <p style="margin:0 0 10px;">You subscribed at <a href="https://siddhants.com" target="_blank" style="color:#B4C6CA;text-decoration:none;">siddhants.com</a>. Whenever I publish. No other email, ever.</p>
+            <p style="margin:0 0 10px;">Personal views. Not investment advice.</p>
+            <p style="margin:0;"><a href="{{ unsubscribe_url }}" style="color:#B4C6CA;text-decoration:underline;">Unsubscribe</a>&nbsp;&nbsp;&middot;&nbsp;&nbsp;{{ address }}</p>
+          </td>
+        </tr>
+
+      </table>
+      <!--[if mso]></td></tr></table><![endif]-->
+    </td>
+  </tr>
+</table>
+</body>
+</html>

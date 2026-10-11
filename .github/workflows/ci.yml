@@ -56,6 +56,9 @@ jobs:
     # own `if:` — the guard below would always see an empty string.
     env:
       KIT_API_KEY: ${{ secrets.KIT_API_KEY }}
+      # Which Kit email template wraps the draft (scripts/email/kit-template.html,
+      # pasted into Kit once). Not a secret. Unset, Kit uses its default design.
+      KIT_EMAIL_TEMPLATE_ID: ${{ vars.KIT_EMAIL_TEMPLATE_ID }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4

@@ -1,0 +1,84 @@
+---
+/**
+ * A video in a post. Also the landing point for the newsletter: email clients
+ * cannot play video, so the email shows a poster and links to `#video` here.
+ *
+ * Without JavaScript it is a plain <video controls>. With it, the native
+ * controls stay hidden behind one quiet play button until the reader asks for
+ * the video, so the poster reads as a figure rather than as a media widget.
+ * `preload="none"` keeps the page weight at the poster until then.
+ *
+ * Assets come from `node scripts/video-assets.mjs <file.mp4> <slug>`, which
+ * writes video.mp4 and poster.jpg into public/media/<slug>/.
+ */
+interface Props {
+  src: string;
+  /** Defaults to poster.jpg next to the video. */
+  poster?: string;
+  caption?: string;
+  /** Spoken name for screen readers; defaults to the caption. */
+  title?: string;
+  /** Anchor the newsletter links to. One video per post keeps `#video` valid. */
+  id?: string;
+}
+const { src, caption, id = "video" } = Astro.props;
+const poster = Astro.props.poster ?? src.replace(/[^/]+$/, "poster.jpg");
+const label = Astro.props.title ?? caption ?? "Video";
+---
+<figure class="vid" id={id} data-video>
+  <div class="frame">
+    <video src={src} poster={poster} controls playsinline preload="none" aria-label={label}></video>
+    <button class="play" type="button" aria-label={`Play: ${label}`} hidden>
+      <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z" fill="currentColor"/></svg>
+    </button>
+  </div>
+  {caption && <figcaption>{caption}</figcaption>}
+</figure>
+
+<style>
+  .vid{ margin:2.2em 0; scroll-margin-top:96px; }
+  .frame{
+    position:relative; aspect-ratio:16/9; overflow:hidden;
+    border-radius:var(--r-md); border:1px solid var(--rule); background:var(--ground);
+  }
+  video{ display:block; width:100%; height:100%; object-fit:cover; background:var(--ground); }
+  .play{
+    position:absolute; left:50%; top:50%; width:76px; height:76px; margin:-38px 0 0 -38px;
+    display:grid; place-items:center; padding:0 0 0 4px; cursor:pointer;
+    border-radius:var(--r-pill); color:var(--text);
+    background:rgba(5,12,15,.62); border:1.5px solid var(--peacock);
+    backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px);
+    transition:transform .35s cubic-bezier(.2,.7,.2,1), border-color .35s, background .35s;
+  }
+  .play:hover{ transform:scale(1.06); border-color:var(--glow); background:rgba(5,12,15,.74); }
+  .play:focus-visible{ outline:2px solid var(--glow); outline-offset:4px; }
+  .play[hidden]{ display:none; }
+  figcaption{
+    margin-top:.8em; font-family:var(--sans); font-size:13.5px; line-height:1.5; color:var(--text-3);
+  }
+  /* Arriving from the newsletter: a brief ring so the eye lands on it. */
+  .vid:target .frame{ animation:arrive 1.6s ease-out 1; }
+  @keyframes arrive{ 0%{ box-shadow:0 0 0 0 rgba(69,181,237,.5); } 100%{ box-shadow:0 0 0 14px rgba(69,181,237,0); } }
+  @media (prefers-reduced-motion: reduce){
+    .play{ transition:none; } .play:hover{ transform:none; }
+    .vid:target .frame{ animation:none; }
+  }
+</style>
+
+<script>
+  for (const fig of document.querySelectorAll<HTMLElement>('[data-video]')) {
+    const v = fig.querySelector('video')!;
+    const btn = fig.querySelector<HTMLButtonElement>('.play')!;
+    // Only take over the controls once the replacement button is in place.
+    v.controls = false;
+    btn.hidden = false;
+    const start = () => {
+      btn.hidden = true;
+      v.controls = true;
+      v.play().catch(() => {});
+    };
+    btn.addEventListener('click', start);
+    v.addEventListener('click', () => { if (!v.controls) start(); });
+    v.addEventListener('play', () => { btn.hidden = true; v.controls = true; });
+  }
+</script>

@@ -41,7 +41,9 @@ Consequences that have already caused real bugs:
 2. **Themes are tagged inline in MDX bodies**, not front matter:
    `<T k="slug">text</T>`. Unknown slugs fail the build. See `src/data/themes.ts`.
 3. **`newsletter: true` is the only thing that emails anyone.** Drafts only —
-   sending stays manual. See `scripts/newsletter.mjs`.
+   sending stays manual. See `scripts/newsletter.mjs`. The email design is
+   `scripts/email/` (body renderer + the Kit template); preview any post with
+   `node scripts/newsletter.mjs --preview <slug|file.md>`.
 4. **Audit the built output, not `astro dev`.** Dev does not load scoped styles
    for MDX-imported components. Serve `dist` with `npx serve dist` — *without*
    `-s`, which serves the homepage for every URL and hides 404s.

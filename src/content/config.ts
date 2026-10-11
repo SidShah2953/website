@@ -50,6 +50,10 @@ const blog = defineCollection({
     // Marks a piece as an illustrative exercise rather than a view on a
     // security. Renders a notice above the piece, not just a footer line.
     demonstrative: z.boolean().default(false),
+    // A video for the piece, from scripts/video-assets.mjs, e.g.
+    // /media/<slug>/video.mp4. Place it in the body with <Video>; the
+    // newsletter shows its poster and links to the player at #video.
+    video: z.string().optional(),
   }),
 });
 

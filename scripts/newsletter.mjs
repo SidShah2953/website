@@ -14,23 +14,38 @@
  * listed first and matching slugs are skipped, so re-running a workflow — or
  * re-deploying the same commit — cannot create duplicates.
  *
- *   node scripts/newsletter.mjs            # act
- *   node scripts/newsletter.mjs --dry-run  # print what it would do
+ * The email itself is designed in scripts/email/: render.mjs builds the body
+ * from front matter (title, description, `thesis`, and `video` if the post has
+ * one), and kit-template.html is the shell that lives in Kit. See
+ * scripts/email/README.md.
  *
- * Requires KIT_API_KEY. SITE_URL defaults to the production origin.
+ *   node scripts/newsletter.mjs                     # act
+ *   node scripts/newsletter.mjs --dry-run           # print what it would do
+ *   node scripts/newsletter.mjs --preview <slug|file.md>
+ *       # write .email-preview/<slug>.html, the full email as a subscriber
+ *       # sees it, without touching Kit. Takes a file path too, so a draft
+ *       # that is not in the repo yet can be previewed.
+ *
+ * Requires KIT_API_KEY. KIT_EMAIL_TEMPLATE_ID picks the template (without it
+ * Kit uses the account default, which drops the design). SITE_URL defaults to
+ * the production origin.
  */
-import { readFile, readdir } from 'node:fs/promises';
-import { join, extname, relative } from 'node:path';
+import { readFile, readdir, writeFile, mkdir } from 'node:fs/promises';
+import { join, extname, relative, basename, resolve } from 'node:path';
 import { existsSync } from 'node:fs';
+import { parse as parseYaml } from 'yaml';
+import { renderContent, videoMeta, preview } from './email/render.mjs';
 
 const API = 'https://api.kit.com/v4';
 const KEY = process.env.KIT_API_KEY;
 const SITE = (process.env.SITE_URL || 'https://siddhants.com').replace(/\/$/, '');
 const DRY = process.argv.includes('--dry-run');
+const PREVIEW = process.argv.includes('--preview') ? process.argv[process.argv.indexOf('--preview') + 1] : null;
+const TEMPLATE_ID = process.env.KIT_EMAIL_TEMPLATE_ID ? Number(process.env.KIT_EMAIL_TEMPLATE_ID) : null;
 const ROOT = new URL('..', import.meta.url).pathname;
 
 const die = (m) => { console.error(`newsletter: ${m}`); process.exit(1); };
-if (!KEY && !DRY) die('KIT_API_KEY is not set');
+if (!KEY && !DRY && !PREVIEW) die('KIT_API_KEY is not set');
 
 const kit = async (path, init = {}) => {
   const res = await fetch(API + path, {
@@ -41,18 +56,12 @@ const kit = async (path, init = {}) => {
   return res.json();
 };
 
-/** Front matter, without pulling in a YAML dependency for four scalar fields. */
+/** Front matter. A real YAML parser, because `thesis` is a block scalar and
+ *  goes into the email verbatim. */
 const parse = (raw) => {
   const m = raw.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n?([\s\S]*)$/);
   if (!m) return null;
-  const data = {};
-  for (const line of m[1].split('\n')) {
-    const kv = line.match(/^([A-Za-z_][\w-]*):\s*(.*)$/);
-    if (!kv) continue;
-    let v = kv[2].trim().replace(/^["'](.*)["']$/, '$1');
-    data[kv[1]] = v === 'true' ? true : v === 'false' ? false : v;
-  }
-  return { data, body: m[2] };
+  return { data: parseYaml(m[1]) ?? {}, body: m[2] };
 };
 
 const walk = async (dir) => {
@@ -87,9 +96,60 @@ const firstLine = (text, max = 90) => {
   return line.slice(0, line.lastIndexOf(' ', max)).replace(/[,;:]$/, '') + '…';
 };
 
-const esc = (s) => s.replace(/[&<>]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' })[c]);
+const words = (md) => md.split(/\s+/).filter(Boolean).length;
+const minutes = (md) => Math.max(1, Math.round(words(md) / 220));  // matches readingMinutes() in src/utils/feed.ts
+
+/** The email body for one piece. `assets` is where images load from. */
+const build = (c, assets = SITE) => {
+  const isNote = c.kind === 'note';
+  const text = plain(c.body);
+  return renderContent({
+    kind: c.kind,
+    url: c.url,
+    assets,
+    title: c.data.title || (isNote ? null : firstLine(text)),
+    description: c.data.description,
+    thesis: c.data.thesis,
+    // Notes are short enough to be the email. Body MDX keeps its markdown for
+    // the renderer; imports and the article's own headings are dropped.
+    body: c.body.replace(/^import .*$/gm, '').trim(),
+    minutes: isNote ? null : minutes(text),
+    video: videoMeta(ROOT, c.data.video),
+  });
+};
+
+/** --preview: render one piece into a standalone HTML file and stop. */
+const runPreview = async (target) => {
+  let file = target && existsSync(target) ? resolve(target) : null;
+  if (!file) {
+    for (const d of ['src/content/blog', 'src/content/notes']) {
+      for (const ext of ['.mdx', '.md']) {
+        const f = (await walk(join(ROOT, d)).catch(() => [])).find((p) =>
+          relative(join(ROOT, d), p).replace(/\.mdx?$/, '').toLowerCase() === String(target).toLowerCase() && p.endsWith(ext));
+        if (f) file = f;
+      }
+    }
+  }
+  if (!file) die(`--preview: no file or slug "${target}"`);
+  const parsed = parse(await readFile(file, 'utf8'));
+  if (!parsed) die(`--preview: ${file} has no front matter`);
+  const isNote = file.includes('/content/notes/');
+  const slug = (parsed.data.slug || basename(file).replace(/\.mdx?$/, ''))
+    .toLowerCase().replace(/[^a-z0-9/-]+/g, '-').replace(/^-|-$/g, '');
+  const c = { slug, kind: isNote ? 'note' : 'post', data: parsed.data, body: parsed.body,
+    url: `${SITE}/${isNote ? 'notes' : 'blog'}/${slug}/` };
+  // Images from the working tree, so the preview is right before anything deploys.
+  const html = preview(await readFile(join(ROOT, 'scripts/email/kit-template.html'), 'utf8'),
+    build(c, 'file://' + join(ROOT, 'public')));
+  await mkdir(join(ROOT, '.email-preview'), { recursive: true });
+  const out = join(ROOT, '.email-preview', `${slug.replace(/\//g, '_')}.html`);
+  await writeFile(out, html);
+  console.log(`newsletter: preview written to ${relative(ROOT, out)}\n  subject: ${c.data.title || '(first line of the note)'}`);
+};
 
 const main = async () => {
+  if (PREVIEW) return runPreview(PREVIEW);
+
   const roots = [
     { dir: join(ROOT, 'src/content/blog'), url: (s) => `/blog/${s}/`, kind: 'post' },
     { dir: join(ROOT, 'src/content/notes'), url: (s) => `/notes/${s}/`, kind: 'note' },
@@ -119,6 +179,15 @@ const main = async () => {
   for (const c of candidates) {
     const page = join(ROOT, 'dist', c.path, 'index.html');
     if (!existsSync(page)) die(`${c.slug} is opted in but ${c.path} is not in dist/ — refusing to draft a broken link`);
+    // The email's poster links to #video on the page. Without the file, or
+    // without a <Video> in the body to carry that anchor, the link is dead.
+    if (c.data.video) {
+      const v = videoMeta(ROOT, c.data.video);
+      for (const f of [c.data.video, `${v.dir}email-poster.jpg`]) {
+        if (!existsSync(join(ROOT, 'dist', f))) die(`${c.slug}: ${f} is not in dist/ — run scripts/video-assets.mjs`);
+      }
+      if (!/<Video[\s>]/.test(c.body)) die(`${c.slug}: front matter has \`video\` but the body has no <Video>, so #video would not resolve`);
+    }
   }
 
   // Idempotency: what has already been drafted or sent?
@@ -141,13 +210,11 @@ const main = async () => {
 
     const text = plain(c.body);
     const subject = c.data.title || firstLine(text);
-    // A note is short enough to be the email. A post gets its opening and a link,
-    // because the piece is meant to be read on the page where it is typeset.
-    const isNote = c.kind === 'note';
-    const intro = isNote ? text : (c.data.description || text.slice(0, 400));
-    const content =
-      `<p>${esc(intro).replace(/\n\n/g, '</p><p>')}</p>` +
-      `<p><a href="${c.url}">${isNote ? 'Read it on the site' : 'Read the full piece'}</a></p>`;
+    // A note is short enough to be the email. A post gets its thesis, its video
+    // if it has one, and a link, because the piece is meant to be read on the
+    // page where it is typeset.
+    const content = build(c);
+    const video = videoMeta(ROOT, c.data.video);
 
     if (DRY) { console.log(`  DRAFT  ${c.slug}\n         subject: ${subject}`); made++; continue; }
 
@@ -162,6 +229,8 @@ const main = async () => {
         send_at: null,                   // draft. Sending stays a human decision.
         preview_text: (c.data.description || text).slice(0, 140),
         subscriber_filter: null,
+        ...(TEMPLATE_ID ? { email_template_id: TEMPLATE_ID } : {}),
+        ...(video ? { thumbnail_url: `${SITE}${video.dir}email-poster.jpg`, thumbnail_alt: subject } : {}),
       }),
     });
     console.log(`  draft  ${c.slug} -> "${subject}"`);
