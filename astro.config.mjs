@@ -196,7 +196,10 @@ export default defineConfig({
   markdown: {
     syntaxHighlight: "shiki",
     shikiConfig: {
-      theme: "dracula",
+      // Dracula on screen. The light theme ships alongside as --shiki-light
+      // variables, which the print stylesheet switches to for paper.
+      themes: { dark: "dracula", light: "github-light" },
+      defaultColor: "dark",
       wrap: true
     }
   }

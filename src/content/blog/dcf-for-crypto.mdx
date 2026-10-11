@@ -15,7 +15,7 @@ thesis: |
 ---
 import CallOutForMDX from "@/components/CallOutForMDX.astro";
 import { Image } from 'astro:assets';
-import sotpFigure from '@/assets/posts/dcf-for-crypto/sotp-framework.png';
+import SotpFramework from '@/components/posts/dcf/SotpFramework.astro';
 
 ## Why DCF Still Works: The Fundamental Structure Holds
 
@@ -46,7 +46,7 @@ This distinction has massive valuation implications. We need **sum-of-the-parts 
 
 - **Token reserves**: Mark these to fair market value for liquid tokens, with appropriate discounts for lockup periods or vesting schedules. For illiquid tokens, we can use recent private transaction prices or comparable protocol valuations. The FASB's 2023 guidance (ASU 2023-8) requires crypto assets to be reported at fair value even without active markets, which actually helps standardize this approach.
 
-<Image src={sotpFigure} alt="Sum-of-the-Parts (SOTP) Valuation Framework for Crypto Companies" />
+<SotpFramework />
 
 The SOTP approach reveals potential mispricings. Consider Ripple. Ripple Labs holds approximately 46 billion `XRP` tokens. With \$$1$ billion in cash and `XRP` trading at \$$0.60$, the theoretical asset value would be roughly \$$28.6$ billion. Yet secondary market equity transactions implied company valuations of \$$4.5$ billion to \$$11.3$ billion—discounts of $60\%$ to $84\%$ relative to asset value. These discounts reflect liquidity constraints on equity, regulatory uncertainty (the SEC lawsuit), and the market's assessment that Ripple may not realize full value from its holdings. Using SOTP, we explicitly quantify each of these factors rather than accepting the discount as some unknowable market mystery.
 

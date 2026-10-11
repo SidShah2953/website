@@ -44,7 +44,10 @@ const browser = await chromium.launch();
 try {
   for (const mode of modes) {
     const page = await browser.newPage({ viewport: { width: 1280, height: 900 } });
-    const res = await page.goto(base + path, { waitUntil: 'networkidle' });
+    // Only the local build. Analytics beacons and other third-party requests
+    // add nothing to a PDF and kept 'networkidle' from ever settling.
+    await page.route('**/*', (r) => (r.request().url().startsWith(base) ? r.continue() : r.abort()));
+    const res = await page.goto(base + path, { waitUntil: 'load' });
     if (!res || res.status() !== 200) throw new Error(`${path} is not in dist/ (status ${res?.status()})`);
     await page.evaluate((m) => { if (m === 'dark') document.documentElement.dataset.print = 'dark'; }, mode);
     // Links in the PDF must point at the real site, not this local server.
@@ -60,8 +63,15 @@ try {
       '600 1em Newsreader', '700 1em Newsreader', '400 1em "Schibsted Grotesk"', '500 1em "Schibsted Grotesk"',
       '600 1em "Schibsted Grotesk"'].map((f) => document.fonts.load(f))));
     await page.evaluate(() => document.fonts.ready);
-    // print-only images (the video poster) were display:none until now
-    await page.evaluate(() => Promise.all([...document.images].map((i) => i.complete ? 0 : new Promise((r) => { i.onload = i.onerror = r; }))));
+    // Lazy images below the fold never start loading on their own, and
+    // print-only ones (the video poster) were display:none until now. Force
+    // them all, and cap the wait so one bad image cannot hang the export.
+    await page.evaluate(() => {
+      for (const i of document.images) { i.loading = 'eager'; if (!i.complete) i.src = i.src; }
+      const all = Promise.all([...document.images].map((i) =>
+        i.complete ? 0 : new Promise((r) => { i.onload = i.onerror = r; })));
+      return Promise.race([all, new Promise((r) => setTimeout(r, 15000))]);
+    });
     const file = join(OUT, `${name} (${mode === 'dark' ? 'dark' : 'print'}).pdf`);
     await page.pdf({ path: file, preferCSSPageSize: true, printBackground: true });
     console.log(`pdf: ${file}`);

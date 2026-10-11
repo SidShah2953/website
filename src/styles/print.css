@@ -72,6 +72,14 @@
   .prose p { orphans: 3; widows: 3; }
   .prose a.print-alt { background-image: none; }
   figure, .thesis, aside, .vid { break-inside: avoid; page-break-inside: avoid; }
+  /* Boxes that scroll sideways on screen would clip on paper: let them grow,
+     and wrap long code lines instead of cutting them off. */
+  .prose table, .prose pre, .prose .katex-display, .prose .katex-html, .prose mjx-container {
+    overflow: visible !important; max-width: 100% !important;
+  }
+  .prose pre { white-space: pre-wrap !important; word-break: break-word; }
+  .prose table { break-inside: auto; }
+  .prose tr { break-inside: avoid; }
   figure figcaption { font-size: 8.5pt !important; }
 
   /* The article's own Disclosure carries the same words, so the site footer
@@ -119,6 +127,10 @@
     --fig-chord: rgba(23,112,156,.45);
     --fig-slot: #FFFFFF;
   }
+  /* Code: swap Dracula for the light theme Shiki ships alongside it. */
+  html:not([data-print="dark"]) .astro-code { background-color: var(--code-bg) !important; border: 1px solid var(--rule); }
+  html:not([data-print="dark"]) .astro-code,
+  html:not([data-print="dark"]) .astro-code span { color: var(--shiki-light) !important; }
   /* Theme chips carry colours lifted toward white for the dark page. */
   html:not([data-print="dark"]) .themes a {
     color: var(--text-2) !important;

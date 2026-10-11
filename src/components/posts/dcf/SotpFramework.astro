@@ -1,0 +1,70 @@
+---
+/**
+ * Sum-of-the-parts framework for crypto-native companies. Was a transparent
+ * PNG whose white connectors and label vanished on paper; rebuilt as HTML on
+ * the site tokens so it reads in both the dark page and the light print.
+ */
+const BUCKETS = [
+  { name: "Token reserves", items: ["Fair market value", "Liquidity discounts", "Vesting schedules", "Regulatory uncertainty"] },
+  { name: "Operating business", items: ["Protocol fee revenue", "Operating expenses", "Terminal value scenarios", "Growth assumptions"] },
+  { name: "Cash & equivalents", items: ["Cash at par value", "Stablecoins as short-term investments (?)"] },
+];
+const RISKS = ["Regulatory uncertainty", "Technology obsolescence", "Tokenomic drift"];
+---
+<figure class="sotp" aria-label="Sum-of-the-parts valuation framework for crypto companies">
+  <div class="panel">
+    <p class="title">A DCF framework for crypto-native companies</p>
+    <div class="flow">
+      <div class="buckets">
+        {BUCKETS.map((b) => (
+          <div class="box bucket">
+            <p class="h">{b.name}</p>
+            <ul>{b.items.map((i) => <li>{i}</li>)}</ul>
+          </div>
+        ))}
+      </div>
+      <div class="join" aria-hidden="true"><span class="bracket"></span><span class="arrow">→</span></div>
+      <div class="mid">
+        <div class="box value"><p class="h">Enterprise value</p><p class="sub">Sum of 3 buckets</p></div>
+        <div class="box risk">
+          <p class="h">Key risks</p>
+          <ul>{RISKS.map((r) => <li>{r}</li>)}</ul>
+        </div>
+      </div>
+      <div class="step"><span class="arrow" aria-hidden="true">→</span><span class="lbl">Subtract debt &amp; other claims</span></div>
+      <div class="end">
+        <div class="box value"><p class="h">Equity value</p><p class="sub">What investors own</p></div>
+      </div>
+    </div>
+  </div>
+</figure>
+
+<style>
+  .sotp{ margin:clamp(30px,4.5vw,48px) 0; }
+  .panel{ background:var(--fig-panel); border:1px solid var(--rule); border-radius:var(--r-md); padding:18px 18px 20px; }
+  .title{ margin:0 0 16px; font-family:var(--serif); font-style:italic; font-size:20px; line-height:1.2; color:var(--glow); }
+  p{ margin:0; }
+  .flow{ display:grid; grid-template-columns:minmax(0,1.2fr) 34px minmax(0,1fr) minmax(70px,.55fr) minmax(0,.9fr); align-items:center; gap:0 6px; }
+  .buckets{ display:grid; gap:8px; }
+  .box{ border-radius:10px; padding:10px 12px; border:1px solid var(--fig-stroke); }
+  .h{ font-family:var(--sans); font-size:11px; font-weight:600; letter-spacing:.1em; text-transform:uppercase; color:var(--text); }
+  .sub{ font-family:var(--serif); font-size:13.5px; color:var(--text-2); margin-top:2px; }
+  ul{ margin:5px 0 0; padding-left:16px; font-family:var(--serif); font-size:13.5px; line-height:1.4; color:var(--text-2); }
+  .bucket{ background:var(--peacock-wash); border-color:var(--peacock-line); }
+  .value{ background:var(--fig-panel-accent); border-color:var(--iris); text-align:center; padding:14px 10px; }
+  .risk{ background:var(--fig-cell); border-color:var(--fig-friction); margin-top:10px; }
+  .risk .h{ color:var(--warn); }
+  .mid{ display:grid; }
+  .join{ align-self:stretch; display:flex; align-items:center; position:relative; }
+  .bracket{ position:absolute; left:0; top:12%; bottom:12%; width:12px; border:1.5px solid var(--fig-stroke-strong); border-left:0; border-radius:0 8px 8px 0; }
+  .arrow{ font-family:var(--sans); font-size:16px; color:var(--text-3); margin-left:16px; }
+  .step{ display:flex; flex-direction:column; align-items:center; text-align:center; gap:2px; }
+  .step .arrow{ margin:0; }
+  .lbl{ font-family:var(--sans); font-size:10px; line-height:1.3; color:var(--text-3); }
+  @media (max-width:640px){
+    .flow{ grid-template-columns:1fr; gap:8px; }
+    .join{ display:none; }
+    .step{ flex-direction:row; justify-content:center; gap:8px; }
+    .step .arrow{ transform:rotate(90deg); }
+  }
+</style>
