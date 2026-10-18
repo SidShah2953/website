@@ -1,0 +1,25 @@
+{
+  // analytics.siddhants.com: private readership dashboard. See README.md.
+  "name": "siddhants-analytics",
+  "main": "src/worker.js",
+  "compatibility_date": "2026-09-01",
+  "assets": { "directory": "./public", "binding": "ASSETS" },
+  "routes": [{ "pattern": "analytics.siddhants.com", "custom_domain": true }],
+  "workers_dev": false,
+  // The readership cache (schema.sql). The dashboard reads only from here.
+  "d1_databases": [
+    { "binding": "DB", "database_name": "siddhants-analytics", "database_id": "e7931a56-3a48-48b8-83eb-b2ab86a866d7" }
+  ],
+  // Sync every 30 minutes: recent days, Kit, and a slice of history each run.
+  "triggers": { "crons": ["*/30 * * * *"] },
+  "preview_urls": false,
+  "vars": {
+    "CF_ACCOUNT_ID": "5e5bf3007aa0b1e48b46ed066d0b4bc3",
+    // Filled in once Cloudflare Access protects the hostname: the team name
+    // (<team>.cloudflareaccess.com) and the application's Audience (AUD) tag.
+    // Until both are set, /api refuses every request.
+    "ACCESS_TEAM": "damp-field-419d",
+    "ACCESS_AUD": "d75a430925b740f795c91f8cbfcc545f3bac83f3265be887e1bc720a4c894438"
+  }
+  // Secrets (wrangler secret put ...): GOATCOUNTER_TOKEN, KIT_API_KEY, CF_API_TOKEN
+}
