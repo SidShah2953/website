@@ -23,6 +23,8 @@ npm run favicon        npm run check:readdepth
 npm run newsletter:dry
 ```
 
+`subdomains/` holds separate apps on subdomains of siddhants.com (`analytics/` = analytics.siddhants.com, a Cloudflare Worker). They are not part of the site: the build, `astro check` and ESLint skip the folder, and each deploys on its own. See `subdomains/README.md`. Never commit their secrets; this repo is public.
+
 ## Deploy — read this before touching CI
 
 **Cloudflare Pages builds and serves siddhants.com.** It watches `main` and
