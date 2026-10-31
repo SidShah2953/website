@@ -1,7 +1,7 @@
 # siddhants.com
 
-Personal writing site. This is the primary professional identity online, not a
-side project — design quality is a feature.
+Personal writing site: ideas Sid wants to think through, plus background on him.
+Design quality is a feature.
 
 The owner-facing reference (what runs automatically, the publish / update /
 takedown / republish workflows, settings and secrets) is in the Obsidian vault
