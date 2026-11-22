@@ -7,7 +7,7 @@ import { readFileSync } from "node:fs";
 
 type Props = HeadTags;
 
-const { title, noindex, canonical, og, markdown } = Astro.props;
+const { title, noindex, canonical, og, markdown, themeColor = "#050C0F" } = Astro.props;
 // Front matter descriptions carry Markdown (`USDC`, *emphasis*). The marks
 // are noise in a search snippet, so strip them from the meta text only.
 const plain = (s?: string) => s?.replace(/[*`]/g, "");
@@ -116,8 +116,8 @@ const openGraph = {
         // sit as a strip of a different colour above and below a dark page.
         // The site is dark in both system modes, so both media get the ground;
         // without a media match some browsers fall back to their own light bar.
-        { name: "theme-color", content: "#050C0F", media: "(prefers-color-scheme: dark)" },
-        { name: "theme-color", content: "#050C0F", media: "(prefers-color-scheme: light)" },
+        { name: "theme-color", content: themeColor, media: "(prefers-color-scheme: dark)" },
+        { name: "theme-color", content: themeColor, media: "(prefers-color-scheme: light)" },
         // Home-screen (standalone) launches: draw under a transparent status bar.
         { name: "apple-mobile-web-app-status-bar-style", content: "black-translucent" },
       ],

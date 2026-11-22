@@ -4,7 +4,7 @@
 //   node scripts/checks/edges.mjs [--base http://localhost:4321]
 //
 // Mobile browsers fill the status-bar and toolbar areas with theme-color / the
-// root background (#050C0F here). If the page arrives at a different colour at
+// root background. If the page arrives at a different colour at
 // its top or bottom edge, the bar shows as a flat strip. This loads pages at
 // 390x844 with emulated notch/home-indicator safe areas, reads the computed
 // root colours and safe-area padding, and samples the rendered edge rows.
@@ -51,7 +51,10 @@ for (const [path, scrollTo] of [["/", 0], ["/", 1], ["/blog/", 0], ["/blog/lego-
   });
   const png = PNG.sync.read(await page.screenshot());
   const top = rowAvg(png, 0), bottom = rowAvg(png, png.height - 1);
+  // the top edge meets the status bar / URL bar, which takes theme-color
+  const hex = (info.themeColor[0] || "#050C0F").slice(1, 7);
+  const theme = [0, 2, 4].map((k) => parseInt(hex.slice(k, k + 2), 16));
   console.log(JSON.stringify({ path, scrolled: !!scrollTo, ...info,
-    topRow: top, topOff: dist(top, GROUND), bottomRow: bottom, bottomOff: dist(bottom, GROUND) }));
+    topRow: top, topOffTheme: dist(top, theme), bottomRow: bottom, bottomOffGround: dist(bottom, GROUND) }));
 }
 await browser.close();
