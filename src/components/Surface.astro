@@ -207,11 +207,17 @@ if (host && cv && gl) {
   const reduce = matchMedia('(prefers-reduced-motion: reduce)');
 
   // Quality is resolution: canvas pixels per CSS pixel. Tier 0 is the display's
-  // native density (capped at 2x). The old ladder multiplied that by as little
+  // native density (capped at MAXDPR). The old ladder multiplied that by as little
   // as 0.45, which on a 1x laptop is 45% of the screen, and it only ever went
   // down: a 1366x768 laptop on battery ended up drawing 615x346 and stretching
   // it. Now the scale never drops below FLOOR CSS pixels, and it can climb back.
-  const MAXDPR = 2, FLOOR = .75;
+  // Laptops and desktops (fine pointer) cap at 1.5: at 2x a 1440x900 screen is
+  // 5.2 million pixels of ray-marching, 17 to 40 ms a frame even on an Apple M5,
+  // so the hero ran near 30 fps. At 1.5 it is 44% fewer pixels; the difference
+  // after the browser upscales averages 0.15 levels in 255 (measured). Phones
+  // keep 2x: their screens are small enough to hold 60 fps there, and they are
+  // viewed closer.
+  const MAXDPR = matchMedia('(pointer: coarse)').matches ? 2 : 1.5, FLOOR = .75;
   const TIERS = [1, .8, .65, .5];
   let tier = 0;
   const scaleAt = (k:number) => Math.max(FLOOR, Math.min(devicePixelRatio || 1, MAXDPR) * TIERS[k]);
