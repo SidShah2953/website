@@ -86,7 +86,7 @@
      would print the disclaimer twice. */
   body > footer { display: none !important; }
 
-  /* Tokens Shell.astro declares as themselves, which resolve to nothing. */
+  /* Dark-print values for the code tokens (slightly different from screen). */
   html:root { --surface-3: rgba(255,255,255,.06); --code-bg: #0B151A; }
 }
 

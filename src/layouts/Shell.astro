@@ -90,10 +90,10 @@ const nav = [
 <!DOCTYPE html>
 <html lang="en" class={snap ? "snap" : undefined}>
   {/* The bar colour is the colour the page really has at its top edge:
-      ground on the homepage, which fades to it, and the mean of the peacock
-      wash across the top row on interior pages (#021B27, sampled from the
-      built page; it runs #03151D at the sides to #021F2F in the middle). */}
-  <SEOTags {...headTags} themeColor={atmosphere === "lines" ? "#021B27" : "#050C0F"} />
+      ground on the homepage, which fades to it, and on interior pages the
+      filled header over the peacock wash (#051016, the mean of the top row
+      in the built page; it runs #050F13 at the sides to #051218 mid). */}
+  <SEOTags {...headTags} themeColor={atmosphere === "lines" ? "#051016" : "#050C0F"} />
   {/* Every page sets its text in these two files, but the browser only finds
       them after downloading and parsing the stylesheet. Preloading starts both
       in the first round trip, so the real faces arrive before the first paint
@@ -169,7 +169,7 @@ const nav = [
            card, a callout and a table header cannot drift apart. */
         --surface-1:rgba(255,255,255,.028);   /* cards, callouts, the disclosure */
         --surface-2:rgba(255,255,255,.05);    /* hover state of the above */
-        --surface-3:var(--surface-3);    /* inline code, chips */
+        --surface-3:rgba(255,255,255,.07);    /* inline code, chips */
         --surface-sunk:#0C1519;               /* sticky table headers */
 
         /* Accent tints. Named by intent so a component asks for "the peacock
@@ -192,12 +192,17 @@ const nav = [
         /* Ambient layers. The flow-line gradient and the drifting sky blobs are
            the only places the palette appears at low saturation, so they get
            named stops rather than one-off literals. */
-        --haze-teal:var(--haze-teal);
-        --haze-navy:var(--haze-navy);
-        --haze-iris:var(--haze-iris);
-        --header-bg:var(--header-bg);
-        --code-bg:var(--code-bg);
-        --selection:var(--selection);
+        /* These seven were written as var(--self) in 7a39920, which resolves
+           to nothing: the haze never drew, the solid header had no fill, code
+           had no ground and selection fell back to the browser's. Values are
+           the literals they replaced; the teal haze and the selection follow
+           the accent's later move to blue (5148d06), as every other tint did. */
+        --haze-teal:#0E4260;                  /* was #0E5560 before the bluer accent */
+        --haze-navy:#173F86;
+        --haze-iris:#3B2E7A;
+        --header-bg:rgba(5,12,15,.72);
+        --code-bg:rgba(0,0,0,.34);
+        --selection:rgba(69,181,237,.24);     /* --glow at .24; was the old glow */
         /* Radius scale. Ten values were in use (10/12/14/16/26px and friends),
            all doing panel duty, which is why panels disagreed by a couple of
            pixels wherever two sat side by side. */
