@@ -147,6 +147,21 @@ const nav = [
     )}
 
     <style is:global>
+      /* Metric-matched fallbacks. Until the web fonts arrive the page is set
+         in Georgia / Helvetica; Georgia runs ~7% wider than Newsreader 300, so
+         paragraphs re-wrapped and the page jumped when the font swapped in
+         (blog index CLS 0.29 on a phone over slow 4G). These faces scale the
+         local fonts to the web fonts' measured widths (canvas measureText over
+         the page's own text) so the swap no longer moves lines. A face whose
+         local() font is missing is skipped and the stack falls through. */
+      @font-face{font-family:"Newsreader Fallback G";src:local("Georgia");
+        size-adjust:93.76%;ascent-override:78.93%;descent-override:27.73%;line-gap-override:0%}
+      @font-face{font-family:"Newsreader Fallback T";src:local("Times New Roman"),local("TimesNewRomanPSMT");
+        size-adjust:102.3%;ascent-override:72.34%;descent-override:25.42%;line-gap-override:0%}
+      @font-face{font-family:"Schibsted Fallback H";src:local("Helvetica Neue"),local("HelveticaNeue");
+        size-adjust:101.04%;ascent-override:96.99%;descent-override:25.73%;line-gap-override:0%}
+      @font-face{font-family:"Schibsted Fallback A";src:local("Arial"),local("ArialMT");
+        size-adjust:104.89%;ascent-override:93.43%;descent-override:24.79%;line-gap-override:0%}
       :root{
         --ground:#050C0F; --deep:#0A2027; --abyss:#0C3A42;
         --peacock:#208EC5; --glow:#45B5ED; --azure:#2F6FE8; --iris:#6A5AD8;
@@ -211,8 +226,8 @@ const nav = [
         --r-lg:20px;     /* large containers: word map, spreadsheet, hero panels */
         --r-pill:999px;  /* buttons, badges, tags */
 
-        --serif:"Newsreader Variable",Georgia,"Times New Roman",serif;
-        --sans:"Schibsted Grotesk Variable","Helvetica Neue",Arial,sans-serif;
+        --serif:"Newsreader Variable","Newsreader Fallback G","Newsreader Fallback T",Georgia,"Times New Roman",serif;
+        --sans:"Schibsted Grotesk Variable","Schibsted Fallback H","Schibsted Fallback A","Helvetica Neue",Arial,sans-serif;
         --hdr-h:64px;
 
         /* Figures (src/components/figures, posts/*): drawn as inline SVG/HTML
