@@ -81,9 +81,11 @@ if (ready && !/\/forms\/[^/]+\/subscriptions\/?$/.test(action)) {
     border:0;border-radius:var(--r-pill);padding:13px 26px;cursor:pointer;
     font-family:var(--sans);font-size:14.5px;font-weight:500;color:var(--on-accent);
     background:linear-gradient(102deg,var(--glow),var(--peacock) 55%,var(--azure));
-    background-size:200% 100%;transition:background-position .5s,opacity .3s;
+    background-size:200% 100%;transition:background-position .5s,opacity .3s,scale .15s ease-out;
   }
   button:hover:not(:disabled){background-position:100% 0}
+  /* press feedback: a small give under the finger, never a bounce */
+  button:active:not(:disabled){scale:.97}
   button:disabled{opacity:.4;cursor:not-allowed}
   .status{font-family:var(--sans);font-size:13.5px;margin:2px 0 0;color:var(--glow)}
   .status[data-bad]{color:var(--warn)}

@@ -164,6 +164,7 @@ const usedThemes = [...new Set(feed.flatMap(themesOf))]
     font-family:var(--sans);font-size:13px;transition:all .2s;
   }
   .chips button:hover{ color:var(--text);border-color:var(--rule-strong); }
+  .chips button:active{ scale:.97; }
   .chips button[aria-pressed="true"]{
     color:var(--ac,var(--glow));border-color:var(--ac,var(--peacock));
     background:var(--peacock-wash);
