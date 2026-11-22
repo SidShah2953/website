@@ -11,7 +11,7 @@
 import { chromium } from 'playwright';
 
 const BASE = process.argv[2] || 'http://localhost:3000';
-const PAGE = '/blog/coin-research-202602/base-chain/';
+const PAGE = '/blog/coin-research-202603/base-chain/';
 
 // Stand in for GoatCounter, which is PROD-only and must not receive test hits.
 const STUB = `window.goatcounter = { count: (o) => (window.__ev ||= []).push(o.path) };`;
@@ -64,7 +64,7 @@ for (const r of [fast, slow]) {
   const reads = r.ev.filter((e) => e.startsWith('read/')).length;
   if (r === fast) check(reads === 0, 'a 2s scroll-through is NOT counted as a read');
   else check(reads === 1, 'a genuine read IS counted, exactly once');
-  check(r.ev.every((e) => e.endsWith('/blog/coin-research-202602/base-chain')), 'every event carries the article path');
+  check(r.ev.every((e) => e.endsWith('/blog/coin-research-202603/base-chain')), 'every event carries the article path');
 }
 
 console.log(bad ? `\n${bad} failing assertion(s)` : '\nall assertions passed');

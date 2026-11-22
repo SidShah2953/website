@@ -67,7 +67,7 @@ for (const [w, h] of SIZES) {
     const probe = document.createElement("i"); document.body.append(probe);
     const resolve = (v) => { probe.style.color = ""; probe.style.color = v; return cs(probe).color; };
     const out = {
-      y: Math.round(scrollY), n: slides.length, i, tall: slides[i].offsetHeight > innerHeight + 2,
+      y: Math.round(scrollY), n: slides.length, i, tall: slides[i].classList.contains("long") || slides[i].offsetHeight > innerHeight + 2,   // a long slide is one screen tall but scrolls inside
       section: resolve(cs(slides[i]).getPropertyValue("--section-bg").trim() || "transparent"),
       chrome: resolve(cs(root).getPropertyValue("--chrome").trim() || "transparent"),
       html: cs(root).backgroundColor, body: cs(document.body).backgroundColor,

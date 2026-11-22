@@ -50,7 +50,7 @@ async function runSize(browser, [w, h]) {
     const s = [...document.querySelectorAll(".slide")];
     return { y: Math.round(scrollY), tops: s.map(top), long: s.map((e) => e.classList.contains("long")),
       inner: s.map((e) => Math.round(e.scrollTop)), max: s.map((e) => e.scrollHeight - e.clientHeight),
-      moves: window.__sections.moves() };
+      moves: window.__sections.moves(), starts: window.__sections.starts() };
   });
   let g = await geo();
   const L = g.long.indexOf(true);
@@ -67,6 +67,9 @@ async function runSize(browser, [w, h]) {
   }, [on, L]);
   const place = (k, inner) => page.evaluate(([k, inner, L]) => {
     const s = document.querySelectorAll(".slide");
+    // every other slide starts at its own top, so an earlier scenario that
+    // scrolled one (a burst's late flick, say) cannot leak into this one
+    s.forEach((e, k) => { if (k !== L) e.scrollTop = 0; });
     if (inner != null) s[L].scrollTop = inner;
     const top = (e) => { let y = 0; for (let n = e; n; n = n.offsetParent) y += n.offsetTop; return y; };
     scrollTo({ top: top(s[k]), behavior: "instant" });
@@ -117,9 +120,12 @@ async function runSize(browser, [w, h]) {
     return { before, after, dm: after.moves - before.moves };
   };
 
-  // inside: from the start, flicks and a slow drag scroll it, page still
+  // inside: from the start, a slow drag then a flick scroll it, page still.
+  // The drag comes first: on a slide only a little taller than the screen
+  // (231 px at 430x740) a flick's momentum reaches the end, and a gesture
+  // after it would start at the edge, where pulling out is a legal handoff.
   let r = await scenario("inside", () => place(L, 0), async () => {
-    await swipe(180, 90); await sleep(700); await swipe(120, 500, 16);
+    await swipe(Math.min(80, Math.round(MAX / 3)), 500, 16); await sleep(700); await swipe(120, 90);
   }, 1);
   check("inside: page stayed on the long slide, no move", r.after.y === TOP && r.dm === 0, r.after);
   check("inside: slide scrolled down", r.after.inner[L] > 0, r.after.inner[L]);
@@ -136,11 +142,19 @@ async function runSize(browser, [w, h]) {
   r = await scenario("handoff", () => place(L, MAX), () => swipe(140, 160), 0);
   check("handoff: exactly one move, to the next slide's top", r.dm === 1 && r.after.y === NEXT, r.after);
 
-  // burst: three flicks at the end, 60 ms apart: still one move
+  // burst: three flicks at the end, 60 ms apart. Each CDP touch event waits
+  // for a frame, so a later flick can begin after the transition and its
+  // cooldown have ended: that is a fresh gesture, and moving for it is right.
+  // What must hold: flicks that begin during a transition are swallowed, and
+  // no gesture moves more than once (moves <= gestures begun outside a
+  // transition), and the first lands on the next slide (checked by handoff).
   r = await scenario("burst", () => place(L, MAX), async () => {
     for (let k = 0; k < 3; k++) { await swipe(400, 90); await sleep(60); }
   }, null, 1500);
-  check("burst: exactly one move, never two", r.dm === 1 && r.after.y === NEXT, r.after);
+  {
+    const fresh = r.after.starts - r.before.starts;
+    check("burst: at least one move, never more than one per fresh gesture", r.dm >= 1 && r.dm <= fresh && fresh <= 3 && r.after.tops.includes(r.after.y), { dm: r.dm, fresh, y: r.after.y });
+  }
 
   // back: from the next slide, one swipe back lands on the long slide's end
   r = await scenario("back", () => place(L + 1, MAX), () => swipe(-160, 160), null);
@@ -182,7 +196,7 @@ async function runSize(browser, [w, h]) {
   const mid = Math.round(MAX / 2);
   await place(L, mid); await sleep(500);
   await page.goto(BASE + "/blog/", { waitUntil: "load" }); await sleep(400);
-  await page.goBack({ waitUntil: "load" }); await sleep(1200);
+  await page.goBack({ waitUntil: "commit" }); await sleep(1500);   // a bfcache restore fires no load
   g = await geo();
   check("restore: back from /blog/ to the same slide and position", g.y === g.tops[L] && Math.abs(g.inner[L] - mid) <= 2, { y: g.y, inner: g.inner[L], mid });
   await page.reload({ waitUntil: "load" }); await sleep(1200);
