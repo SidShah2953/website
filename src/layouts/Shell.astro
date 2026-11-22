@@ -427,7 +427,8 @@ const nav = [
       html.snap-js, html.snap-js body{ overscroll-behavior-y:none; }
 
       /* scroll choreography: sections rise in, and settle out downward */
-      .rise{opacity:0;transform:translateY(34px);
+      /* entrances start slightly small (0.97) as well as low, never from nothing */
+      .rise{opacity:0;transform:translateY(34px) scale(.97);
         transition:opacity .95s cubic-bezier(.2,.7,.3,1),transform .95s cubic-bezier(.2,.7,.3,1)}
       .rise.in{opacity:1;transform:none}
 
