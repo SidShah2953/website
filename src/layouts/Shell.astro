@@ -42,6 +42,8 @@ export type Props = HeadTags & {
   footer?: boolean;
 };
 const { transparentHeader = false, snap = false, atmosphere = "lines", footer = true, ...headTags } = Astro.props;
+/* theme-color, and the solid strip the status bar sits on (--bar-top). */
+const barTop = atmosphere === "lines" ? "#051016" : "#050C0F";
 
 /* ---------------------------------------------------------------------------
    Flow lines, generated once at build time. These trace the same value-noise
@@ -88,12 +90,12 @@ const nav = [
 ];
 ---
 <!DOCTYPE html>
-<html lang="en" class={snap ? "snap" : undefined}>
+<html lang="en" class={snap ? "snap" : undefined} style={`--bar-top:${barTop}`}>
   {/* The bar colour is the colour the page really has at its top edge:
       ground on the homepage, which fades to it, and on interior pages the
       filled header over the peacock wash (#051016, the mean of the top row
       in the built page; it runs #050F13 at the sides to #051218 mid). */}
-  <SEOTags {...headTags} themeColor={atmosphere === "lines" ? "#051016" : "#050C0F"} />
+  <SEOTags {...headTags} themeColor={barTop} />
   {/* Every page sets its text in these two files, but the browser only finds
       them after downloading and parsing the stylesheet. Preloading starts both
       in the first round trip, so the real faces arrive before the first paint
@@ -314,6 +316,20 @@ const nav = [
         transition:opacity .5s ease,transform .5s ease;
       }
       .hdr.solid .mark,.hdr.filled .mark{opacity:1;transform:none}
+      /* Phone bars on every page but the homepage (whose veil does this, per
+         section). The status bar sits on the header's safe-area strip: solid
+         theme-color there, so text scrolling under the translucent header
+         never tints it. The home indicator / toolbar sits on a solid strip of
+         the page edge colour, so the flow lines, the wash and scrolling text
+         never show through it. Both are 0 px tall without a safe area. */
+      html:not(.snap) .hdr.solid{
+        background:linear-gradient(var(--bar-top),var(--bar-top)) 0 0/100% env(safe-area-inset-top,0px) no-repeat,var(--header-bg);
+      }
+      html:not(.snap) body::after{
+        content:"";position:fixed;left:0;right:0;bottom:0;z-index:49;pointer-events:none;
+        height:env(safe-area-inset-bottom,0px);background:var(--chrome);
+      }
+      @media print{ html:not(.snap) body::after{display:none} }
 
       /* Page transitions (View Transitions API, cross-document). Browsers
          without it navigate exactly as before. The name in the homepage hero
