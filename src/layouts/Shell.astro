@@ -397,6 +397,18 @@ const nav = [
       @media (prefers-reduced-motion:no-preference){
         html.snap.snap-ok{ scroll-snap-type:y mandatory; }
       }
+      /* Touch screens: one swipe moves one slide (src/scripts/sections.ts),
+         including over slides taller than the screen, which scroll inside
+         themselves first. The script owns the gesture, so CSS snapping is off
+         while it runs. If the script never loads, mandatory snap is the
+         fallback: an oversized snap area still scrolls freely inside itself
+         in current Chrome and Safari. */
+      @media (pointer:coarse) and (prefers-reduced-motion:no-preference){
+        html.snap:not(.snap-js){ scroll-snap-type:y mandatory; }
+      }
+      html.snap-js{ scroll-snap-type:none!important; scroll-behavior:auto; }
+      /* the browser's own pull/overscroll would fight a slide transition */
+      html.snap-js, html.snap-js body{ overscroll-behavior-y:none; }
 
       /* scroll choreography: sections rise in, and settle out downward */
       .rise{opacity:0;transform:translateY(34px);
@@ -412,6 +424,7 @@ const nav = [
     </style>
 
     <script>
+      import { initSections } from '@/scripts/sections';
       const hdr = document.getElementById('hdr')!;
       if (!hdr.classList.contains('solid')) {
         const onScroll = () => hdr.classList.toggle('filled', window.scrollY > 80);
@@ -420,7 +433,10 @@ const nav = [
       }
       // enable snapping only while every slide fits the viewport
       const root = document.documentElement;
-      if (root.classList.contains('snap')) {
+      if (root.classList.contains('snap') && matchMedia('(pointer:coarse)').matches) {
+        // touch: the gesture controller handles slides of any height
+        initSections({ root, slides: [...document.querySelectorAll<HTMLElement>('.slide')] });
+      } else if (root.classList.contains('snap')) {
         const slides = [...document.querySelectorAll<HTMLElement>('.slide')];
         const fits = () => slides.every((s) => s.getBoundingClientRect().height <= innerHeight + 1);
         const sync = () => root.classList.toggle('snap-ok', slides.length > 0 && fits());
