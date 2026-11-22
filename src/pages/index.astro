@@ -148,10 +148,16 @@ const desc =
                               transparent 78%,
                               color-mix(in srgb, var(--ground) 42%, transparent) 100%);
   }
+  /* Phones: the veil ends in solid ground at both edges. Mobile browsers fill
+     the status-bar and toolbar areas with the page ground (#050C0F), so the
+     page has to arrive at exactly that colour where it meets them; it used to
+     end at 80% ground over the lit surface, which left a visibly lighter band
+     right above a flat near-black toolbar. */
   @media(max-width:860px){
     .veil{background:linear-gradient(180deg,
-      color-mix(in srgb, var(--ground) 80%, transparent) 0%, var(--scrim-1) 38%,
-      var(--scrim-1) 70%, color-mix(in srgb, var(--ground) 80%, transparent) 100%)}
+      var(--ground) 0%, color-mix(in srgb, var(--ground) 80%, transparent) 6%,
+      var(--scrim-1) 38%, var(--scrim-1) 70%,
+      color-mix(in srgb, var(--ground) 80%, transparent) 90%, var(--ground) 100%)}
   }
   /* content rides above the fixed surface + veil */
   .slide{ z-index:1; }
@@ -176,7 +182,7 @@ const desc =
   @keyframes up{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:none}}
   @keyframes hue{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
 
-  .scroll-cue{position:absolute;left:50%;bottom:38px;translate:-50% 0;
+  .scroll-cue{position:absolute;left:50%;bottom:calc(38px + env(safe-area-inset-bottom,0px));translate:-50% 0;
     width:1px;height:52px;background:linear-gradient(var(--text-3),transparent);overflow:hidden}
   .scroll-cue span{position:absolute;inset:0;background:var(--glow);animation:cue 2.6s ease-in-out infinite}
   @keyframes cue{0%{transform:translateY(-100%)}60%,100%{transform:translateY(100%)}}

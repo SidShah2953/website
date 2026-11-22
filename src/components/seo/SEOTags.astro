@@ -105,12 +105,21 @@ const openGraph = {
         ...(markdown ? [{ rel: "alternate", type: "text/markdown", href: markdown }] : []),
       ],
       meta: [
-        { name: "viewport", content: "width=device-width, initial-scale=1" },
+        // viewport-fit=cover lets the page paint into the notch / status bar
+        // and home-indicator areas instead of the browser filling them with a
+        // flat colour; Shell pads the header and bottom-anchored UI with
+        // env(safe-area-inset-*) so nothing sits under them.
+        { name: "viewport", content: "width=device-width, initial-scale=1, viewport-fit=cover" },
         { name: "generator", content: Astro.generator },
         { name: "author", content: "Siddhant Shah" },
-        // tints mobile browser chrome to the page ground, so the bar does
-        // not sit as a bright strip above a dark page
-        { name: "theme-color", content: "#050C0F" },
+        // Tints mobile browser chrome to the page ground, so the bars do not
+        // sit as a strip of a different colour above and below a dark page.
+        // The site is dark in both system modes, so both media get the ground;
+        // without a media match some browsers fall back to their own light bar.
+        { name: "theme-color", content: "#050C0F", media: "(prefers-color-scheme: dark)" },
+        { name: "theme-color", content: "#050C0F", media: "(prefers-color-scheme: light)" },
+        // Home-screen (standalone) launches: draw under a transparent status bar.
+        { name: "apple-mobile-web-app-status-bar-style", content: "black-translucent" },
       ],
     }}
   />

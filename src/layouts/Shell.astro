@@ -229,7 +229,11 @@ const nav = [
          makes body its own scroll container, which silently kills scroll-snap
          set on html. */
       *,*::before,*::after{ min-width:0; }
-      html{scroll-behavior:smooth;-webkit-font-smoothing:antialiased}
+      /* The ground is set on html as well as body. Overscroll (rubber-band) and
+         the areas mobile browsers paint behind their bars take the root
+         background; leaving it to propagate from body worked, but one later
+         body background change would turn those strips a different colour. */
+      html{scroll-behavior:smooth;-webkit-font-smoothing:antialiased;background:var(--ground)}
       body{
         margin:0;background:var(--ground);color:var(--text);
         overflow-wrap:break-word;
@@ -260,9 +264,14 @@ const nav = [
       @keyframes f3{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(5vw,-6vh) scale(1.16)}}
 
       .hdr{
-        position:fixed;top:0;left:0;right:0;height:var(--hdr-h);z-index:50;
+        position:fixed;top:0;left:0;right:0;z-index:50;
         display:flex;align-items:center;justify-content:space-between;
-        padding:0 clamp(18px,4vw,42px);
+        /* viewport-fit=cover: grow into the status-bar / notch area (0 in a
+           normal browser tab, non-zero in landscape and home-screen launches)
+           so the nav never sits underneath it */
+        height:calc(var(--hdr-h) + env(safe-area-inset-top,0px));
+        padding:env(safe-area-inset-top,0px) max(clamp(18px,4vw,42px), env(safe-area-inset-right,0px))
+                0 max(clamp(18px,4vw,42px), env(safe-area-inset-left,0px));
         background:transparent;backdrop-filter:blur(0px);
         border-bottom:1px solid transparent;
         transition:background .5s ease,backdrop-filter .5s ease,border-color .5s ease;
@@ -362,7 +371,8 @@ const nav = [
         letter-spacing:.09em;text-transform:uppercase;display:flex;flex-wrap:wrap;gap:6px 14px; }
       footer{
         position:relative;z-index:1;border-top:1px solid var(--rule);
-        margin-top:clamp(60px,10vw,120px);padding:38px clamp(18px,4vw,42px) 54px;
+        margin-top:clamp(60px,10vw,120px);
+        padding:38px clamp(18px,4vw,42px) calc(54px + env(safe-area-inset-bottom,0px));
         font-family:var(--sans);font-size:13px;color:var(--text-3);
         display:flex;flex-wrap:wrap;gap:8px 26px;
         justify-content:space-between;align-items:baseline;
