@@ -174,6 +174,18 @@ const desc =
   }
   /* content rides above the fixed surface + veil */
   .slide{ z-index:1; }
+  /* Touch screens: a slide taller than the screen is one screen tall and
+     scrolls inside itself (class set by src/scripts/sections.ts). Native
+     momentum and rubber band stay inside it; overscroll-behavior stops them
+     at its edges, so they never carry the page into the next slide. Its
+     content starts below the fixed header and ends above the home indicator. */
+  .slide.long{
+    height:100svh;min-height:0;overflow-y:auto;overscroll-behavior:contain;
+    justify-content:flex-start;scrollbar-width:none;
+    padding-top:calc(var(--hdr-h) + env(safe-area-inset-top,0px));
+    padding-bottom:env(safe-area-inset-bottom,0px);
+  }
+  .slide.long::-webkit-scrollbar{display:none}
   .kicker{
     font-family:var(--sans);font-size:12px;letter-spacing:.24em;text-transform:uppercase;
     color:var(--text-3);margin:0 0 18px;

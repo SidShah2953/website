@@ -13,10 +13,11 @@
 //   (touches start in the 6 px left gutter, so a tap never follows a link)
 //   mid    a flick, then a second one 200 ms later, mid-transition (swallowed)
 //
-// A rest position is valid when the viewport top is on a slide's top (a slide
-// that fits the screen) or anywhere within a tall slide's own scroll range.
-// "One per gesture": the slide index changes by at most 1, and by exactly 1
-// for an intentful gesture that starts on a slide that fits.
+// A rest position is valid when the viewport top is on a slide's top: long
+// slides scroll inside themselves, so the page never rests between slides.
+// "One per gesture": the slide index changes by at most 1, by exactly 1 for an
+// intentful gesture on a slide that fits or at a long slide's edge heading
+// out, and by 0 for one inside a long slide heading away from its edge.
 import { chromium } from "playwright";
 
 const arg = (k, d) => { const i = process.argv.indexOf(k); return i > 0 ? process.argv[i + 1] : d; };
@@ -36,17 +37,20 @@ async function runSize(browser, [w, h]) {
   const cdp = await ctx.newCDPSession(page);
   await page.goto(BASE + "/", { waitUntil: "load" });
   await sleep(800);
+  // Long slides scroll inside themselves (class "long"): the page only ever
+  // rests on a slide's top, and a long slide's own position is its scrollTop.
   const geo = () => page.evaluate(() => {
     const top = (e) => { let y = 0; for (let n = e; n; n = n.offsetParent) y += n.offsetTop; return y; };
-    const s = [...document.querySelectorAll(".slide")].map((e) => [top(e), e.offsetHeight]);
+    const s = [...document.querySelectorAll(".slide")].map((e) => [top(e), e.offsetHeight,
+      e.classList.contains("long"), Math.round(e.scrollTop), e.scrollHeight - e.clientHeight]);
     return { y: scrollY, vh: innerHeight, s, js: document.documentElement.classList.contains("snap-js") };
   });
   const state = (g) => {
     const y = g.y; let i = 0;
     g.s.forEach(([t], k) => { if (t <= y + 2) i = k; });
-    const [t, hh] = g.s[i], tall = hh > g.vh + 2, end = t + Math.max(0, hh - g.vh);
-    const valid = tall ? y >= t - 2 && y <= end + 2 : Math.abs(y - t) <= 2;
-    return { i, tall, valid, atEnd: Math.abs(y - end) <= 2, atTop: Math.abs(y - t) <= 2 };
+    const [t, , long, inner, max] = g.s[i];
+    return { i, tall: long, inner, valid: Math.abs(y - t) <= 2,
+      atEnd: !long || inner >= max - 2, atTop: !long || inner <= 2 };
   };
   // Each swipe records whether the controller was mid-transition when the
   // finger went down: such a gesture must be swallowed, not counted.
@@ -66,11 +70,15 @@ async function runSize(browser, [w, h]) {
   if (!g0.js) throw new Error("controller not active (html.snap-js missing)");
   const res = { size: `${w}x${h}`, runs: 0, pass: 0, fails: [] };
   for (let n = 0; n < N; n++) {
-    // start: a random slide, at its top (or for a tall slide, sometimes its end)
+    // start: a random slide, at its top; a long slide at its start, its end
+    // or somewhere in between
     const g = await geo(), k = Math.floor(rnd() * g.s.length);
-    const [t, hh] = g.s[k];
-    const startY = hh > g.vh + 2 && rnd() < .5 ? t + hh - g.vh : t;
-    await page.evaluate((y) => scrollTo({ top: y, behavior: "instant" }), startY);
+    const [t, , long, , max] = g.s[k];
+    const r = rnd(), inner = !long ? 0 : r < .35 ? 0 : r < .7 ? max : Math.round(max * (.2 + .6 * rnd()));
+    await page.evaluate(([y, k, inner]) => {
+      const s = document.querySelectorAll(".slide")[k]; s.scrollTop = inner;
+      scrollTo({ top: y, behavior: "instant" });
+    }, [t, k, inner]);
     await sleep(250);
     const before = state(await geo());
     const [m0, f0] = await page.evaluate(() => [window.__sections.moves(), window.__sections.starts()]);
@@ -102,9 +110,9 @@ async function runSize(browser, [w, h]) {
       if (ok && !intent) ok = d === 0;
       else if (ok && edgeOfPage) ok = d === 0;
       else if (ok && (!before.tall || leavesTall)) ok = d === dir;
-      // inside a tall slide a swipe scrolls it, and one that pulls well past
-      // its edge may cross over: by one slide at most, in its own direction
-      else if (ok && before.tall) ok = d === 0 || d === dir;
+      // inside a long slide, away from the edge it heads for, a swipe only
+      // scrolls the slide: the page never moves
+      else if (ok && before.tall) ok = d === 0 && moves === 0;
     }
     res.runs++; if (ok) res.pass++;
     else res.fails.push({ kind, dir, free, moves, from: before, to: after });

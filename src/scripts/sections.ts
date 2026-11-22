@@ -3,24 +3,29 @@
  *
  * Desktop gets this from CSS alone (`scroll-snap-type: y mandatory` plus
  * `scroll-snap-stop: always` on each .slide), which is enabled once every slide
- * fits the window. Phones never got it: the "Who I am" slide is 900-1100 px tall
- * at phone widths, mandatory snap over a slide taller than the screen traps the
- * reader, so the gate in Shell switched snapping off for the whole page.
- *
- * On a touch screen this controller takes over instead:
+ * fits the window. On a touch screen this controller takes over instead:
  *
  * - A slide that fits the screen: the swipe is read for intent (distance or
- *   speed) and the page moves exactly one slide, however hard the flick. There
- *   is no native momentum to overshoot with, because the controller owns the
- *   gesture.
- * - A slide taller than the screen scrolls natively inside itself. A swipe that
- *   starts at its top or bottom edge, heading out, moves to the neighbouring
- *   slide; momentum that would carry past an edge is stopped at the edge.
- * - Input that arrives during a transition is swallowed, and the first ~120 ms
+ *   speed) and the page moves exactly one slide, however hard the flick.
+ * - A slide taller than the screen ("long") becomes its own scroll container,
+ *   one screen tall (class `long`, styled in index.astro). Inside it, scrolling
+ *   is the browser's own: native momentum, rubber band, nothing intercepted.
+ *   `overscroll-behavior: contain` stops that momentum at the slide's edge, so
+ *   a flick to the end can never carry into the next slide. Only a new gesture
+ *   that starts at the edge and pulls deliberately outwards (HANDOFF px, or a
+ *   quick flick) hands over to the neighbouring slide.
+ *   Earlier versions scrolled long slides in the page itself and stopped the
+ *   momentum at the edge by clipping the root and jumping back, then snapped
+ *   the page into place once it stopped: on iOS that fought the momentum and
+ *   the toolbar, and read as jumps.
+ * - The page itself only ever moves by this controller, one slide at a time;
+ *   input that arrives during a transition is swallowed, and the first ~120 ms
  *   after it are a cooldown, so one hard flick cannot become two moves.
- * - Keyboard (arrows, Page Up/Down, Space, Home/End), in-page anchors (#contact)
- *   and the back button work: positions are read back from the page, never
- *   kept only in a counter. No history entries are added per slide.
+ * - Arriving at a long slide from below lands on its end, so reading back up
+ *   continues where it left off; arriving from above lands on its start.
+ * - Keyboard (arrows, Page Up/Down, Space, Home/End) pages through a long slide
+ *   before leaving it; in-page anchors (#contact) and the back button work;
+ *   the slide and each long slide's own position are restored on return.
  * - Reduce Motion: moves are instant jumps instead of animated.
  *
  * Long-form pages never load this: it only runs on html.snap (the homepage).
@@ -30,9 +35,11 @@ type Opts = { root: HTMLElement; slides: HTMLElement[] };
 
 const DUR = 460;                  // ms per slide transition
 const COOLDOWN = 120;             // ms after a transition during which input is ignored
-const MIN_DIST = 36;              // px of travel that counts as intent
+const MIN_DIST = 36;              // px of travel that counts as intent on a slide that fits
 const MIN_SPEED = 0.35;           // px/ms at release that counts as intent (a short flick)
-const EDGE = 2;                   // px slack when deciding a tall slide is at its edge
+const HANDOFF = 56;               // px pulled past a long slide's edge to leave it
+const HANDOFF_SPEED = 0.5;        // or a flick at least this fast (and 16 px long)
+const EDGE = 2;                   // px slack when deciding a scroller is at its edge
 
 const ease = (t: number) => (t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
 
@@ -50,7 +57,6 @@ export function initSections({ root, slides }: Opts) {
     return y;
   };
   const tops = () => slides.map(docTop);
-  const heights = () => slides.map((s) => s.offsetHeight);
   const vh = () => innerHeight;
   /** Slide whose span holds the viewport's top edge (with slack). */
   const current = () => {
@@ -59,17 +65,27 @@ export function initSections({ root, slides }: Opts) {
     for (let k = 0; k < t.length; k++) if (t[k] <= y) i = k;
     return i;
   };
-  const isTall = (i: number) => heights()[i] > vh() + EDGE;
-  /** Lowest scroll position that still shows only slide i. */
-  const endOf = (i: number) => tops()[i] + Math.max(0, heights()[i] - vh());
+  const isLong = (s: HTMLElement) => s.classList.contains('long');
+  const maxIn = (s: HTMLElement) => Math.max(0, s.scrollHeight - s.clientHeight);
+  const atTop = (s: HTMLElement) => !isLong(s) || s.scrollTop <= EDGE;
+  const atEnd = (s: HTMLElement) => !isLong(s) || s.scrollTop >= maxIn(s) - EDGE;
+
+  /** Give every slide taller than the screen its own scroller. A long slide's
+   *  content height is its scrollHeight; any other slide's is its box. */
+  const classify = () => {
+    for (const s of slides) {
+      const long = isLong(s) ? s.scrollHeight > s.clientHeight + EDGE : s.offsetHeight > vh() + EDGE;
+      if (long !== isLong(s)) s.classList.toggle('long', long);
+    }
+  };
+  classify();
 
   // ---- browser chrome colour -------------------------------------------------
   // The status bar, the toolbar, the safe-area strips and the overscroll area
   // take the colour of the slide on screen: its --section-bg goes into the
   // root's --chrome (html and body background, the veil's solid edges) and
   // into theme-color. The slide holding the viewport's middle counts, so the
-  // colour flips halfway through a transition, in either direction, and a
-  // tall slide keeps its colour while it scrolls inside itself.
+  // colour flips halfway through a transition, in either direction.
   const metas = [...document.querySelectorAll<HTMLMetaElement>('meta[name="theme-color"]')];
   let shown = '';
   const syncChrome = () => {
@@ -84,7 +100,6 @@ export function initSections({ root, slides }: Opts) {
   };
   syncChrome();
   addEventListener('scroll', syncChrome, { passive: true });
-  addEventListener('resize', syncChrome, { passive: true });
 
   // ---- animated move ------------------------------------------------------
   let busy = false, until = 0, raf = 0;
@@ -94,53 +109,60 @@ export function initSections({ root, slides }: Opts) {
     y = Math.max(0, Math.min(max, Math.round(y)));
     cancelAnimationFrame(raf);
     if (count) moves++;
-    if (reduce.matches || Math.abs(y - scrollY) < 2) { jump(y); until = performance.now() + COOLDOWN; return; }
+    if (reduce.matches || Math.abs(y - scrollY) < 2) { jump(y); busy = false; until = performance.now() + COOLDOWN; return; }
     busy = true;
-    // Native momentum from the gesture that triggered this (a fling inside a
-    // tall slide) would keep adding to the scroll under the animation and
-    // carry it past the target. Clipping the root kills momentum in every
-    // engine; programmatic scrolling still works while it is clipped.
-    root.style.overflow = 'hidden';
     const from = scrollY, t0 = performance.now();
     const step = (now: number) => {
       const k = Math.min(1, (now - t0) / DUR);
       jump(from + (y - from) * ease(k));
       if (k < 1) raf = requestAnimationFrame(step);
-      else { busy = false; root.style.overflow = ''; until = performance.now() + COOLDOWN; }
+      else { busy = false; until = performance.now() + COOLDOWN; }
     };
     raf = requestAnimationFrame(step);
   };
   const locked = () => busy || performance.now() < until;
-  // Read by scripts/checks/sections.mjs to tell swallowed gestures from real ones.
+  // Read by scripts/checks/sections.mjs and longsections.mjs.
   let moves = 0, starts = 0;
-  (window as any).__sections = { locked, moves: () => moves, starts: () => starts };
+  (window as any).__sections = { locked, busy: () => busy, moves: () => moves, starts: () => starts };
 
-  /** Move one slide in direction d (+1 down the page, -1 up). */
-  const move = (d: 1 | -1) => {
-    const i = current(), t = tops();
-    if (d > 0) {
-      if (isTall(i) && scrollY < endOf(i) - EDGE) return go(Math.min(endOf(i), scrollY + vh() * .85));
-      if (i < slides.length - 1) go(t[i + 1]);
-    } else {
-      // inside a tall slide, below its top: step back up within it first
-      if (scrollY > t[i] + EDGE) return go(isTall(i) ? Math.max(t[i], scrollY - vh() * .85) : t[i]);
-      if (i > 0) go(isTall(i - 1) ? endOf(i - 1) : t[i - 1]);
+  /** Show slide j, entering a long one at the end it is entered from. */
+  const enter = (j: number, from: 1 | -1) => {
+    const s = slides[j];
+    if (isLong(s)) s.scrollTop = from > 0 ? 0 : maxIn(s);
+    go(tops()[j]);
+  };
+  /** Move one step in direction d (+1 down the page, -1 up): through a long
+   *  slide a screen at a time (keyboard, header swipes), then to the next. */
+  const move = (d: 1 | -1, page = true) => {
+    const i = current(), s = slides[i];
+    if (page && isLong(s) && (d > 0 ? !atEnd(s) : !atTop(s))) {
+      s.scrollBy({ top: d * vh() * .85, behavior: reduce.matches ? 'instant' as ScrollBehavior : 'smooth' });
+      return;
     }
+    if (i + d >= 0 && i + d < slides.length) enter(i + d, d);
   };
 
   // ---- touch --------------------------------------------------------------
   // `mode` is decided on the first move of each gesture:
-  //   'own'    — the controller handles it (slide fits, or leaving a tall slide)
-  //   'native' — let the browser scroll inside a tall slide
+  //   'own'    — a slide that fits: the controller reads the swipe
+  //   'edge'   — at a long slide's edge, heading out: a possible handoff
+  //   'native' — inside a long slide: the browser scrolls it
   let sy = 0, st = 0, ly = 0, lt = 0, v = 0, touching = false;
-  let mode: 'own' | 'native' | null = null;
+  let mode: 'own' | 'edge' | 'native' | null = null;
   let stale = false;              // gesture began during a transition: swallow all of it
+  let scroller: HTMLElement | null = null, top0 = false, end0 = false, inside = false;
 
   addEventListener('touchstart', (e) => {
     if (e.touches.length !== 1) { mode = 'native'; return; }
     touching = true; mode = null; stale = locked();
     if (!stale) starts++;
     sy = ly = e.touches[0].clientY; st = lt = e.timeStamp; v = 0;
+    const s = slides[current()];
+    scroller = isLong(s) ? s : null;
+    // edge state as the finger lands: a gesture that only reaches the edge
+    // on its way never counts as a pull past it
+    top0 = !!scroller && atTop(scroller); end0 = !!scroller && atEnd(scroller);
+    inside = !!scroller && scroller.contains(e.target as Node);
   }, { passive: true });
 
   addEventListener('touchmove', (e) => {
@@ -151,71 +173,31 @@ export function initSections({ root, slides }: Opts) {
     if (mode === 'native') return;
     if (mode === null) {
       if (Math.abs(dy) < 4 && !stale && !locked()) return;   // not decided yet
-      const i = current();
-      const atEnd = scrollY >= endOf(i) - EDGE, atTop = scrollY <= tops()[i] + EDGE;
-      mode = stale || locked() || !isTall(i) || (dy > 0 && atEnd) || (dy < 0 && atTop) ? 'own' : 'native';
+      if (stale || locked() || !scroller) mode = 'own';
+      else if (!inside) mode = 'own';                       // on the header: page like the keyboard
+      else if ((dy > 0 && end0) || (dy < 0 && top0)) mode = 'edge';
+      else mode = 'native';
     }
-    if (mode === 'own' && e.cancelable) e.preventDefault();
+    if (mode !== 'native' && e.cancelable) e.preventDefault();
   }, { passive: false });
-
-  /** Put the page back on a valid resting place if anything left it between
-   *  two (a fling that outran the fence, a gesture swallowed mid-fling). */
-  const rest = () => {
-    if (busy) return;
-    const i = current(), t = tops();
-    if (isTall(i)) {
-      if (scrollY > endOf(i) + EDGE) go(scrollY - endOf(i) > (t[i + 1] ?? Infinity) - scrollY ? t[i + 1] : endOf(i), false);
-    } else if (Math.abs(scrollY - t[i]) > EDGE) {
-      const next = t[i + 1] ?? t[i];
-      go(scrollY - t[i] < next - scrollY ? t[i] : next, false);
-    }
-  };
-  let restT = 0;
-  const restSoon = () => { clearTimeout(restT); restT = window.setTimeout(() => { if (!touching) rest(); }, 140); };
 
   const end = (e: TouchEvent) => {
     if (!touching) return;
     touching = false;
-    restSoon();
-    if (mode === 'native' && fence && !locked()) {
-      // A slow drag inside a tall slide can pull past its edge with no momentum
-      // left to fence. Past a fifth of the screen it reads as "next slide";
-      // less than that springs back to the edge.
-      // A fast flick counts too: at release the scroll position lags the
-      // finger by a frame or two, so distance alone undercounts it.
-      const y = scrollY, t = tops(), i = slides.findIndex((_, k) => t[k] === fence![0]);
-      const far = (px: number) => px > vh() * .2 || Math.abs(v) >= MIN_SPEED;
-      if (y > fence[1] + EDGE) go(far(y - fence[1]) && v > 0 && i < slides.length - 1 ? t[i + 1] : fence[1]);
-      else if (y < fence[0] - EDGE) go(far(fence[0] - y) && v < 0 && i > 0 ? (isTall(i - 1) ? endOf(i - 1) : t[i - 1]) : fence[0]);
-      mode = null; return;
-    }
-    if (mode !== 'own' || stale || locked()) { mode = null; return; }
+    const m = mode; mode = null;
+    if (m === 'native' || m === null || stale || locked()) return;
     const dy = sy - ly, dt = Math.max(1, e.timeStamp - st);
     // speed over the last stretch of the gesture, or over the whole of a very short one
     const speed = Math.max(Math.abs(v), Math.abs(dy) / dt);
-    if (Math.abs(dy) >= MIN_DIST || (speed >= MIN_SPEED && Math.abs(dy) >= 8)) move(dy > 0 ? 1 : -1);
-    mode = null;
+    const d = dy > 0 ? 1 : -1;
+    if (m === 'edge') {
+      if (Math.abs(dy) >= HANDOFF || (speed >= HANDOFF_SPEED && Math.abs(dy) >= 16)) move(d, false);
+    } else if (Math.abs(dy) >= MIN_DIST || (speed >= MIN_SPEED && Math.abs(dy) >= 8)) {
+      move(d, !scroller || !inside);
+    }
   };
   addEventListener('touchend', end, { passive: true });
   addEventListener('touchcancel', () => { touching = false; mode = null; }, { passive: true });
-
-  // Momentum inside a tall slide must stop at its edge rather than carry the
-  // reader half into the next slide; the next swipe then crosses over.
-  let fence: [number, number] | null = null;
-  addEventListener('touchstart', () => {
-    const i = current();
-    fence = isTall(i) ? [tops()[i], endOf(i)] : null;
-  }, { passive: true });
-  addEventListener('scroll', () => {
-    if (busy || touching) return;
-    restSoon();                       // once scrolling stops, make sure it stopped somewhere valid
-    if (!fence) return;
-    if (scrollY > fence[1] + 1 || scrollY < fence[0] - 1) {
-      root.style.overflow = 'hidden';               // stop the fling, as in go()
-      jump(scrollY > fence[1] ? fence[1] : fence[0]);
-      requestAnimationFrame(() => requestAnimationFrame(() => { if (!busy) root.style.overflow = ''; }));
-    }
-  }, { passive: true });
 
   // ---- keyboard -------------------------------------------------------------
   addEventListener('keydown', (e) => {
@@ -225,32 +207,82 @@ export function initSections({ root, slides }: Opts) {
     const down = e.key === 'ArrowDown' || e.key === 'PageDown' || (e.key === ' ' && !e.shiftKey);
     const up = e.key === 'ArrowUp' || e.key === 'PageUp' || (e.key === ' ' && e.shiftKey);
     if (down || up) { e.preventDefault(); if (!locked()) move(down ? 1 : -1); }
-    else if (e.key === 'Home') { e.preventDefault(); go(0); }
-    else if (e.key === 'End') { e.preventDefault(); go(tops()[slides.length - 1]); }
+    else if (e.key === 'Home') { e.preventDefault(); enter(0, 1); }
+    else if (e.key === 'End') { e.preventDefault(); enter(slides.length - 1, 1); }
   });
 
-  // ---- anchors and history --------------------------------------------------
-  // In-page links (#contact) land on their slide's top with the same motion.
+  // ---- anchors, history and restoration ------------------------------------
+  /** Bring an element into view: its slide, and inside a long slide, the
+   *  element itself just below the header. */
+  const reveal = (target: HTMLElement, animate: boolean) => {
+    const k = slides.findIndex((s) => s.contains(target));
+    if (k < 0) return false;
+    const s = slides[k];
+    if (isLong(s)) {
+      const hdr = document.getElementById('hdr')?.offsetHeight ?? 0;
+      s.scrollTop = target === s ? 0 : target.getBoundingClientRect().top - s.getBoundingClientRect().top + s.scrollTop - hdr - 16;
+    }
+    if (animate) go(tops()[k]); else jump(tops()[k]);
+    return true;
+  };
   document.addEventListener('click', (e) => {
     const a = (e.target as HTMLElement | null)?.closest?.('a[href^="#"]') as HTMLAnchorElement | null;
     if (!a || e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey) return;
     const target = a.hash.length > 1 && document.getElementById(decodeURIComponent(a.hash.slice(1)));
-    const slide = target && slides.find((s) => s.contains(target));
-    if (!slide) return;
+    if (!target || !slides.some((s) => s.contains(target))) return;
     e.preventDefault();
-    history.pushState(null, '', a.hash);                // a link click is a real navigation
-    go(tops()[slides.indexOf(slide)]);
+    history.pushState(null, '', a.hash);               // a link click is a real navigation
+    reveal(target, true);
   });
-  // Back/forward between #hashes, and returning to the page from bfcache:
-  // settle onto whichever slide the browser restored.
+
+  // Each long slide's own position is not something the browser restores, so
+  // it travels in this history entry's state, with the slide index.
+  const save = () => {
+    try {
+      history.replaceState({ ...(history.state || {}), sections: { i: current(), inner: slides.map((s) => s.scrollTop) } }, '');
+    } catch {}
+  };
+  let saveT = 0;
+  const saveSoon = () => { clearTimeout(saveT); saveT = window.setTimeout(save, 200); };
+  for (const s of slides) s.addEventListener('scroll', saveSoon, { passive: true });
+  addEventListener('scroll', saveSoon, { passive: true });
+  addEventListener('pagehide', save);
+
+  /** Put the page on a slide: a restored position, the hash target, or the
+   *  slide the browser's own restoration left in view. */
   const settle = () => {
+    cancelAnimationFrame(raf); busy = false;
+    classify();
+    const saved = history.state?.sections as { i: number; inner: number[] } | undefined;
+    if (saved && saved.i >= 0 && saved.i < slides.length) {
+      slides.forEach((s, k) => { if (isLong(s)) s.scrollTop = saved.inner[k] ?? 0; });
+      jump(tops()[saved.i]);
+      return;
+    }
     const id = location.hash.slice(1);
     const target = id && document.getElementById(decodeURIComponent(id));
-    const slide = target && slides.find((s) => s.contains(target));
-    if (slide) { jump(tops()[slides.indexOf(slide)]); return; }
-    const i = current();
-    if (!isTall(i)) jump(tops()[i]);
+    if (target && reveal(target, false)) return;
+    jump(tops()[current()]);
   };
   addEventListener('popstate', settle);
   addEventListener('pageshow', (e) => { if ((e as PageTransitionEvent).persisted) settle(); });
+  if (history.state?.sections || location.hash || scrollY > 0) {
+    // run after the browser's own scroll restoration, which happens at load
+    if (document.readyState === 'complete') settle();
+    else addEventListener('load', () => requestAnimationFrame(settle), { once: true });
+  }
+
+  // A rotation or a resize can change which slides are long and where each
+  // slide starts: re-measure and stay on the same slide.
+  let resizeT = 0;
+  addEventListener('resize', () => {
+    clearTimeout(resizeT);
+    resizeT = window.setTimeout(() => {
+      if (busy || touching) return;
+      const i = current();
+      classify();
+      jump(tops()[i]);
+      syncChrome();
+    }, 120);
+  }, { passive: true });
 }
