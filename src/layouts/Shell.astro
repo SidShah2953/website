@@ -286,6 +286,22 @@ const nav = [
         transition:opacity .5s ease,transform .5s ease;
       }
       .hdr.solid .mark,.hdr.filled .mark{opacity:1;transform:none}
+
+      /* Page transitions (View Transitions API, cross-document). Browsers
+         without it navigate exactly as before. The name in the homepage hero
+         and the name in every other page's header are one element as far as
+         the transition is concerned, so leaving the homepage, the large name
+         settles into the header instead of vanishing. Arriving at the homepage
+         it is not shared (the hero runs its own entrance); see the script. */
+      @media (prefers-reduced-motion:no-preference){
+        @view-transition{ navigation:auto; }
+      }
+      .mark{ view-transition-name:site-name; }
+      html.snap .mark{ view-transition-name:none; }
+      html.snap .hero h1{ view-transition-name:site-name; }
+      ::view-transition-group(*){ animation-duration:280ms; animation-timing-function:cubic-bezier(.2,.7,.3,1); }
+      ::view-transition-old(root){ animation-duration:180ms; }
+      ::view-transition-new(root){ animation-duration:240ms; }
       .hdr nav{display:flex;gap:clamp(14px,2.4vw,30px);font-family:var(--sans);font-size:14px}
       .hdr nav a{
         text-decoration:none;color:var(--text-2);padding:4px 0;position:relative;
@@ -425,6 +441,17 @@ const nav = [
 
     <script>
       import { initSections } from '@/scripts/sections';
+      // Shared name, one direction only (see the CSS). Arriving on the homepage
+      // the hero name runs its own entrance, so it does not take part; leaving
+      // it, it only morphs into the header if it is actually on screen.
+      const heroName = document.querySelector<HTMLElement>('html.snap .hero h1');
+      if (heroName) {
+        addEventListener('pagereveal', () => { heroName.style.viewTransitionName = 'none'; });
+        addEventListener('pageswap', () => {
+          const r = heroName.getBoundingClientRect();
+          heroName.style.viewTransitionName = r.bottom > 0 && r.top < innerHeight ? 'site-name' : 'none';
+        });
+      }
       const hdr = document.getElementById('hdr')!;
       if (!hdr.classList.contains('solid')) {
         const onScroll = () => hdr.classList.toggle('filled', window.scrollY > 80);
