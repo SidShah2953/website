@@ -470,7 +470,8 @@ const nav = [
         initSections({ root, slides: [...document.querySelectorAll<HTMLElement>('.slide')] });
       } else if (root.classList.contains('snap')) {
         const slides = [...document.querySelectorAll<HTMLElement>('.slide')];
-        const fits = () => slides.every((s) => s.getBoundingClientRect().height <= innerHeight + 1);
+        // layout height: the entrance transform (translate + 0.97 scale) must not count
+        const fits = () => slides.every((s) => s.offsetHeight <= innerHeight + 1);
         const sync = () => root.classList.toggle('snap-ok', slides.length > 0 && fits());
         sync();
         addEventListener('resize', sync, { passive: true });
