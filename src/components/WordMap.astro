@@ -265,21 +265,41 @@ const laid = placed.map((p, i) => ({
   const fonts = (document as any).fonts;
   if (fonts?.ready) fonts.ready.then(() => requestAnimationFrame(settle));
   else requestAnimationFrame(settle);
-  addEventListener('resize', () => requestAnimationFrame(settle), { passive: true });
+  // Phones fire `resize` every time the address bar slides in or out, i.e. on
+  // most scrolls. The layout only depends on the map's width, so re-settle
+  // (700 O(n^2) passes plus a layout read per term) only when that changes.
+  let lastW = wm.clientWidth;
+  addEventListener('resize', () => {
+    const w = wm.clientWidth;
+    if (w !== lastW) { lastW = w; requestAnimationFrame(settle); }
+  }, { passive: true });
 
+  // The drift: each term wanders on dx = sin(.17 s + ph) * amp,
+  // dy = cos(.14 s + 1.3 ph) * .8 amp. It used to run, restyling every term
+  // every frame, for as long as the page was open, including while the map was
+  // scrolled out of view. It now stops whenever the map is off screen.
+  // Positions are a function of time, so pausing and resuming is seamless.
+  // (A looping Web Animation with the same path was tried and measured: Chrome
+  // kept it on the main thread, at roughly twice the style cost of this loop.)
   if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {
       const t0 = performance.now();
+      // read once: the per-term phase and amplitude never change
+      const motion = terms.map((t) => ({ t, ph: +(t.dataset.ph || 0), amp: +(t.dataset.amp || 2) }));
+      let raf = 0, visible = false;
       const drift = (now: number) => {
+        raf = 0;
         const s = (now - t0) / 1000;
-        for (const t of terms) {
-          const ph = +(t.dataset.ph || 0), amp = +(t.dataset.amp || 2);
+        for (const { t, ph, amp } of motion) {
           const dx = Math.sin(s * .17 + ph) * amp;
           const dy = Math.cos(s * .14 + ph * 1.3) * amp * .8;
           t.style.transform = `translate(${dx.toFixed(2)}px,${dy.toFixed(2)}px)`;
         }
-        requestAnimationFrame(drift);
+        if (visible) raf = requestAnimationFrame(drift);
       };
-      requestAnimationFrame(drift);
+      new IntersectionObserver(([e]) => {
+        visible = e.isIntersecting;
+        if (visible && !raf) raf = requestAnimationFrame(drift);
+      }, { rootMargin: '100px' }).observe(wm);
     }
   }
 </script>

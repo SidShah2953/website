@@ -118,6 +118,11 @@ const agentHeaders = () => ({
       });
       rules.push("/llms.txt\n  Content-Type: text/plain; charset=utf-8");
       rules.push("/llms-full.txt\n  Content-Type: text/plain; charset=utf-8");
+      // Everything under /_astro/ is content-hashed by Vite (CSS, JS, fonts,
+      // optimised images), so a changed file always gets a new URL. Pages'
+      // default is max-age=0 with revalidation, which costs a round trip per
+      // file on every repeat visit; these can be cached for a year.
+      rules.push("/_astro/*\n  Cache-Control: public, max-age=31536000, immutable");
       if (existsSync(join(root, "_headers")))
         throw new Error("dist/_headers already exists (public/_headers?); merge it into agentHeaders() in astro.config.mjs");
       if (rules.length > 90)

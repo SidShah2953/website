@@ -6,6 +6,8 @@ import type { HeadTags } from "@/utils/types/HeadTags";
 // Self-hosted variable fonts — no third-party request, one file per family.
 import "@fontsource-variable/newsreader";
 import "@fontsource-variable/schibsted-grotesk";
+import serifLatin from "@fontsource-variable/newsreader/files/newsreader-latin-wght-normal.woff2?url";
+import sansLatin from "@fontsource-variable/schibsted-grotesk/files/schibsted-grotesk-latin-wght-normal.woff2?url";
 // Static instances of the same two faces, for print and PDF only. Chrome embeds
 // a *variable* font in a PDF as Type 3 glyphs, which every viewer renders soft
 // and blotchy; static fonts embed as ordinary TrueType. Declaring them costs no
@@ -88,6 +90,13 @@ const nav = [
 <!DOCTYPE html>
 <html lang="en" class={snap ? "snap" : undefined}>
   <SEOTags {...headTags} />
+  {/* Every page sets its text in these two files, but the browser only finds
+      them after downloading and parsing the stylesheet. Preloading starts both
+      in the first round trip, so the real faces arrive before the first paint
+      more often and the swap from the fallback is rarer. Same URLs the CSS
+      uses (Vite hashes the file, not the importer). */}
+  <link rel="preload" href={serifLatin} as="font" type="font/woff2" crossorigin />
+  <link rel="preload" href={sansLatin} as="font" type="font/woff2" crossorigin />
   <Analytics />
   <slot name="head" />
   <body>
