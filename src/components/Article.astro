@@ -73,6 +73,7 @@ const needsDisclosure = themes.some(([slug]) => FINANCIAL.has(slug));
 const lift = ([r, g, b]: [number, number, number], k = 0.3): string =>
   `rgb(${Math.round(r + (234 - r) * k)},${Math.round(g + (243 - g) * k)},${Math.round(b + (245 - b) * k)})`;
 ---
+<div class="progress" aria-hidden="true"></div>
 <article class="page">
   <div class="shell">
     <div class="rail"></div>
@@ -193,6 +194,22 @@ const lift = ([r, g, b]: [number, number, number], k = 0.3): string =>
 </article>
 
 <style>
+  /* Reading progress: a hairline under the header that fills with the page's
+     scroll. Driven by a scroll timeline, so it runs on the compositor with no
+     script, and it is fixed-position so it never moves the layout. Browsers
+     without scroll-driven animations show nothing. */
+  .progress{ display:none; }
+  @supports (animation-timeline: scroll()){
+    .progress{
+      display:block;position:fixed;left:0;right:0;z-index:51;height:2px;
+      top:calc(var(--hdr-h) + env(safe-area-inset-top,0px) - 1px);
+      background:linear-gradient(90deg,var(--peacock),var(--azure) 60%,var(--iris));
+      transform-origin:0 50%;transform:scaleX(0);pointer-events:none;
+      animation:read-progress linear both;animation-timeline:scroll(root block);
+    }
+    @keyframes read-progress{ to{ transform:scaleX(1); } }
+  }
+  @media print{ .progress{ display:none!important; } }
   .page{ padding-block: calc(var(--hdr-h) + clamp(28px,6vw,72px)) clamp(48px,9vw,120px); }
 
   /* one column for everything the reader reads; the TOC sits beside it */
