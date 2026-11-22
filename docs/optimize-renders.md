@@ -130,18 +130,30 @@ Not built, for Sid to pick:
 8. **Theme map ↔ list shared-element morph** (the brief's "primary joy
    moment"). High cost; worth its own pass.
 
-## Needs Sid
+## Follow-ups Sid approved (2026-11-22)
 
-- **Laptop hero frame rate.** Rendering the hero at 1.5 canvas pixels per CSS
-  pixel instead of 2 draws 44% fewer pixels and should hold 60 fps on a
-  2x laptop; measured image difference is 0.13 to 0.18 levels in 255 on
-  average, under 0.5% of pixels off by more than 8 (specular glints). This
-  reverses "full quality on every device", so it is not on the branch.
-- **Seven colour tokens point at themselves** since 2026-08-30 (`--header-bg`,
-  `--haze-teal/navy/iris`, `--surface-3`, `--code-bg`, `--selection` in
-  `Shell.astro`, e.g. `--header-bg:var(--header-bg)`), so they resolve to
-  nothing: interior headers have no fill (blur only), the homepage haze blobs
-  never draw, inline code has no chip and text selection uses the default.
-  The values before that commit are in `7a39920^`. Restoring them changes the
-  live look, so it is left for Sid.
-- **Blog index CLS 0.31 on phones** (main as well): not caused by this branch.
+Each is its own commit.
+
+- **Laptop hero at 1.5x** (fine-pointer devices; phones keep 2x). Laptop
+  profile, homepage: frame p95 50 → 16.8 ms, p99 67 → 16.8 ms, frames over
+  33 ms 14.5% → 0%; GPU per frame (top / bottom of page) 17-23 / 31-42 ms →
+  9.8 / 19.2 ms. Shader source still pixel-identical to main.
+- **Seven self-referencing tokens restored** (`--header-bg`, `--haze-*`,
+  `--surface-3`, `--code-bg`, `--selection`) to their pre-7a39920 literals,
+  with the teal haze (#0E5560 → #0E4260) and selection moved to the blue
+  accent as 5148d06 did for every other tint. On screen: interior headers are
+  filled again (rgba(5,12,15,.72)), inline code has its chip, the homepage
+  haze draws. Print and PDF (light and dark) compute exactly as before: the
+  header is hidden there and print.css sets its own code colours. Interior
+  theme-color follows the filled header: #051016 (top row 1 level off).
+  The haze adds about 1 ms of GPU per frame on the phone profile (M5).
+- **Blog index layout shift**: the cause was the font swap. Georgia runs ~7%
+  wider than Newsreader 300, so paragraphs re-wrapped when the web font
+  arrived. Metric-matched local fallback faces (size-adjust and ascent /
+  descent overrides, measured over the page's own text) fix it: phone CLS
+  on /blog/ 0.33 → 0.0003, and 0 on the homepage and posts. Android has no
+  Georgia or Helvetica, so it falls through to its own serif unadjusted;
+  only a real Android phone shows how much that moves.
+
+Re-run after these: gestures 360 of 360; phone frame p95 16.8 ms; edges 0 / 0
+on the homepage, top row 1 level off theme-color on interior pages.
