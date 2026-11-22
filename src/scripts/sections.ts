@@ -63,6 +63,29 @@ export function initSections({ root, slides }: Opts) {
   /** Lowest scroll position that still shows only slide i. */
   const endOf = (i: number) => tops()[i] + Math.max(0, heights()[i] - vh());
 
+  // ---- browser chrome colour -------------------------------------------------
+  // The status bar, the toolbar, the safe-area strips and the overscroll area
+  // take the colour of the slide on screen: its --section-bg goes into the
+  // root's --chrome (html and body background, the veil's solid edges) and
+  // into theme-color. The slide holding the viewport's middle counts, so the
+  // colour flips halfway through a transition, in either direction, and a
+  // tall slide keeps its colour while it scrolls inside itself.
+  const metas = [...document.querySelectorAll<HTMLMetaElement>('meta[name="theme-color"]')];
+  let shown = '';
+  const syncChrome = () => {
+    const t = tops(), mid = scrollY + vh() / 2;
+    let i = 0;
+    for (let k = 0; k < t.length; k++) if (t[k] <= mid) i = k;
+    const c = getComputedStyle(slides[i]).getPropertyValue('--section-bg').trim();
+    if (!c || c === shown) return;
+    shown = c;
+    root.style.setProperty('--chrome', c);
+    for (const m of metas) m.content = c;
+  };
+  syncChrome();
+  addEventListener('scroll', syncChrome, { passive: true });
+  addEventListener('resize', syncChrome, { passive: true });
+
   // ---- animated move ------------------------------------------------------
   let busy = false, until = 0, raf = 0;
   const jump = (y: number) => window.scrollTo({ top: y, behavior: 'instant' as ScrollBehavior });

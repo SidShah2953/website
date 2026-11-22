@@ -133,6 +133,11 @@ const desc =
   .slide{
     min-height:100svh;display:flex;flex-direction:column;justify-content:center;
     position:relative;scroll-snap-align:start;scroll-snap-stop:always;
+    /* What the browser's bars and the page edges take while this slide is on
+       screen (read by src/scripts/sections.ts into --chrome and theme-color).
+       Every slide sits on the ground today; a slide with its own background
+       sets this to that colour. */
+    --section-bg:var(--ground);
   }
   .hero{padding:0 clamp(18px,6vw,80px);isolation:isolate}
   .hero-copy{position:relative;z-index:2;max-width:1180px;margin:0 auto;width:100%}
@@ -153,11 +158,19 @@ const desc =
      page has to arrive at exactly that colour where it meets them; it used to
      end at 80% ground over the lit surface, which left a visibly lighter band
      right above a flat near-black toolbar. */
+  /* The solid part covers the whole safe area, not just the edge pixel: the
+     status bar and the home indicator / toolbar sit on those strips, and a
+     gradient that only reached ground at 100% let the lit surface show through
+     them as a lighter band (up to 28 levels off at 320x568). The navy fade
+     starts where the safe area ends. The colour is --chrome, the current
+     section's --section-bg (set by src/scripts/sections.ts). */
   @media(max-width:860px){
     .veil{background:linear-gradient(180deg,
-      var(--ground) 0%, color-mix(in srgb, var(--ground) 80%, transparent) 6%,
+      var(--chrome) 0, var(--chrome) env(safe-area-inset-top,0px),
+      color-mix(in srgb, var(--chrome) 80%, transparent) calc(env(safe-area-inset-top,0px) + 6svh),
       var(--scrim-1) 38%, var(--scrim-1) 70%,
-      color-mix(in srgb, var(--ground) 80%, transparent) 90%, var(--ground) 100%)}
+      color-mix(in srgb, var(--chrome) 80%, transparent) calc(100% - env(safe-area-inset-bottom,0px) - 10svh),
+      var(--chrome) calc(100% - env(safe-area-inset-bottom,0px)), var(--chrome) 100%)}
   }
   /* content rides above the fixed surface + veil */
   .slide{ z-index:1; }

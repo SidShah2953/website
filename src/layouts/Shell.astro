@@ -257,9 +257,13 @@ const nav = [
          the areas mobile browsers paint behind their bars take the root
          background; leaving it to propagate from body worked, but one later
          body background change would turn those strips a different colour. */
-      html{scroll-behavior:smooth;-webkit-font-smoothing:antialiased;background:var(--ground)}
+      /* --chrome is the colour of the page's edges: the ground everywhere,
+         except that on the homepage the section controller sets it to the
+         current slide's --section-bg, together with theme-color. */
+      :root{ --chrome:var(--ground); }
+      html{scroll-behavior:smooth;-webkit-font-smoothing:antialiased;background:var(--chrome)}
       body{
-        margin:0;background:var(--ground);color:var(--text);
+        margin:0;background:var(--chrome);color:var(--text);
         overflow-wrap:break-word;
         font-family:var(--serif);font-weight:300;line-height:1.62;
         font-size:17px;

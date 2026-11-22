@@ -60,7 +60,13 @@ git show main:src/components/Surface.astro > /tmp/old.astro
 node scripts/checks/shader.mjs /tmp/old.astro     # shader cost + pixel diff vs another version
 node scripts/checks/sections.mjs --n 120          # touch gestures: one section per swipe
 node scripts/checks/edges.mjs                     # page edge colour vs the phone's bars
+node scripts/checks/chrome.mjs                    # bar colour follows each section, down and back up
 ```
+
+On the homepage the browser's bars follow the section on screen: each `.slide`
+sets `--section-bg`, and the section controller copies the current one into
+`--chrome` (html and body background, the veil's solid edges) and into
+`theme-color`. A slide with its own background only needs to set that variable.
 
 `perf.mjs` runs a phone profile (390x844 at 3x, 4x CPU throttle, slow 4G) and a
 laptop profile (1440x900 at 2x), with analytics requests blocked. Frame times
